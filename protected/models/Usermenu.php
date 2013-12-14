@@ -149,7 +149,7 @@ class Usermenu extends CActiveRecord
 		return $menu;
 	}
 
-	public function getPositions()
+	public static function getPositions()
 	{
 		$count = Usermenu::model()->count();
 		$return = array();
