@@ -1,0 +1,13 @@
+php_flag display_errors Off
+php_flag session.cookie_httponly On
+AddDefaultCharset UTF-8
+Options -Indexes +FollowSymLinks
+
+RewriteEngine on
+
+# if a directory or a file exists, use it directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# otherwise forward it to index.php
+RewriteRule . index.php
