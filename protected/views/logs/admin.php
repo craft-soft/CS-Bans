@@ -1,16 +1,17 @@
 <?php
 /**
  * Управление логами
- *
+ */
+
+/**
  * @author Craft-Soft Team
+ * @package CS:Bans
  * @version 1.0 beta
  * @copyright (C)2013 Craft-Soft.ru.  Все права защищены.
- * @package CS:Bans
  * @link http://craft-soft.ru/
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru  «Attribution-NonCommercial-ShareAlike»
  */
-?>
 
-<?php
 $this->pageTitle = Yii::app()->name . ' :: Админцентр - Системный лог';
 $this->breadcrumbs = array(
 	'Админцентр' => array('/admin/index'),

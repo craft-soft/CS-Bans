@@ -1,13 +1,15 @@
 <?php
 /**
  * Вьюшка управления серверами
- *
+ */
+
+/**
  * @author Craft-Soft Team
- * @version 6.1 beta
+ * @package CS:Bans
+ * @version 1.0 beta
  * @copyright (C)2013 Craft-Soft.ru.  Все права защищены.
- * @package AmxBans
  * @link http://craft-soft.ru/
- *
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru  «Attribution-NonCommercial-ShareAlike»
  */
 
 $this->pageTitle = Yii::app()->name .' :: Админцентр - Управление серверами';

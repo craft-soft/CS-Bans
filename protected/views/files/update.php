@@ -1,12 +1,15 @@
 <?php
 /**
  * Вьюшка редактирования файла
- *
+ */
+
+/**
  * @author Craft-Soft Team
+ * @package CS:Bans
  * @version 1.0 beta
  * @copyright (C)2013 Craft-Soft.ru.  Все права защищены.
- * @package CS:Bans
  * @link http://craft-soft.ru/
+ * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru  «Attribution-NonCommercial-ShareAlike»
  */
 
 $this->pageTitle = Yii::app()->name . ' :: Редактировать файл';
