@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <?php
 /**
  * MOTD окно. Показывается забаненному игроку в игре
@@ -12,7 +13,6 @@
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru  «Attribution-NonCommercial-ShareAlike»
  */
 ?>
-<!DOCTYPE html>
 <html>
 <head>
 	<title>Детали бана</title>
