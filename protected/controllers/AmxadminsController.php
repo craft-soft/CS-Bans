@@ -170,7 +170,7 @@ class AmxadminsController extends Controller
 			Yii::app()->end($js);
 		}
 
-		$this->render('adminsonservers');
+		$this->render('adminsonservers', array('servers'=>Serverinfo::model()->cache(600)->findAll(),));
 	}
 
 	/**

@@ -111,12 +111,8 @@ class Serverinfo extends CActiveRecord
 		));
 	}
 
-	protected function afterFind() {
-		parent::afterFind();
 
-		if(!$this->amxban_motd)
-			$this->amxban_motd = 'http://'.$_SERVER['SERVER_NAME'] . Yii::app()->urlManager->baseUrl . DIRECTORY_SEPARATOR . 'motd.php?sid=%s&adm=%d&lang=%s';
-
+	public function getInfo() {
 		$sip = explode(':',  $this->address);
 		include_once ROOTPATH . '/include/lgsl_query.php';
 		$server = query_live('halflife', $sip[0], $sip[1], $sip[1], '0', 'spet');
@@ -126,23 +122,23 @@ class Serverinfo extends CActiveRecord
 		$fields = lgsl_sort_fields($server, $fields_show, $fields_hide, FALSE);
 		$server = lgsl_sort_players($server);
 		$rules = array();
-		$this->online = $server['b']['status'];
+		$info['online'] = $server['b']['status'];
 		
-		if($this->online)
+		if($info['online'])
 		{
-			$this->players = $server['s']['players'];
-			$this->playersmax = $server['s']['playersmax'];
-			$this->name = $server['s']['name'];
-			$this->map = $server['s']['map'];
-			$this->game = $server['s']['game'];
-			$this->os = $server['e']['os'] == 'l' ? 'Linux' : 'Windows';
-			$this->secure = $server['e']['anticheat'] == 0 ? FALSE : TRUE;
-			$this->playersinfo = is_array($server['p']) ? $server['p'] : array();
-			$this->timeleft = isset($server['e']['amx_timeleft'])?$server['e']['amx_timeleft']:false;
-			$this->nextmap = isset($server['e']['amx_nextmap'])?$server['e']['amx_nextmap']:FALSE;
-			$this->contact = isset($server['e']['sv_contact'])?$server['e']['sv_contact']:FALSE;
-			$game = $this->gametype ? $this->gametype : $this->game;
-			$this->modimg = Yii::app()->urlManager->baseUrl .
+			$info['players'] = $server['s']['players'];
+			$info['playersmax'] = $server['s']['playersmax'];
+			$info['name'] = $server['s']['name'];
+			$info['map'] = $server['s']['map'];
+			$info['game'] = $server['s']['game'];
+			$info['os'] = $server['e']['os'] == 'l' ? 'Linux' : 'Windows';
+			$info['secure'] = $server['e']['anticheat'] == 0 ? FALSE : TRUE;
+			$info['playersinfo'] = is_array($server['p']) ? $server['p'] : array();
+			$info['timeleft'] = isset($server['e']['amx_timeleft'])?$server['e']['amx_timeleft']:false;
+			$info['nextmap'] = isset($server['e']['amx_nextmap'])?$server['e']['amx_nextmap']:FALSE;
+			$info['contact'] = isset($server['e']['sv_contact'])?$server['e']['sv_contact']:FALSE;
+			$game = $this->gametype ? $this->gametype : $info['game'];
+			$info['modimg'] = Yii::app()->urlManager->baseUrl .
 					DIRECTORY_SEPARATOR .
 					"images".
 					DIRECTORY_SEPARATOR .
@@ -150,39 +146,39 @@ class Serverinfo extends CActiveRecord
 					DIRECTORY_SEPARATOR .
 					$game .
 					".gif";
-			$this->vacimg = Yii::app()->urlManager->baseUrl .
+			$info['vacimg'] = Yii::app()->urlManager->baseUrl .
 					DIRECTORY_SEPARATOR .
 					"images".
 					DIRECTORY_SEPARATOR .
-					($this->secure ? "vac.png" : "no_vac.png");
-			$this->osimg = Yii::app()->urlManager->baseUrl .
+					($info['secure'] ? "vac.png" : "no_vac.png");
+			$info['osimg'] = Yii::app()->urlManager->baseUrl .
 					DIRECTORY_SEPARATOR .
 					"images".
 					DIRECTORY_SEPARATOR .
 					"os" .
 					DIRECTORY_SEPARATOR .
-					$this->os.
+					$info['os'].
 					".png";
 
-			if(!$this->online)
+			if(!$info['online'])
 			{
 				$mapimage = Yii::app()->urlManager->baseUrl ."/images/maps/noresponse.jpg";
 			}
-			elseif(is_file(ROOTPATH ."/images/maps/" . $game . '/' . $this->map . ".jpg"))
+			elseif(is_file(ROOTPATH ."/images/maps/" . $game . '/' . $info['map'] . ".jpg"))
 			{
-				$mapimage = Yii::app()->urlManager->baseUrl . "/images/maps/" . $game . '/' . $this->map . ".jpg";
+				$mapimage = Yii::app()->urlManager->baseUrl . "/images/maps/" . $game . '/' . $info['map'] . ".jpg";
 			}
 			else
 			{
 				$mapimage = Yii::app()->urlManager->baseUrl . "/images/maps/" . $game . "/noimage.jpg";
 			}
 
-			$this->mapimg = CHtml::image($mapimage, $this->map, array('title' => $this->map, 'class' => 'img-polaroid'));
-
+			$info['mapimg'] = CHtml::image($mapimage, $info['map'], array('title' => $info['map'], 'class' => 'img-polaroid'));
+			return $info;
 		}
-		return TRUE;
+		return FALSE;
 	}
-
+	
 	public function rconCommand($command)
 	{
 		$addr = explode(':', $this->address);

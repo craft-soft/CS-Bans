@@ -12,11 +12,13 @@
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru  «Attribution-NonCommercial-ShareAlike»
  */
 
-$this->pageTitle = Yii::app()->name .' :: Сервер ' . $server->name;
+$info = $server->getInfo();
+
+$this->pageTitle = Yii::app()->name .' :: Сервер ' . $info['name'];
 
 $this->breadcrumbs=array(
 	'Серверы'=>array('index'),
-	$server->name,
+	$info['name'],
 );
 
 // Если страницу запрашивает аякс, то не отдаем ему жабаскрипт совсем
@@ -111,8 +113,8 @@ endif;
 ?>
 
 <div id="container">
-	<h2>Детали сервера &laquo;<?php echo $server->name; ?>&raquo;</h2>
-	<?php if($server->online): ?>
+	<h2>Детали сервера &laquo;<?php echo $info['name']; ?>&raquo;</h2>
+	<?php if($info): ?>
 
 	<?php if(!Yii::app()->user->isGuest): ?>
 	<p class="text-success">
@@ -123,7 +125,7 @@ endif;
 
 	<div class="row-fluid">
 		<div class="span7">
-			<?php if(is_array($server->playersinfo) && !empty($server->players)): ?>
+			<?php if(is_array($info['playersinfo']) && !empty($info['playersinfo'])): ?>
 			<h5 class="text-center">Игроки</h5>
 			<table class="table table-bordered" id="players">
 				<thead>
@@ -139,7 +141,7 @@ endif;
 				</thead>
 				<tbody>
 					<?php
-					foreach($server->playersinfo as $player):?>
+					foreach($info['playersinfo'] as $player):?>
 						<tr class="context-menu-one" id="<?php echo CHtml::encode($player['name'])?>">
 							<td><?php echo CHtml::encode($player['name'])?></td>
 							<td style="text-align: center"><?php echo CHtml::encode($player['score'])?></td>
@@ -157,7 +159,7 @@ endif;
 			<table class="table table-bordered">
 				<tr>
 					<td style="text-align: center" colspan="2">
-						<?php echo $server->mapimg; ?>
+						<?php echo $info['mapimg']; ?>
 					</td>
 				</tr>
 				<tr>
@@ -178,7 +180,7 @@ endif;
 						Карта:
 					</td>
 					<td>
-						 <?php echo CHtml::encode($server->map); ?>
+						 <?php echo CHtml::encode($info['map']); ?>
 					</td>
 				</tr>
 				<tr>
@@ -187,37 +189,37 @@ endif;
 					</td>
 					<td>
 						 <?php
-						 echo CHtml::encode($server->players) . '/' . CHtml::encode($server->playersmax);
+						 echo CHtml::encode($info['players']) . '/' . CHtml::encode($info['playersmax']);
 						 ?>
 					</td>
 				</tr>
-				<?php if($server->nextmap):?>
+				<?php if($info['nextmap']):?>
 				<tr>
 					<td class="bold">
 						Следующая карта:
 					</td>
 					<td>
-						 <?php echo CHtml::encode($server->nextmap); ?>
+						 <?php echo CHtml::encode($info['nextmap']); ?>
 					</td>
 				</tr>
 				<?php endif?>
-				<?php if($server->timeleft):?>
+				<?php if($info['timeleft']):?>
 				<tr>
 					<td class="bold">
 						До смены карты:
 					</td>
 					<td>
-						 <?php echo CHtml::encode($server->timeleft); ?>
+						 <?php echo CHtml::encode($info['timeleft']); ?>
 					</td>
 				</tr>
 				<?php endif?>
-				<?php if($server->contact):?>
+				<?php if($info['contact']):?>
 				<tr>
 					<td class="bold">
 						Контакты:
 					</td>
 					<td>
-						 <?php echo CHtml::encode($server->contact); ?>
+						 <?php echo CHtml::encode($info['contact']); ?>
 					</td>
 				</tr>
 				<?php endif?>

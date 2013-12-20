@@ -46,6 +46,7 @@ class SiteController extends Controller
 
 		$this->render('index',array(
 			'bans' => $bans,
+			'servers' => Serverinfo::model()->findAll(),
 		));
 	}
 

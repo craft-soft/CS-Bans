@@ -18,6 +18,7 @@ if(Yii::app()->config->start_page !== '/site/index')
 
 $this->pageTitle=Yii::app()->name;
 
+/*
 Yii::app()->clientScript->registerScript('', '
 $.post(
 	"'.$this->createUrl('/serverinfo/getinfo', array('limit' => 10, 'page' => 'siteindex', 'colspan' => 3)).'",
@@ -25,6 +26,8 @@ $.post(
 	function(data) {$("#servers").html(data);}
 );
 ');
+ * 
+ */
 ?>
 
 <?php
@@ -87,15 +90,45 @@ $this->beginWidget('bootstrap.widgets.TbHeroUnit',array(
 				</tr>
 			</thead>
 			<tbody id="servers">
-				<tr class="warning">
+				<?php foreach($servers as $server):?>
+				<tr class="warning" id="server<?php echo intval($server['id'])?>">
 					<td colspan="3">
-						Получение информации с серверов
+						<?php echo $server['hostname']?>
 						&nbsp;
 						<?php echo CHtml::image(Yii::app()->baseUrl . '/images/loading.gif'); ?>
 					</td>
 				</tr>
+				<?php endforeach;?>
 			</tbody>
 		</table>
 
 	</div>
 </div>
+<script>
+	$(document).ready(function(){
+	<?php foreach($servers as $server):?>
+		$.post(
+			"<?php echo $this->createUrl('/serverinfo/getinfo')?>",
+			{
+				'<?php echo Yii::app()->request->csrfTokenName ?>': '<?php echo Yii::app()->request->csrfToken ?>',
+				'server': '<?php echo intval($server['id'])?>'
+			},
+			function(data){
+				var ret;
+				var info = $.parseJSON(data);
+				var elem = $('#server<?php echo intval($server['id'])?>');
+				if(!info)
+				{
+					ret = '<td colspan="3"><?php echo $server['hostname']?> <b>Не отвечает</b></td>';
+					elem.addClass('error');
+				}
+				else
+				{
+					ret = '<td>' + info.name + '</td><td>' + info.players + '/' + info.playersmax + '</td><td>' + info.map + '</td>';
+				}
+				elem.removeClass('warning').html(ret);
+			}
+		);
+	<?php endforeach;?>
+	});
+</script>

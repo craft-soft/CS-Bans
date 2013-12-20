@@ -24,9 +24,9 @@ $this->renderPartial('/admin/mainmenu', array('active' =>'server', 'activebtn' =
 <?php
 
 Yii::app()->clientScript->registerScript('serverview', '
-$(".servtr").live("click", function(){
+$(".servtr").css("cursor", "pointer").live("click", function(){
 	$("#loading").show();
-	var sid = this.id.substr(5);
+	var sid = this.id.substr(6);
 	$.post(
 		"",
 		{
@@ -39,11 +39,7 @@ $(".servtr").live("click", function(){
 		}
 	);
 });
-$.post(
-	"'.Yii::app()->createUrl('/serverinfo/getinfo', array('page' => 'serveradmins')).'",
-	{"'.Yii::app()->request->csrfTokenName.'": "'.Yii::app()->request->csrfToken.'"},
-	function(data) {$("#servers").html(data);}
-);
+
 ');
 
 Yii::app()->clientScript->registerScript('checkaccess', '
@@ -62,19 +58,19 @@ function checkaccess(hash)
 <table class="table table-bordered table-condensed table-striped">
 	<thead>
 		<tr>
-			<th style="width: 20px">Мод</th>
-			<th style="width: 150px">Адрес</th>
-			<th>Имя</th>
+			<th>Название</th>
+			<th>Адрес</th>
+			<th style="width: 50px">Версия</th>
 		</tr>
 	</thead>
 	<tbody id="servers">
-		<tr class="warning">
-			<td colspan="7">
-				Получение информации с серверов
-				&nbsp;
-				<?php echo CHtml::image(Yii::app()->baseUrl . '/images/loading.gif'); ?>
-			</td>
+		<?php foreach($servers as $server):?>
+		<tr class="servtr" id="server<?php echo intval($server['id'])?>">
+			<td><?php echo CHtml::encode($server['hostname'])?></td>
+			<td><?php echo CHtml::encode($server['address'])?></td>
+			<td><?php echo CHtml::encode($server['amxban_version'])?></td>
 		</tr>
+		<?php endforeach;?>
 	</tbody>
 </table>
 <div id="ololo"></div>

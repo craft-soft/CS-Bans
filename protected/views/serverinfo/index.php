@@ -19,9 +19,9 @@ $this->breadcrumbs=array(
 );
 
 Yii::app()->clientScript->registerScript('serverview', '
-$(".servtr").live("click", function(){
+$(".servtr").css("cursor", "pointer").live("click", function(){
 	$("#loading").show();
-	var sid = this.id.substr(5);
+	var sid = this.id.substr(6);
 	$.post(
 		"'.Yii::app()->urlManager->createUrl('/serverinfo/serverdetail').'",
 		{
@@ -33,11 +33,6 @@ $(".servtr").live("click", function(){
 		}
 	);
 });
-$.post(
-	"'.Yii::app()->createUrl('/serverinfo/getinfo').'",
-	{"'.Yii::app()->request->csrfTokenName.'": "'.Yii::app()->request->csrfToken.'"},
-	function(data) {$("#servers").html(data);}
-);
 ');
 
 ?>
@@ -59,13 +54,15 @@ $.post(
 					</tr>
 				</thead>
 				<tbody id="servers">
-					<tr class="warning">
+					<?php foreach($servers as $server):?>
+					<tr class="servtr warning" id="server<?php echo intval($server['id'])?>">
 						<td colspan="7">
-							Получение информации с серверов
+							<?php echo $server['hostname']?>
 							&nbsp;
 							<?php echo CHtml::image(Yii::app()->baseUrl . '/images/loading.gif'); ?>
 						</td>
 					</tr>
+					<?php endforeach;?>
 				</tbody>
 			</table>
 		</div>
@@ -149,7 +146,7 @@ $.post(
 									<b>Серверов:</b>
 								</div>
 								<div class="span4">
-									<?php echo $info['servers']; ?>
+									<?php echo $info['serversCount']; ?>
 								</div>
 							</div>
 						</td>
@@ -218,3 +215,37 @@ $.post(
     )); ?>
 </div>
 <?php $this->endWidget(); ?>
+<script>
+	$(document).ready(function(){
+	<?php foreach($servers as $server):?>
+		$.post(
+			"<?php echo $this->createUrl('/serverinfo/getinfo')?>",
+			{
+				'<?php echo Yii::app()->request->csrfTokenName ?>': '<?php echo Yii::app()->request->csrfToken ?>',
+				'server': '<?php echo intval($server->id)?>'
+			},
+			function(data){
+				var ret;
+				var info = $.parseJSON(data);
+				var elem = $('#server<?php echo intval($server->id)?>');
+				if(!info)
+				{
+					ret = '<td colspan="7"><?php echo $server['hostname']?> <b>Не отвечает</b></td>';
+					elem.addClass('error');
+				}
+				else
+				{
+					ret = '<td style="text-align:center"><img src="' + info.modimg + '" title="' + info.game + '" /></td>' + 
+						  '<td style="text-align:center"><img src="' + info.osimg + '" title="' + info.os + '" /></td>' +
+						  '<td style="text-align:center"><img src="' + info.vacimg + '" /></td>' + 
+						  '<td>' + info.name + '</td>' + 
+						  '<td style="text-align:center">' + info.players + '/' + info.playersmax + '</td>' + 
+						  '<td>' + info.map + '</td>' + 
+						  '<td style="text-align:center"><?php echo CHtml::link('<i class="icon-eye-open"></i>',Yii::app()->createUrl('/serverinfo/view',array('id' => $server->id)),array('rel' => 'tooltip','title' => 'Подробности'))?></td>';
+				}
+				elem.removeClass('warning').html(ret);
+			}
+		);
+	<?php endforeach;?>
+	});
+</script>

@@ -54,126 +54,16 @@ class ServerinfoController extends Controller
 	 * @param integer|false $limit Количество вывода серверов
 	 * @return string Возвращает Javascript для аякса
 	 */
-	public function actionGetinfo($limit = FALSE, $page = 'serverindex', $colspan = 7)
+	public function actionGetinfo()
 	{
-		// Если есть $limit, создаем кондицию с лимитом
-		$condition = is_numeric($limit) ? array('limit'=>intval($limit)) : NULL;
+		
+		$id = filter_input(INPUT_POST, 'server');
+		$server = $this->loadModel($id);
+		
+		if($server === NULL)
+			Yii::app()->end();
 
-		// Выбираем сервера
-		$servers = Serverinfo::model()->findAll($condition);
-
-		// Формируем вывод
-		$js = "";
-		foreach ($servers as $server)
-		{
-			// Нафик нам пустые строки
-			if(!$server) continue;
-
-			// Еслисервер офлайн, то возвращаем инфу об этом
-			if(!$server->online)
-			{
-				//$colspan = $page ? 3 : 7;
-				$js .= "<tr id=\"serv_{$server->id}\" style=\"cursor: pointer\" class=\"error servtr\"><td colspan=\"{$colspan}\"><b>".CHtml::encode($server->hostname)."</b> <small class=\"text-info\">(Сервер не отвечает...)</small></td></tr>";
-			}
-
-			// Иначе формируем таблицу с инфой
-			else {
-				
-				
-				switch($page)
-				{
-					case 'serverindex':
-						$js .= "<tr id=\"serv_".intval($server->id)." style=\"cursor: pointer\" class=\"servtr\" style=\"cursor: pointer\">";
-						
-						// Картинка мод
-						$js .= "<td style=\"text-align: center\">";
-						$js .= CHtml::image($server->modimg);
-						$js .= "</td>";
-
-						// картинка ОС
-						$js .= "<td style=\"text-align: center\">";
-						$js .= CHtml::image($server->osimg);
-						$js .= "</td>";
-
-						// Картинка VAC
-						$js .= "<td style=\"text-align: center\">";
-						$js .= CHtml::image($server->vacimg);
-						$js .= "</td>";
-
-						// Название сервера (Берется с самого сервера а не из базы)
-						$js .= "<td>";
-						$js .= CHtml::encode($server->name);
-						$js .= "</td>";
-
-						// Игроки
-						$js .= "<td>";
-						$js .= $server->players ? intval($server->players) . "/" . intval($server->playersmax) : "Нет игроков";
-						$js .= "</td>";
-
-						// Карта
-						$js .= "<td>";
-						$js .= CHtml::encode($server->map);
-						$js .= "</td>";
-
-						$js .= "<td style=\"text-align: center\">";
-						$js .= CHtml::link(
-							'<i class="icon-eye-open"></i>',
-							Yii::app()->createUrl(
-								'/serverinfo/view',
-								array(
-									'id' => $server->id
-								)
-							),
-							array(
-								'rel' => 'tooltip',
-								'title' => 'Подробности'
-							)
-						);
-						$js .= "</td>";
-						break;
-
-					case 'siteindex':
-						$js .= "<tr onclick=\"document.location.href='".$this->createUrl('view', array('id' => $server->id))."'\" style=\"cursor: pointer\">";
-						
-						// Название сервера (Берется с самого сервера а не из базы)
-						$js .= "<td>";
-						$js .= CHtml::encode($server->name);
-						$js .= "</td>";
-
-						// Игроки
-						$js .= "<td>";
-						$js .= $server->players ? intval($server->players) . "/" . intval($server->playersmax) : "Нет игроков";
-						$js .= "</td>";
-
-						// Карта
-						$js .= "<td>";
-						$js .= CHtml::encode($server->map);
-						$js .= "</td>";
-						break;
-
-					case 'serveradmins':
-						$js .= "<tr id=\"serv_".intval($server->id)."\" style=\"cursor: pointer\" class=\"servtr\">";
-						
-						// Картинка мод
-						$js .= "<td style=\"text-align: center\">";
-						$js .= CHtml::image($server->modimg);
-						$js .= "</td>";
-						// IP адрес
-						$js .= "<td>";
-						$js .= CHtml::encode($server->address);
-						$js .= "</td>";
-
-						// Название сервера
-						$js .= "<td>";
-						$js .= CHtml::encode($server->name);
-						$js .= "</td>";
-						break;
-
-				}
-				$js .= "</tr>";
-			}
-		}
-		Yii::app()->end($js);
+		Yii::app()->end(json_encode($server->getInfo()));
 	}
 
 	/**
@@ -328,14 +218,14 @@ class ServerinfoController extends Controller
 		$permbans = Bans::model()->cache(600)->count('ban_length = 0');
 
 		$this->render('index',array(
-			'servers'=>$servers,
+			'servers'=>Serverinfo::model()->cache(600)->findAll(),
 			'info' => array(
 				'bancount' => $allbans,
 				'actbans' => $activebans,
 				'permbans' => $permbans,
 				'tempbans' => $activebans - $permbans,
 				'admins' => Amxadmins::model()->cache(600)->count(),
-				'servers' => Serverinfo::model()->cache(600)->count()
+				'serversCount' => Serverinfo::model()->cache(600)->count()
 			)
 		));
 	}
@@ -373,9 +263,11 @@ class ServerinfoController extends Controller
 	public function actionServerdetail()
 	{
 		$model = Serverinfo::model()->findByPk($_POST['sid']);
+		
+		$info = $model->getInfo();
 
 		$players = "";
-		if (empty($model->playersinfo) || !is_array($model->playersinfo)) {
+		if (empty($info['playersinfo']) || !is_array($info['playersinfo'])) {
 			$players .= "<table class=\"items table table-bordered table-condensed\">";
 			$players .= "<tr class=\"odd\"><td width=\"100%\" style=\"text-align:center\">Нет игроков</td></tr></table>";
 		} else {
@@ -385,7 +277,7 @@ class ServerinfoController extends Controller
 			$players .= "<td><b>Счёт</b></td>";
 			$players .= "<td><b>Время</b></td>";
 
-			foreach ($model->playersinfo as $player_key => $player) {
+			foreach ($info['playersinfo'] as $player_key => $player) {
 				$players .= "<tr class=\"odd\">";
 				$players .= "<td width=\"70%\">" . CHtml::encode($player['name']) . "</td>";
 				$players .= "<td style=\"text-align:center\">" . intval($player['score'], ENT_QUOTES) . "</td>";
@@ -395,15 +287,15 @@ class ServerinfoController extends Controller
 			$players .= "</table>";
 		}
 
-		$js = "$('#server-name').html('" . CJavaScript::quote($model->name) . "');";
-		$js .= "$('#serverlink').html('" . CJavaScript::quote($model->name) . "').attr({'href': '".Yii::app()->createUrl('serverinfo/view', array('id'=>$model->id))."'});";
+		$js = "$('#server-name').html('" . CJavaScript::quote($info['name']) . "');";
+		$js .= "$('#serverlink').html('" . CJavaScript::quote($info['name']) . "').attr({'href': '".Yii::app()->createUrl('serverinfo/view', array('id'=>$model->id))."'});";
 		$js .= "$('#server-address').html('" . CJavaScript::quote($model->address) . "');";
 		$js .= "$('#steam-connect').attr({'href': 'steam://connect/" . CJavaScript::quote($model->address) . "'});";
 		$js .= "$('#hlws-add').attr({'href': 'hlsw://" . CJavaScript::quote($model->address) . "'});";
-		$js .= "$('#server-map').html('" . CJavaScript::quote($model->map) . "');";
-		$js .= "$('#server-players').html('" . $model->players . '/' . $model->playersmax . "');";
+		$js .= "$('#server-map').html('" . CJavaScript::quote($info['map']) . "');";
+		$js .= "$('#server-players').html('" . $info['players'] . '/' . $info['playersmax'] . "');";
 		$js .= "$('#serverinfo-players').html('" . CJavaScript::quote($players) . "');";
-		$js .= "$('#server-mapimage').html('" . CJavaScript::quote($model->mapimg) . "');";
+		$js .= "$('#server-mapimage').html('" . CJavaScript::quote($info['mapimg']) . "');";
 		$js .= "$('#loading').hide();";
 		$js .= "$('#ServerDetail').modal('show');";
 
