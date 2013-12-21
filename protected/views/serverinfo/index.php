@@ -19,7 +19,7 @@ $this->breadcrumbs=array(
 );
 
 Yii::app()->clientScript->registerScript('serverview', '
-$(".servtr").css("cursor", "pointer").live("click", function(){
+$(".servtr").live("click", function(){
 	$("#loading").show();
 	var sid = this.id.substr(6);
 	$.post(
@@ -55,7 +55,7 @@ $(".servtr").css("cursor", "pointer").live("click", function(){
 				</thead>
 				<tbody id="servers">
 					<?php foreach($servers as $server):?>
-					<tr class="servtr warning" id="server<?php echo intval($server['id'])?>">
+					<tr class="warning" id="server<?php echo intval($server['id'])?>">
 						<td colspan="7">
 							<?php echo $server['hostname']?>
 							&nbsp;
@@ -242,6 +242,7 @@ $(".servtr").css("cursor", "pointer").live("click", function(){
 						  '<td style="text-align:center">' + info.players + '/' + info.playersmax + '</td>' + 
 						  '<td>' + info.map + '</td>' + 
 						  '<td style="text-align:center"><?php echo CHtml::link('<i class="icon-eye-open"></i>',Yii::app()->createUrl('/serverinfo/view',array('id' => $server->id)),array('rel' => 'tooltip','title' => 'Подробности'))?></td>';
+				  elem.addClass('servtr').css('cursor', 'pointer');
 				}
 				elem.removeClass('warning').html(ret);
 			}
