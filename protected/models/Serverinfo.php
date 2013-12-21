@@ -279,6 +279,7 @@ class Serverinfo extends CActiveRecord
 	}
 
 	public function afterDelete() {
+		Yii::app()->cache->flush();
 		Syslog::add(Logs::LOG_DELETED, 'Удален сервер <strong>' . $this->address . '</strong>');
 		return parent::afterDelete();
 	}
