@@ -158,6 +158,9 @@ class Bans extends CActiveRecord
 	protected function beforeValidate() {
 		if($this->isNewRecord)
 		{
+			if(!filter_var($this->player_ip, FILTER_VALIDATE_IP, array('flags' => FILTER_FLAG_IPV4)))
+				return $this->addError($this->player_ip, 'Неверно введен IP');
+			
 			$ban = Bans::model()->count('(`player_ip` = :ip OR `player_id` = :id) AND (`ban_length` = 0 OR `ban_created` + (`ban_length` * 60) >= UNIX_TIMESTAMP())', array(
 				':ip' => $this->player_ip,
 				':id' => $this->player_id
