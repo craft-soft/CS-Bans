@@ -57,7 +57,7 @@ class Bans extends CActiveRecord
 	public function rules()
 	{
 		return array(
-			array('player_nick, player_ip', 'required'),
+			array('player_nick', 'required'),
 			array('ban_length, imported', 'numerical', 'integerOnly'=>true),
 			array('player_ip', 'match', 'pattern' => '/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/'),
 			array('player_id', 'match', 'pattern' => '/^STEAM_(0|1):(0|1):\d{1,21}$/'),
