@@ -161,14 +161,18 @@ class Bans extends CActiveRecord
 			if(!filter_var($this->player_ip, FILTER_VALIDATE_IP, array('flags' => FILTER_FLAG_IPV4)))
 				return $this->addError($this->player_ip, 'Неверно введен IP');
 			
-			$ban = Bans::model()->count('(`player_ip` = :ip OR `player_id` = :id) AND (`ban_length` = 0 OR `ban_created` + (`ban_length` * 60) >= UNIX_TIMESTAMP())', array(
-				':ip' => $this->player_ip,
-				':id' => $this->player_id
-			));
-
-			if($ban)
+			if($this->player_id && Bans::model()->count('`player_ip` = :ip AND (`ban_length` = 0 OR `ban_created` + (`ban_length` * 60) >= UNIX_TIMESTAMP())', array(
+					':ip' => $this->player_ip
+				)))
 			{
-				return $this->addError($this->player_ip, 'Эти IP и STEAMID уже забанены');
+				return $this->addError($this->player_ip, 'Этот IP уже забанен');
+			}
+			
+			if($this->player_id && Bans::model()->count('`player_id` = :id AND (`ban_length` = 0 OR `ban_created` + (`ban_length` * 60) >= UNIX_TIMESTAMP())', array(
+					':id' => $this->player_id
+				)))
+			{
+				return $this->addError($this->player_id, 'Этот STEAMID уже забанен');
 			}
 		}
 
