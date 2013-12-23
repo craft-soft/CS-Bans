@@ -113,9 +113,8 @@ endif;
 ?>
 
 <div id="container">
-	<h2>Детали сервера &laquo;<?php echo $info['name']; ?>&raquo;</h2>
 	<?php if($info): ?>
-
+	<h2>Детали сервера &laquo;<?php echo $info['name']; ?>&raquo;</h2>
 	<?php if(!Yii::app()->user->isGuest): ?>
 	<p class="text-success">
 		<i class="icon-exclamation-sign"></i>
@@ -227,7 +226,7 @@ endif;
 		</div>
 	</div>
 	<?php else: ?>
-
+	<h2>Детали сервера &laquo;<?php echo $server->hostname; ?>&raquo;</h2>
 	<div class="alert alert-error">
 		Сервер не отвечает. Возможно сервер выключен или сменяет карту
 	</div>
