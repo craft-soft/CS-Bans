@@ -18,16 +18,6 @@ if(Yii::app()->config->start_page !== '/site/index')
 
 $this->pageTitle=Yii::app()->name;
 
-/*
-Yii::app()->clientScript->registerScript('', '
-$.post(
-	"'.$this->createUrl('/serverinfo/getinfo', array('limit' => 10, 'page' => 'siteindex', 'colspan' => 3)).'",
-	{"'.Yii::app()->request->csrfTokenName.'": "'.Yii::app()->request->csrfToken.'"},
-	function(data) {$("#servers").html(data);}
-);
-');
- * 
- */
 ?>
 
 <?php
@@ -91,7 +81,12 @@ $this->beginWidget('bootstrap.widgets.TbHeroUnit',array(
 			</thead>
 			<tbody id="servers">
 				<?php foreach($servers as $server):?>
-				<tr class="warning" id="server<?php echo intval($server['id'])?>">
+				<tr 
+					class="warning" 
+					style="cursor: pointer"
+					id="server<?php echo intval($server['id'])?>"
+					onclick="document.location.href='<?php echo $this->createUrl('/serverinfo/view', array('id' => $server['id'])) ?>'"
+				>
 					<td colspan="3">
 						<?php echo $server['hostname']?>
 						&nbsp;
