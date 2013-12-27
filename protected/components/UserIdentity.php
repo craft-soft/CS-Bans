@@ -24,7 +24,6 @@ class UserIdentity extends CUserIdentity
 	{
 		$username = strtolower($this->username);
 		$user = Webadmins::model()->find('LOWER(username)=?', array($username));
-		$user->scenario = 'auth';
 
 		if($user === null) {
 			$this->errorCode = self::ERROR_USERNAME_INVALID;
@@ -32,6 +31,7 @@ class UserIdentity extends CUserIdentity
 		elseif(!$user->validatePassword($this->password)) {
 			$this->errorCode = self::ERROR_PASSWORD_INVALID;
 			$user->try++;
+			$user->scenario = 'auth';
 			$user->save();
 		}
 		else {
@@ -43,6 +43,7 @@ class UserIdentity extends CUserIdentity
 			// Лог входа, добавить запись
 			$user->last_action = time();
 			$user->try = 0;
+			$user->scenario = 'auth';
 			$user->save();
 		}
 
