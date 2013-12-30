@@ -110,10 +110,7 @@ class Levels extends CActiveRecord
 	public static function getList() {
 		$model = self::model()->findAll();
 
-		$list = array();
-		foreach($model AS $item) {
-			$list[$item->level] = $item->level;
-		}
+		$list = CHtml::listData($model, 'level', 'level');
 
 		return $list;
 	}

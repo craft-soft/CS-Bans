@@ -26,7 +26,7 @@ class Logs extends CActiveRecord
 	const LOG_DELETED = 'deleted';
 	const LOG_PURCHASE = 'purchase';
 	const LOG_INSTALL = 'Install';
-	
+
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -43,10 +43,10 @@ class Logs extends CActiveRecord
 		);
 		if($all)
 			return $types;
-			
+
 		if(array_key_exists($type, $types))
 			return $types[$type];
-			
+
 		return 'Другая';
 	}
 
@@ -62,7 +62,7 @@ class Logs extends CActiveRecord
 			array('ip, username', 'length', 'max'=>32),
 			array('action', 'length', 'max'=>64),
 			array('remarks', 'length', 'max'=>256),
-			array('id, timestamp, ip, username, action, remarks', 'safe', 'on'=>'search'),
+			array('timestamp, username, action', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -88,12 +88,10 @@ class Logs extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id);
-		$criteria->compare('timestamp',$this->timestamp);
-		$criteria->compare('ip',$this->ip,true);
+		if($this->timestamp)
+			$criteria->addBetweenCondition('timestamp', strtotime("{$this->timestamp} 00:00:00"), strtotime("{$this->timestamp} 23:59:59"));
 		$criteria->compare('username',$this->username,true);
 		$criteria->compare('action',$this->action,true);
-		$criteria->compare('remarks',$this->remarks,true);
 		$criteria->order = 'id DESC';
 
 		return new CActiveDataProvider($this, array(
@@ -103,7 +101,7 @@ class Logs extends CActiveRecord
 			)
 		));
 	}
-	
+
 	public function beforeValidate() {
 		if($this->isNewRecord)
 		{
@@ -117,8 +115,8 @@ class Logs extends CActiveRecord
 	public function afterDelete() {
 		Syslog::add(
 			Logs::LOG_DELETED,
-			'Удалена запись системного лога № <strong>' . 
-				$this->id . '</strong>, зафиксированная за админом strong>' . 
+			'Удалена запись системного лога № <strong>' .
+				$this->id . '</strong>, зафиксированная за админом strong>' .
 				$this->username . '</strong>'
 		);
 		return parent::afterDelete();

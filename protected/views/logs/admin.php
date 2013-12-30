@@ -23,25 +23,58 @@ $this->renderPartial('/admin/mainmenu', array('active' =>'site', 'activebtn' => 
 
 <h2>Системный лог</h2>
 
-<?php $this->widget('bootstrap.widgets.TbGridView',array(
+<?php
+
+$criteria = new CDbCriteria();
+$criteria->group = 'username';
+
+$this->widget('bootstrap.widgets.TbGridView',array(
 	'id'=>'logs-grid',
 	'dataProvider'=>$model->search(),
 	'filter'=>$model,
+	'afterAjaxUpdate' => 'reinstallDatePicker',
 	'columns'=>array(
 		array(
 			'name' => 'timestamp',
 			'type' => 'datetime',
-			'value' => '$data->timestamp'
+			'value' => '$data->timestamp',
+			'filter' => $this->widget('zii.widgets.jui.CJuiDatePicker', array(
+				'model' => $model,
+				'id' => 'timestamp',
+				'attribute' => 'timestamp',
+				'language' => 'ru',
+				'i18nScriptFile' => 'jquery-ui-i18n.min.js',
+				'htmlOptions' => array(
+					'id' => 'timestamp',
+					'size' => '10',
+				),
+				'options' => array(
+					'showAnim'=>'fold',
+					/*'dateFormat'=>'yy-mm-dd',
+					'changeMonth' => 'true',
+					'changeYear'=>'true',*/
+				)
+			), true),
 		),
-		'username',
+		array(
+			'name' => 'username',
+			'filter' => CHtml::listData(Logs::model()->findAll($criteria), 'username', 'username'),
+		),
 		array(
 			'name' => 'action',
 			'value' => 'Logs::getLogType($data->action)',
-			'filter' => Logs::getLogType(FALSE, TRUE)
+			'filter' => Logs::getLogType(FALSE, TRUE),
 		),
 		array(
 			'class'=>'bootstrap.widgets.TbButtonColumn',
-			'template' => '{view} {delete}'
+			'template' => '{view} {delete}',
 		),
 	),
-)); ?>
+));
+
+Yii::app()->clientScript->registerScript('re-install-date-picker', "
+	function reinstallDatePicker(id, data) {
+		$('#timestamp').datepicker(jQuery.extend({showMonthAfterYear:false},jQuery.datepicker.regional['ru'],{'showAnim':'fold'}));
+	}
+");
+?>

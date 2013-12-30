@@ -37,7 +37,10 @@ $this->renderPartial('/admin/mainmenu', array('active' =>'site', 'activebtn' => 
 		'id',
 		'username',
 		'email',
-		'level',
+		array(
+			'name' => 'level',
+			'filter' => Levels::getList(),
+		),
 		array(
 			'class'=>'bootstrap.widgets.TbButtonColumn',
 		),
