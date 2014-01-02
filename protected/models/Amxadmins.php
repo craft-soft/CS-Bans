@@ -30,6 +30,7 @@ class Amxadmins extends CActiveRecord
 	//public $accessflags = array();
 	public $change;
 	public $addtake = null;
+	public $servers;
 
 	public static function model($className=__CLASS__)
 	{
@@ -41,13 +42,14 @@ class Amxadmins extends CActiveRecord
 		return '{{amxadmins}}';
 	}
 
+	
 	public function getAccessflags() {
 
 		return str_split($this->access);
 	}
 
 	public function setAccessflags($value) {
-		$this->access = is_array($value) ? implode('', $value) : '';
+		//return false;
 	}
 
 	public function scopes()
@@ -63,7 +65,7 @@ class Amxadmins extends CActiveRecord
 	{
 		return array(
 			array('steamid, nickname', 'required'),
-			array('accessflags, addtake', 'safe'),
+			array('accessflags, addtake, servers', 'safe'),
 			array('icq, ashow, days, change', 'numerical', 'integerOnly'=>true),
 			array('username, access, flags, steamid, nickname', 'length', 'max'=>32),
 			array('password', 'length', 'max'=>50),
@@ -196,6 +198,7 @@ class Amxadmins extends CActiveRecord
 	}
 
 	protected function beforeSave() {
+		//exit(print_r($this->servers));
 		if($this->isNewRecord)
 		{
 			$this->created = time();
@@ -235,7 +238,7 @@ class Amxadmins extends CActiveRecord
 
 	protected function beforeValidate() {
 		parent::beforeValidate();
-
+		//exit(var_dump($this->servers));
 		if($this->scenario == 'buy') return TRUE;
 
 		/*if($this->addtake && $this->long <= 0)
@@ -305,6 +308,24 @@ class Amxadmins extends CActiveRecord
 	}
 
 	public function afterSave() {
+		
+		if(isset($this->servers))
+		{
+			foreach($this->servers as $is)
+			{
+				$inservers = new AdminsServers;
+				$inservers->unsetAttributes();
+				if(!Serverinfo::model()->findByPk($is))
+					continue;
+
+				$inservers->admin_id = $this->id;
+				$inservers->server_id = intval($is);
+				$inservers->use_static_bantime = 'no';
+				if(!$inservers->save())
+					continue;
+			}
+		}
+		
 		if($this->isNewRecord)
 			Syslog::add(Logs::LOG_ADDED, 'Добавлен новый AmxModX админ <strong>' . $this->nickname . '</strong>');
 		else

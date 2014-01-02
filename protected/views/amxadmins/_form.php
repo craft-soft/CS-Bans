@@ -67,6 +67,16 @@ Yii::app()->clientScript->registerScript('adminactions', '
 		$("#flagsmodal").modal("show");
 		return false;
 	});
+	
+	$("#setFlags").click(function(){
+		var finputs = [];
+		$("input[id^=Amxadmins_accessflags]:checked").each(function(){
+			finputs.push($(this).val());
+		});
+		$("#Amxadmins_access").val(finputs.join(""));
+		$("#flagsmodal").modal("hide");
+		return false;
+	});
 ');
 ?>
 
@@ -101,19 +111,15 @@ Yii::app()->clientScript->registerScript('adminactions', '
 
 	<?php echo $form->passwordFieldRow($model,'password',array('class' => 'span6','maxlength'=>50, 'disabled' => 'disabled', 'value' => '')); ?>
 
-	<?php echo CHtml::label('Флаги доступа', FALSE) ?>
-
 	<?php
-	echo CHtml::button(
-			'Выбрать',
-			array(
-				'id' => 'flagsselector',
-				'class' => 'span6 btn',
-				'style' => 'margin-bottom: 10px',
-				'rel' => 'tooltip',
-				'title' => 'Выбрать флаги'
-			)
-		);
+	echo $form->textFieldRow(
+		$model,
+		'access',
+		array(
+			'style' => 'width: 233px',
+			'append' => '<span id="flagsselector" style="cursor: pointer">Выбрать</span>'
+		)
+	);
 	?>
 
 	<?php echo $form->textFieldRow($model,'icq',array('class' => 'span6',)); ?>
@@ -131,6 +137,9 @@ Yii::app()->clientScript->registerScript('adminactions', '
 			'append' => CHtml::checkBox('', false, array('id' => 'forever')) . ' навсегда'
 		)
 	);
+	
+	echo $form->checkBoxListRow($model, 'servers', CHtml::listData(Serverinfo::model()->findAll(), 'id', 'hostname'), array('multiple'=>true));
+	
 	else:
 	if($model->expired != 0):
 	echo $form->textFieldRow(
@@ -185,7 +194,14 @@ Yii::app()->clientScript->registerScript('adminactions', '
 	</div>
 	<div class="modal-footer">
 		<?php $this->widget('bootstrap.widgets.TbButton', array(
-			'label'=>'Закрыть',
+			'label'=>'Установить',
+			'type'=>'primary',
+			'htmlOptions'=>array(
+				'id'=>'setFlags',
+			),
+		)); ?>
+		<?php $this->widget('bootstrap.widgets.TbButton', array(
+			'label'=>'Отмена',
 			'url'=>'#',
 			'htmlOptions'=>array(
 				'data-dismiss'=>'modal',

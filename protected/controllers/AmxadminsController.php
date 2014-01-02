@@ -288,12 +288,9 @@ class AmxadminsController extends Controller
 				$wa = new Webadmins;
 				$wa->attributes = $_POST['Webadmins'];
 				$wa->username = $_POST['Amxadmins']['nickname'];
-				if($wa->save())
-				{
-					$model->save();
-					$this->redirect(array('admin'));
-				}
+				$wa->save();
 			}
+			
 			if($model->save())
 				$this->redirect(array('admin'));
 		}
