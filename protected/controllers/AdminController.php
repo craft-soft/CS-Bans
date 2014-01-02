@@ -22,9 +22,16 @@ class AdminController   extends Controller
 		return array(
 			'accessControl',
 			'postOnly + delete',
-			'ajaxOnly + actions',
+			'ajaxOnly + actions, version',
 		);
     }
+
+	public function actionVersion() {
+		if(isset($_POST['version']))
+			Yii::app ()->end(Prefs::getVersion());
+		Yii::app ()->end('1');
+	}
+
 
 	/**
 	 * Причины банов

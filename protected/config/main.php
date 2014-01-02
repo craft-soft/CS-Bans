@@ -39,7 +39,7 @@ Yii::setPathOfAlias('bootstrap', dirname(__FILE__).'/../extensions/bootstrap');
 // Главные параметры приложения
 return array(
 	'basePath'=>ROOTPATH . DIRECTORY_SEPARATOR . 'protected',
-	'name'=>'СS:Bans 1.1',
+	'name'=>'СS:Bans 1.0',
 	'sourceLanguage' => 'ru',
 	'language'=>'ru',
 
@@ -140,6 +140,6 @@ return array(
 	'params'=>array(
 		'adminEmail'=>'webmaster@example.com',
 		'dbname' => $config->db_db,
-		'Version' => '1.1',
+		'Version' => '1.0',
 	),
 );

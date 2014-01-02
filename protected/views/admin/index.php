@@ -20,6 +20,9 @@ $this->breadcrumbs=array(
 );
 
 Yii::app()->clientScript->registerScript('adminaction', "
+$.post('".$this->createUrl('version')."', {'version': 1}, function(data){
+	$('#version').html(data);
+});
 $('.bdaction').click(function(){
 	if(!confirm('Вы подтверждаете свои действия?'))
 	{
@@ -34,9 +37,6 @@ $('.bdaction').click(function(){
 })
 ");
 
-?>
-
-<?php
 $this->renderPartial('/admin/mainmenu', array('active' =>'main', 'activebtn' => 'admsystem'));
 $sysprefs = Prefs::sysprefs();
 ?>
@@ -48,6 +48,14 @@ $sysprefs = Prefs::sysprefs();
 			<tr>
 				<td class="info" colspan="2">
 					<b>Настройки сервера</b>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 200px">
+					Версия сайта
+				</td>
+				<td id="version">
+					<?php echo Yii::app()->params['Version'] ?> <?php echo CHtml::image(Yii::app()->baseUrl . '/images/loading.gif'); ?>
 				</td>
 			</tr>
 			<?php

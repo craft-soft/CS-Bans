@@ -318,7 +318,7 @@ class Prefs extends CApplicationComponent {
 
 		return array(
 			'info' => array(
-				'Версия сайта'			=> self::getVersion(),
+				//'Версия сайта'			=> self::getVersion(),
 				'Версия PHP'			=> version_compare(PHP_VERSION, '5.3', '<')
 						? '<span class="text-error"><b>'.PHP_VERSION.'</b> (рекомендуемая 5.3 или выше)</span>'
 						: PHP_VERSION,
@@ -359,7 +359,7 @@ class Prefs extends CApplicationComponent {
 		Yii::app()->cache->set('getVersion', $last, 21600);
 
 		if(version_compare($current, $last, '<')) {
-			return "{$current} <span class='text-error'>(версия устарела)</span>";
+			return "{$current} <span class='text-error'>(доступна новая версия)</span>";
 		}
 
 		return "{$current} <span class='text-success'>(вы используете последнюю версию)</span>";
