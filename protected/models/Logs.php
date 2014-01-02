@@ -38,7 +38,6 @@ class Logs extends CActiveRecord
 			self::LOG_ADDED => 'Добавление',
 			self::LOG_EDITED => 'Редактирование',
 			self::LOG_DELETED => 'Удаление',
-			self::LOG_PURCHASE => 'Покупка',
 			self::LOG_INSTALL => 'Установка',
 		);
 		if($all)
@@ -50,7 +49,7 @@ class Logs extends CActiveRecord
 		return 'Другая';
 	}
 
-		public function tableName()
+	public function tableName()
 	{
 		return '{{logs}}';
 	}
@@ -88,8 +87,11 @@ class Logs extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
+		$criteria->compare('id',$this->id);
+		//$criteria->compare('timestamp',$this->timestamp);
 		if($this->timestamp)
-			$criteria->addBetweenCondition('timestamp', strtotime("{$this->timestamp} 00:00:00"), strtotime("{$this->timestamp} 23:59:59"));
+			$criteria->addBetweenCondition ('timestamp', strtotime("$this->timestamp 00:00:00"), strtotime("$this->timestamp 23:59:59"));
+		$criteria->compare('ip',$this->ip,true);
 		$criteria->compare('username',$this->username,true);
 		$criteria->compare('action',$this->action,true);
 		$criteria->order = 'id DESC';

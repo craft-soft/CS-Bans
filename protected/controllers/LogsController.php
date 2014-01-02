@@ -59,6 +59,13 @@ class LogsController extends Controller
 		$model->unsetAttributes();
 		if(isset($_GET['Logs']))
 			$model->attributes=$_GET['Logs'];
+		
+		if(isset($_POST['clearlog']) && Yii::app()->request->isAjaxRequest)
+		{
+			$this->layout = FALSE;
+			$tr = Yii::app()->db->createCommand()->truncateTable('{{logs}}');
+			exit("$tr");
+		}
 
 		$this->render('admin',array(
 			'model'=>$model,

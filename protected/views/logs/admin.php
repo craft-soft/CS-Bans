@@ -18,6 +18,31 @@ $this->breadcrumbs = array(
 	'Системный лог'
 );
 
+$this->menu = array(
+	array(
+		'label' => 'Удалить все записи',
+		'url' => '#',
+		'linkOptions' => array(
+			'id' => 'clearLog'
+		)
+	)
+);
+
+Yii::app()->clientScript->registerScript('', '
+	$("a#clearLog").click(function(){
+		if(!confirm("Удалить все записи лога?"))
+			return false;
+
+		var ret = "";
+
+		$.post("", {"clearlog": 1}, function(data){
+			jQuery("#logs-grid").yiiGridView("update");
+			alert("Лог очищен");
+		});
+		return false;
+	});
+');
+
 $this->renderPartial('/admin/mainmenu', array('active' =>'site', 'activebtn' => 'logs'));
 ?>
 
@@ -58,7 +83,8 @@ $this->widget('bootstrap.widgets.TbGridView',array(
 		),
 		array(
 			'name' => 'username',
-			'filter' => CHtml::listData(Logs::model()->findAll($criteria), 'username', 'username'),
+			'value' => '$data->username',
+			'filter' => CHtml::listData(Webadmins::model()->findAll(), 'username', 'username'),
 		),
 		array(
 			'name' => 'action',
