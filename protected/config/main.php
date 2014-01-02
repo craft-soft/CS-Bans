@@ -53,6 +53,9 @@ return array(
 	'import'=>array(
 		'application.models.*',
 		'application.components.*',
+		'application.components.gameq.*',
+		'application.components.gameq.protocols.*',
+		'application.components.gameq.filters.*',
 		'ext.editable.*'
 	),
 	'modules'=>array(),
