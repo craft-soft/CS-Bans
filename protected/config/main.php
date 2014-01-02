@@ -141,10 +141,5 @@ return array(
 		'adminEmail'=>'webmaster@example.com',
 		'dbname' => $config->db_db,
 		'Version' => '1.0',
-		'robokassa_login' => $config->robo_login,
-		'robokassa_pass1' => $config->robo_pass1,
-		'robokassa_pass2' => $config->robo_pass2,
-		'robokassa_testing' => $config->robo_testing,
-		'code' => $config->code
 	),
 );
