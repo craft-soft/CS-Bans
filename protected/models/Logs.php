@@ -87,11 +87,8 @@ class Logs extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id);
-		//$criteria->compare('timestamp',$this->timestamp);
 		if($this->timestamp)
-			$criteria->addBetweenCondition ('timestamp', strtotime("$this->timestamp 00:00:00"), strtotime("$this->timestamp 23:59:59"));
-		$criteria->compare('ip',$this->ip,true);
+			$criteria->addBetweenCondition('timestamp', strtotime("{$this->timestamp} 00:00:00"), strtotime("{$this->timestamp} 23:59:59"));
 		$criteria->compare('username',$this->username,true);
 		$criteria->compare('action',$this->action,true);
 		$criteria->order = 'id DESC';
