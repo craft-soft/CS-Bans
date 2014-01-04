@@ -137,7 +137,8 @@ class AmxadminsController extends Controller
 					'<i class="icon-ok-sign"></i>',
 					'#',
 					array(
-						'onclick' => '$.post("", $("#form' . $admin->id . '").serialize(), function(data){ eval(data); }); return false;',
+						//'onclick' => '$.post("", $("#form' . $admin->id . '").serialize(), function(data){ eval(data); }); return false;',
+						'onclick' => '$.post("", $("#tr' . $admin->id . ' input, #tr' . $admin->id . ' select").serialize(), function(data){ eval(data); }); return false;',
 						'rel' => 'tooltip',
 						'title' => 'Сохранить'
 					)
@@ -290,7 +291,7 @@ class AmxadminsController extends Controller
 				$wa->username = $_POST['Amxadmins']['nickname'];
 				$wa->save();
 			}
-			
+
 			if($model->save())
 				$this->redirect(array('admin'));
 		}
