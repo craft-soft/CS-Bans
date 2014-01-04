@@ -42,7 +42,7 @@ class Amxadmins extends CActiveRecord
 		return '{{amxadmins}}';
 	}
 
-	
+
 	public function getAccessflags() {
 
 		return str_split($this->access);
@@ -96,13 +96,14 @@ class Amxadmins extends CActiveRecord
 			'steamid' => 'Steamid/IP/Ник',
 			'nickname' => 'Ник',
 			'icq' => 'ICQ',
-			'ashow' => 'Видимость в списке админов',
+			'ashow' => 'Показывать в списке админов',
 			'created' => 'Дата добавления',
 			'expired' => 'Истекает',
 			'days' => 'Дней',
 			'long' => 'Осталось дней',
 			'change' => 'Новый срок',
-			'addtake' => 'Выбор'
+			'addtake' => 'Выбор',
+			'servers' => 'Назначить на серверах',
 		);
 	}
 
@@ -308,7 +309,7 @@ class Amxadmins extends CActiveRecord
 	}
 
 	public function afterSave() {
-		
+
 		if(isset($this->servers))
 		{
 			foreach($this->servers as $is)
@@ -325,7 +326,7 @@ class Amxadmins extends CActiveRecord
 					continue;
 			}
 		}
-		
+
 		if($this->isNewRecord)
 			Syslog::add(Logs::LOG_ADDED, 'Добавлен новый AmxModX админ <strong>' . $this->nickname . '</strong>');
 		else

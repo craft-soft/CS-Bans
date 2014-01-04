@@ -67,7 +67,7 @@ Yii::app()->clientScript->registerScript('adminactions', '
 		$("#flagsmodal").modal("show");
 		return false;
 	});
-	
+
 	$("#setFlags").click(function(){
 		var finputs = [];
 		$("input[id^=Amxadmins_accessflags]:checked").each(function(){
@@ -137,9 +137,9 @@ Yii::app()->clientScript->registerScript('adminactions', '
 			'append' => CHtml::checkBox('', false, array('id' => 'forever')) . ' навсегда'
 		)
 	);
-	
+
 	echo $form->checkBoxListRow($model, 'servers', CHtml::listData(Serverinfo::model()->findAll(), 'id', 'hostname'), array('multiple'=>true));
-	
+
 	else:
 	if($model->expired != 0):
 	echo $form->textFieldRow(
@@ -211,9 +211,9 @@ Yii::app()->clientScript->registerScript('adminactions', '
 	<?php $this->endWidget(); ?>
 
 	<?php if($model->isNewRecord):?>
-	<hr class="row-divider" />
-	<button class="btn btn-primary" type="button" onclick="$('#webrights').slideToggle('slow');">Добавить WEB админа</button>
-	<div id="webrights" style="display: none">
+	<hr class="row-divider">
+	<button class="btn btn-info" type="button" onclick="$('#webrights').slideToggle('slow');">Добавить WEB админа</button>
+	<div id="webrights" style="display: none"><br>
 		<?php echo $form->textFieldRow($webadmins,'username',array('class' => 'span6','size'=>32,'maxlength'=>32, 'value' => 'Будет использован ник Amx админа', 'disabled' => 'disabled'));?>
 		<?php echo $form->passwordFieldRow($webadmins,'password',array('class' => 'span6','size'=>32,'maxlength'=>32, 'value' => '')); ?>
 		<?php echo $form->textFieldRow($webadmins,'email',array('class' => 'span6','size'=>60,'maxlength'=>64)); ?>
