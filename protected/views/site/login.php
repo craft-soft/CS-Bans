@@ -41,6 +41,16 @@ $this->breadcrumbs=array(
 
 	<?php echo $form->checkBoxRow($model,'rememberMe'); ?>
 
+	<?php if(CCaptcha::checkRequirements() && Yii::app()->request->cookies['captcha_auth']): ?>
+		<div class="control-group">
+			<?php echo CHtml::label('Проверочный код', 'verify', array('class'=>'control-label'))?>
+			<div class="controls">
+				<p><?php echo CHtml::textField('verify')?></p>
+				<?php $this->widget('ext.kcaptcha.KCaptcha', array('showRefreshButton' => FALSE)); ?>
+			</div>
+		</div>
+	<?php endif; ?>
+
 	<div class="form-actions">
 		<?php $this->widget('bootstrap.widgets.TbButton', array(
             'buttonType'=>'submit',

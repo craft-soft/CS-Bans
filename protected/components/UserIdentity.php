@@ -25,8 +25,17 @@ class UserIdentity extends CUserIdentity
 		$username = strtolower($this->username);
 		$user = Webadmins::model()->find('LOWER(username)=?', array($username));
 
+		Yii::import('ext.kcaptcha.KCaptchaValidator');
+
 		if($user === null) {
 			$this->errorCode = self::ERROR_USERNAME_INVALID;
+		}
+		elseif($user->try >= 3 && empty($_POST['verify'])) {
+			Yii::app()->request->cookies['captcha_auth'] = new CHttpCookie('captcha_auth', '1');
+			Yii::app()->controller->refresh();
+		}
+		elseif($user->try >= 3 && !KCaptchaValidator::testCode($_POST['verify'])) {
+			$this->errorCode = self::ERROR_PASSWORD_INVALID;
 		}
 		elseif(!$user->validatePassword($this->password)) {
 			$this->errorCode = self::ERROR_PASSWORD_INVALID;
@@ -45,6 +54,8 @@ class UserIdentity extends CUserIdentity
 			$user->try = 0;
 			$user->scenario = 'auth';
 			$user->save();
+
+			unset(Yii::app()->request->cookies['captha_auth']);
 		}
 
 		return $this->errorCode == self::ERROR_NONE;

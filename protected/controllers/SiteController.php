@@ -17,9 +17,9 @@ class SiteController extends Controller
 	public function actions()
 	{
 		return array(
-			'captcha'=>array(
-				'class'=>'CCaptchaAction',
-				'backColor'=>0xFFFFFF,
+			'captcha' => array(
+				'class' => 'ext.kcaptcha.KCaptchaAction',
+				'settings' => array()
 			),
 			'page'=>array(
 				'class'=>'CViewAction',
