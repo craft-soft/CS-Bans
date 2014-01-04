@@ -224,10 +224,12 @@ class AdminController   extends Controller
 			$sid = intval($_POST['sid']);
 
 			$server = Serverinfo::model()->findByPk($sid);
+			
+			$info = $server->getInfo();
 
 			$js = "";
 
-			if(!$server->players)
+			if(!$info['players'])
 				$js .= "<tr class=\"error\"><td colspan=\"7\">Нет игроков</td></tr>";
 			elseif(!$players = $server->getPlayersInfo())
 				$js .= "<tr class=\"error\"><td colspan=\"7\">Ошибка получения информации (проверьте RCON пароль)</td></tr>";
@@ -273,7 +275,9 @@ class AdminController   extends Controller
 			Yii::app()->end("$('#loading').hide();$('#players').html('".$js."');");
 		}
 
-		$this->render('addbanonline');
+		$this->render('addbanonline', array(
+			'servers'=>Serverinfo::model()->cache(600)->findAll(),
+		));
 	}
 
 	/**
