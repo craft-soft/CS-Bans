@@ -24,7 +24,7 @@ Yii::app()->clientScript->registerScript('', '
 
 $(".servtr").live("click", function(){
 	$("#loading").show();
-	var sid = this.id.substr(5);
+	var sid = this.id.substr(6);
 	$.post(
 		"",
 		{
@@ -96,23 +96,19 @@ $this->renderPartial('/admin/mainmenu', array('active' =>'main', 'activebtn' => 
 <table class="table table-bordered table-condensed table-striped">
 	<thead>
 		<tr>
-			<th>Мод</th>
-			<th>OS</th>
-			<th>VAC</th>
 			<th>Имя</th>
-			<th>Игроки</th>
-			<th>Карта</th>
-			<th></th>
+			<th>Адрес</th>
+			<th>Версия</th>
 		</tr>
 	</thead>
-	<tbody id="servers">
-		<tr class="warning">
-			<td colspan="7">
-				Получение информации с серверов
-				&nbsp;
-				<?php echo CHtml::image(Yii::app()->baseUrl . '/images/loading.gif'); ?>
-			</td>
+	<tbody>
+		<?php foreach($servers as $server):?>
+		<tr class="servtr" id="server<?php echo intval($server->id) ?>">
+			<td><?php echo CHtml::encode($server->hostname)?></td>
+			<td><?php echo CHtml::encode($server->address)?></td>
+			<td><?php echo CHtml::encode($server->amxban_version)?></td>
 		</tr>
+		<?php endforeach;?>
 	</tbody>
 </table>
 <table class="table table-bordered table-condensed table-striped">
