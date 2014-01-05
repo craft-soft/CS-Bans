@@ -36,6 +36,17 @@ require_once ROOTPATH . '/include/db.config.inc.php';
 // Подключаем bootstrap
 Yii::setPathOfAlias('bootstrap', dirname(__FILE__).'/../extensions/bootstrap');
 
+$dirs = scandir(dirname(__FILE__).'/../modules');
+
+$modules = array();
+foreach ($dirs as $name){
+	if ($name[0] != '.') {
+		$modules[$name] = array('class'=>'application.modules.' . $name . '.' . ucfirst($name) . 'Module');
+	}
+}
+
+define('MODULES_MATCHES', implode('|', array_keys($modules)));
+
 // Главные параметры приложения
 return array(
 	'basePath'=>ROOTPATH . DIRECTORY_SEPARATOR . 'protected',
@@ -58,7 +69,18 @@ return array(
 		'application.components.gameq.filters.*',
 		'ext.editable.*'
 	),
-	'modules'=>array(),
+	
+	'modules'=>array_replace($modules, array(
+		'gii'=>array(
+			'class'=>'system.gii.GiiModule',
+			'password'=>'1232580',
+			'ipFilters'=>array(),
+			'generatorPaths'=>array(
+				'bootstrap.gii',
+			),
+		),
+		//*/
+	)),
 
 	// Компоненты приложения
 	'components'=>array(
@@ -85,12 +107,19 @@ return array(
 			'urlSuffix'=>'.html',
 			'rules'=>array(
 				'/'=>'site/index',
+				
+				'billing/unban/<id:\d+>' => 'billing/default/unban',
+				'billing/<controller:\w+>/<action:\w+>/<id:\d+>' => 'billing/<controller>/<action>',
+                'billing/<controller:\w+>/<action:\w+>' => 'billing/<controller>/<action>',
+				'billing/<action:\w+>' => 'billing/default/<action>',
+                'billing/<controller:\w+>' => 'billing/<controller>/buy',
+				
 				'<controller:\w+>/<id:\d+>'=>'<controller>/view',
 				'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 			),
 		),
-
+		
 		'format'=>array(
 			'booleanFormat'=>array('Нет', 'Да'),
 			'datetimeFormat'=>'d.m.Y H:i',
