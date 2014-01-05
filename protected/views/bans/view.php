@@ -116,8 +116,7 @@ if($geo)
 		'ban_reason',
 		array(
 			'name' => 'ban_created',
-			'type' => 'datetime',
-			'value' => $model->ban_created,
+			'value' => date('d.m.Y - H:i:s', $model->ban_created),
 		),
 		array(
 			'name' => 'ban_length',
