@@ -136,7 +136,20 @@ class Bans extends CActiveRecord
 		}
 		else
 		{
-			$this->expired = 0;
+			$unbanned = $this->ban_length == '-1' || $this->expired == 1 || ($this->ban_created + ($this->ban_length * 60)) < time();
+			
+			if($unbanned)
+			{
+				//exit($this->bid);
+				$this->expired = time() + $this->ban_length * 60;
+			}
+
+			 else
+			 {
+				 //exit($this->bid);
+				 $oldban = self::model()->findByPk($this->bid);
+				 $this->expired = $oldban->expired + $this->ban_length * 60;
+			 }
 		}
 
 		return parent::beforeSave();;
