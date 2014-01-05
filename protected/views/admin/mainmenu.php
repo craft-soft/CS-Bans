@@ -51,6 +51,11 @@ $this->widget('bootstrap.widgets.TbTabs', array(
 					<li><a href="' . Yii::app()->createUrl('/usermenu/admin') . '" class="btn"'.($activebtn == 'webmainmenu' ? $disabled : '').'>Ссылки</a></li>
 					<li><a href="' . Yii::app()->createUrl('/admin/websettings') . '" class="btn"'.($activebtn == 'websettings' ? $disabled : '').'>Настройки</a></li>
 					<li><a href="' . Yii::app()->createUrl('/logs/admin') . '" class="btn"'.($activebtn == 'logs' ? $disabled : '').'>Логи</a></li>
+					'.(Yii::app()->hasModule('billing')
+						?
+					'<li><a href="'.Yii::app()->createUrl('/billing/tariff/admin').'" class="btn"'.($activebtn == 'tariffs' ? $disabled : '').'>Тарифы</a></li>'
+						:
+					'').'
 				</ul>',
 			'active' => $active == 'site'
 		),

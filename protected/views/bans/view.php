@@ -47,7 +47,7 @@ if($geo)
 	?>
 	&nbsp;
 	<?php
-	$unbanned = $model->ban_length == '-1' || $model->expired == 1 || ($model->ban_created + ($model->ban_length * 60)) > time();
+	$unbanned = $model->ban_length == '-1' || $model->expired == 1 || ($model->ban_created + ($model->ban_length * 60)) < time();
 	if(Webadmins::checkAccess('bans_unban', $model->admin_nick) && !$unbanned):
 	echo CHtml::ajaxLink(
 		'<i class="icon-remove"></i>',
@@ -128,7 +128,9 @@ if($geo)
 				'Разбанен'
 					:
 				Prefs::date2word($model->ban_length) .
-				($model->expired == 1 ? ' (истек)' : '')
+				($model->expired == 1 ? ' (истек)' : Yii::app()->hasModule('billing') ? CHtml::link('Купить разбан',
+						array('/billing/unban', 'id' => $model->primaryKey),
+						array('class' => 'btn btn-mini btn-success pull-right')) : '')
 		),
 		'expiredTime',
 		'server_name',
