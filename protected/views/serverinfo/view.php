@@ -131,10 +131,10 @@ endif;
 					<th>
 						Ник
 					</th>
-					<th style="width: 60px; text-align: center">
+					<th style="text-align: center">
 						Счет
 					</th>
-					<th style="width: 80px; text-align: center">
+					<th style="text-align: center">
 						Время
 					</th>
 				</thead>
@@ -144,7 +144,7 @@ endif;
 						<tr class="context-menu-one" id="<?php echo CHtml::encode($player['name'])?>">
 							<td><?php echo CHtml::encode($player['name'])?></td>
 							<td style="text-align: center"><?php echo CHtml::encode($player['score'])?></td>
-							<td style="text-align: center"><?php echo CHtml::encode($player['time'])?></td>
+							<td style="text-align: center"><?php echo Prefs::date2word(intval($player['time']))?></td>
 						</tr>
 					<?php endforeach;?>
 				</tbody>
