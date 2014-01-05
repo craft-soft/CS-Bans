@@ -195,12 +195,16 @@ class Prefs extends CApplicationComponent {
 	{
 		if($lenght == 0)
 			return 'Никогда';
+		
+		if($lenght == '-1')
+			return 'Разбанен';
+		
 		$lenght = $lenght * 60;
 
 		$expired = $create + $lenght;
 
 		$minutes = intval(($create + $lenght - time()) / 60);
-		return date('d.m.y - H:i:s', $create + $lenght) . ' ('.($expired > time() ? 'через '.  self::date2word($minutes) : 'истек').')';
+		return date('d.m.Y - H:i:s', $create + $lenght);
 
 	}
 
