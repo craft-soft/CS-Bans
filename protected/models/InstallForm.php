@@ -169,9 +169,10 @@ class InstallForm extends CFormModel
 			// Добавляем админа
 			$admin = "INSERT INTO {$this->db_prefix}_webadmins(username, password, level, email) VALUES(:username, :password, :level, :email)";
 			$level = 1;
+			$passwd = md5($this->password);
 			$comm = $this->conn->createCommand($admin);
 			$comm->bindParam(':username', $this->login, PDO::PARAM_STR);
-			$comm->bindParam(':password', md5($this->password), PDO::PARAM_STR);
+			$comm->bindParam(':password', $passwd, PDO::PARAM_STR);
 			$comm->bindParam(':level', $level, PDO::PARAM_INT);
 			$comm->bindParam(':email', $this->email, PDO::PARAM_STR);
 			$comm->execute();
