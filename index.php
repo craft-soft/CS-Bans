@@ -12,7 +12,7 @@
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru  «Attribution-NonCommercial-ShareAlike»
  */
 
-define('ROOTPATH', __DIR__);
+define('ROOTPATH', dirname(__FILE__));
 
 // Дебаг
 //defined('YII_DEBUG') or define('YII_DEBUG', true);
