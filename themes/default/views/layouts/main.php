@@ -134,7 +134,7 @@
 		<div class="container">
 			<div class="row">
 				<div id="rights" class="grid-6">
-					<b>CS:Bans 1.0 Beta</b>
+					<b><?php echo CHtml::encode(Yii::app()->name)?></b>
 				</div>
 				<div id="totop" class="grid-6">
 					© 2013-<?php echo date('Y') ?>
