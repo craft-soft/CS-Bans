@@ -29,7 +29,7 @@ require_once GAMEQ_BASE . 'Protocol.php';
  * @author          Tom Buskens <t.buskens@deviation.nl>
  * @version         $Revision: 1.1 $
  */
-class GameQ_Protocol_valve extends GameQ_Protocol
+class GameQ_Protocol_Valve extends GameQ_Protocol
 {
     /*
      * Status
