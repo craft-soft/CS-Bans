@@ -179,7 +179,7 @@ class Serverinfo extends CActiveRecord
 			}
 			else
 			{
-				$mapimage = Yii::app()->urlManager->baseUrl . "/images/maps/" . $game . "/noimage.jpg";
+				$mapimage = Yii::app()->urlManager->baseUrl . "/images/maps/noimage.jpg";
 			}
 
 			$info['mapimg'] = CHtml::image($mapimage, $info['map'], array('title' => $info['map'], 'class' => 'img-polaroid'));
