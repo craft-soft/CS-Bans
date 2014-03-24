@@ -14,147 +14,36 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * $Id: halflife.php,v 1.1 2007/06/30 12:43:43 tombuskens Exp $  
  */
-
-
-require_once GAMEQ_BASE . 'Protocol.php';
-
 
 /**
- * HalfLife Protocol
+ * Counter-Strike 1.6 Protocol Class
  *
- * @author          Aidan Lister <aidan@php.net>
- * @author          Tom Buskens <t.buskens@deviation.nl>
- * @version         $Revision: 1.1 $
+ * @author Austin Bischoff <austin@codebeard.com>
  */
-class GameQ_Protocol_Valve extends GameQ_Protocol
+class GameQ_Protocols_Valve extends GameQ_Protocols_Source
 {
-    /*
-     * Status
-     */
-    public function infostring()
-    {
-        // Header
-        if ($this->p->readInt32()     !== -1
-            or $this->p->readString() !== 'infostringresponse'
-            or $this->p->read()       !== '\\'
-            or $this->p->readLast()   !== "\x00"
-        ) {
-            throw new GameQ_ParsingException($this->p);
-        }
-        
-        // Rules
-        while ($this->p->getLength()) {
-            $this->r->add($this->p->readString('\\'), $this->p->readString('\\'));
-        }
-    }
+	protected $name = "valve";
+	protected $name_long = "Half-Life";
 
-    public function details()
-    {
-        // Header
-        $this->header('m');
+	/**
+	 * We have to overload this function to cheat the rules processing because of some wierdness, old ass game!
+	 *
+	 * @see GameQ_Protocols_Source::preProcess_rules()
+	 */
+	protected function preProcess_rules($packets)
+	{
+		$engine_orig = $this->source_engine;
 
-        // Rules
-        $this->r->add('address',     $this->p->readString());
-        $this->r->add('hostname',    $this->p->readString());
-        $this->r->add('map',         $this->p->readString());
-        $this->r->add('gamedir',     $this->p->readString());
-        $this->r->add('gamename',    $this->p->readString());
-        $this->r->add('num_players', $this->p->readInt8());
-        $this->r->add('max_players', $this->p->readInt8());
-        $this->r->add('protocol',    $this->p->readInt8());
-        $this->r->add('server_type', $this->p->read());
-        $this->r->add('server_os',   $this->p->read());
-        $this->r->add('password',    $this->p->readInt8());
-        $this->r->add('mod',         $this->p->readInt8());
+		// Override the engine type for rules, not sure why its like that
+		$this->source_engine = self::GOLDSOURCE_ENGINE;
 
-        // These only exist when the server is running a mod
-        if ($this->p->getLength() > 2) {
-            $this->r->add('mod_info',      $this->p->readString());
-            $this->r->add('mod_download',  $this->p->readString());
-            $this->r->add('mod_version',   $this->p->readInt32());
-            $this->r->add('mod_size',      $this->p->readInt32());
-            $this->r->add('mod_ssonly',    $this->p->readInt8());
-            $this->r->add('mod_customdll', $this->p->readInt8());
-        }
-    }
+		// Now process the rules
+		$ret = parent::preProcess_rules($packets);
 
+		// Reset the engine type
+		$this->source_engine = $engine_orig;
 
-    /*
-     * Players
-     */
-    public function players()
-    {
-        // Header
-        $this->header('D');
-
-        // Player count
-        $this->r->add('num_players', $this->p->readInt8());
-
-        // Players
-        while ($this->p->getLength()) {
-            $this->r->addPlayer('id',      $this->p->readInt8());
-            $this->r->addPlayer('name',    $this->p->readString());
-            $this->r->addPlayer('score',   $this->p->readInt32());
-            $this->r->addPlayer('time',    $this->p->readFloat32());
-        }
-    }
-
-
-    /*
-     * Rules
-     */
-    public function rules()
-    {
-        // Header
-        $this->header('E');
-
-        // Rule count
-        $this->r->add('num_rules', $this->p->readInt16());
-
-        // Rules
-        while ($this->p->getLength()) {
-            $this->r->add($this->p->readString(), $this->p->readString());
-        }
-    }
-
-    /**
-     * Header
-     */
-    private function header($char)
-    {
-        if ($this->p->readInt32() !== -1 or $this->p->read() !== $char) {
-            throw new GameQ_ParsingException($this->p);
-        }
-    }
-    
-    
-    /*
-     * Join multiple packets
-     */
-    public function preprocess($packets)
-    {
-        if (count($packets) == 1) return $packets[0];
-
-        foreach ($packets as $packet) {
-            // Make sure it's a valid packet
-            if (strlen($packet) < 9) {
-                continue;
-            }
-            
-            // Get the low nibble of the 9th bit
-            $key = substr(bin2hex($packet{8}), 0, 1);
-            
-            // Strip whole header
-            $packet = substr($packet, 9);
-            
-            // Order by low nibble
-            $result[$key] = $packet;
-        }
-
-        return implode('', $result);
-    }
+		return $ret;
+	}
 }
-?>
