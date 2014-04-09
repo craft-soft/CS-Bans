@@ -219,7 +219,7 @@ class AmxadminsController extends Controller
 		$servers = '';
 
 		// Если есть сервера у админа, выводим сервера
-		if(is_array($model->servers))
+		if(count($model->servers))
 		{
 			foreach($model->servers as $server)
 			{
@@ -259,8 +259,8 @@ class AmxadminsController extends Controller
 		$info .= "</tr>";
 		$info .= "</table>";
 		$js  = "$('#adminInfo').html('".$info."');";
-		$js .= "$('#adminSteam').html('".($steam != '' ? $steam : '<i>Информация отсутствует</i>')."');";
-		$js .= "$('#adminServers').html('".($servers != "" ? $servers : '<i>Информация отсутствует</i>')."');";
+		$js .= "$('#adminSteam').html('".($steam ? $steam : '<i>Информация отсутствует</i>')."');";
+		$js .= "$('#adminServers').html('".($servers ? $servers : '<i>Информация отсутствует</i>')."');";
 		$js .= "$('#loading').hide();";
 		$js .= "$('#adminDetail').modal('show');";
 		// Выводим инфу

@@ -123,63 +123,83 @@ class Prefs extends CApplicationComponent {
 	 * @return string
 	 * @author AmxBans Team <amxbans.de>
 	 */
-	public static function date2word($dif,$short=false)
+	public static function date2word($dif, $short=false)
 	{
-		if($dif == 0)
+		if($dif == 0) {
 			return 'Навсегда';
-		if($dif == '-1')
+		}
+		if($dif == '-1') {
 			return 'Разбанен';
+		}
+
 		$dif = $dif * 60;
+
 		if($dif) {
-			$s = "";
-			$years=intval($dif/(60*60*24*365));
-			$dif=$dif-($years*(60*60*24*365));
-		   if($years) {
-				   $s.= $years." лет ";
-		   }
-		   if($years && $short) return $s;
+			$s = '';
+			$years = intval($dif / (60 * 60 * 24 * 365));
+			$dif = $dif - ($years * (60 * 60 * 24 * 365));
 
-		   $months=intval($dif/(60*60*24*30));
-		   $dif=$dif-($months*(60*60*24*30));
-		   if($months) {
-				   $s.= $months." мес. ";
-		   }
-		   if($months && $short) return $s;
+			if($years) {
+				$s .= "{$years} лет ";
+			}
+			if($years && $short) {
+				return $s;
+			}
 
-		   $weeks=intval($dif/(60*60*24*7));
-			$dif=$dif-($weeks*(60*60*24*7));
+			$months = intval($dif / (60 * 60 * 24 * 30));
+			$dif = $dif - ($months * (60 * 60 * 24 * 30));
+			if($months) {
+				$s .= "{$months} мес. ";
+			}
+			if($months && $short) {
+				return $s;
+			}
 
-		   if($weeks) {
-				   $s.= $weeks." нед. ";
-		   }
+			$weeks = intval($dif / (60 * 60 * 24 * 7));
+			$dif = $dif - ($weeks * (60 * 60 * 24 * 7));
 
-		   if($weeks && $short) return $s;
+			if($weeks) {
+				$s .= "{$weeks} нед. ";
+			}
 
-		   $days=intval($dif/(60*60*24));
-			$dif=$dif-($days*(60*60*24));
-		   if($days) {
-				   $s.= $days." дн. ";
-		   }
-		   if($days && $short) return $s;
+			if($weeks && $short) {
+			   return $s;
+			}
 
-		   $hours=intval($dif/(60*60));
-			$dif=$dif-($hours*(60*60));
-		   if($hours) {
-				   $s.= $hours." час. ";
-		   }
-		   if($hours && $short) return $s;
+			$days = intval($dif / (60 * 60 * 24));
+			$dif = $dif - ($days * (60 * 60 * 24));
+			if($days) {
+				$s .= "{$days} дн. ";
+			}
+			if($days && $short) {
+				return $s;
+			}
 
-			$minutes=intval($dif/(60));
-		   $seconds=$dif-($minutes*60);
-		   if($minutes) {
-				   $s.= $minutes." мин.";
-		   }
-		   if($minutes && $short) return $s;
+			$hours = intval($dif / (60 * 60));
+			$dif = $dif - ($hours * (60 * 60));
+			if($hours) {
+				$s .= "{$hours} час. ";
+			}
+			if($hours && $short) {
+				return $s;
+			}
 
-		   if($short) return $seconds." сек.";
+			$minutes = intval($dif / 60);
+			$seconds = $dif - ($minutes * 60);
+			if($minutes) {
+				$s .= "{$minutes} мин.";
+			}
+			if($minutes && $short) {
+				return $s;
+			}
 
-		   return $s;
-		} else {
+			if($short) {
+				return "{$seconds} сек.";
+			}
+
+			return $s;
+		}
+		else {
 			return;
 		}
 	}
@@ -195,10 +215,10 @@ class Prefs extends CApplicationComponent {
 	{
 		if($lenght == 0)
 			return 'Никогда';
-		
+
 		if($lenght == '-1')
 			return 'Разбанен';
-		
+
 		$lenght = $lenght * 60;
 
 		$expired = $create + $lenght;
@@ -229,7 +249,7 @@ class Prefs extends CApplicationComponent {
 				break;
 
 			case 'steamid':
-				if(!preg_match("/^STEAM_(0|1):(0|1):[0-9]{1,15}$/",$value))
+				if(!preg_match("/^(STEAM|VALVE)_[0-9]:[0-9]:[0-9]{1,15}$/",$value))
 				{
 					return false;
 				}
