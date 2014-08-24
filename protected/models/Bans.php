@@ -123,6 +123,10 @@ class Bans extends CActiveRecord
 		);
 	}
 
+	public function getUnbanned() {
+		return $this->ban_length == '-1' || $this->expired == 1 || ($this->ban_created + ($this->ban_length * 60)) < time();
+	}
+	
 	protected function afterFind() {
 		parent::afterFind();
 
