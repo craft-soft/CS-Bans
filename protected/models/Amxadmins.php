@@ -310,7 +310,7 @@ class Amxadmins extends CActiveRecord
 
 	public function afterSave() {
 
-		if(isset($this->servers))
+		if(isset($this->servers) && $this->isNewRecord)
 		{
 			foreach($this->servers as $is)
 			{
