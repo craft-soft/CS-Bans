@@ -124,6 +124,21 @@ class BansController extends Controller
 				),
 			),
 		));
+		
+		// История банов
+		$history = new CActiveDataProvider('Bans', array(
+			'criteria' => array(
+				'condition' => '`bid` <> :hbid AND (`player_ip` = :hip OR `player_id` = :hid)',
+				'params' => array(
+					':hbid' => $id,
+					':hip' => $model->player_ip,
+					':hid' => $model->player_id
+				),
+			),
+			'pagination' => array(
+				'pageSize' => 5
+			)
+		));
 
 		// Вывод всего на вьюху
 		$this->render('view',array(
@@ -133,7 +148,8 @@ class BansController extends Controller
 			'files' => $files,
 			'comments'=> $comments,
 			'f' => $f,
-			'c' => $c
+			'c' => $c,
+			'history' => $history
 		));
 	}
 

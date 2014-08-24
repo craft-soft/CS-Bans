@@ -137,7 +137,58 @@ if($geo)
 	),
 )); ?>
 
-
+<hr>
+<p class="text-success">
+	<i class="icon-calendar"></i>
+	История банов
+</p>
+<?php
+$this->widget('bootstrap.widgets.TbGridView',array(
+	'type' => 'bordered stripped',
+	'id'=>'ban-history-grid',
+	'dataProvider'=>$history,
+	'enableSorting' => FALSE,
+	'template' => '{items} {pager}',
+	'columns'=>array(
+		array(
+			'name' => 'player_nick',
+			'type' => 'html',
+			'value' => 'Chtml::link($data->player_nick, Yii::app()->createUrl("/bans/view", array("id" => $data->bid)))'
+		),
+		array(
+			'name' => 'player_id',
+			'type' => 'raw',
+			'value' => 'Prefs::steam_convert($data->player_id, TRUE)
+				? CHtml::link($data->player_id, "http://steamcommunity.com/profiles/"
+						. Prefs::steam_convert($data->player_id), array("target" => "_blank"))
+				: $data->player_id',
+		),
+		array(
+			'name' => 'player_ip',
+			'value' => '$data->player_ip',
+			'visible' => $ipaccess
+		),
+		array(
+			'name' => 'ban_created',
+			'value' => 'date("d.m.Y - H:i:s", $data->ban_created)',
+		),
+		'ban_reason',
+		
+		array(
+			'name' => 'ban_length',
+			'type' => 'raw',
+			'value' =>
+				'$data->ban_length == "-1"
+					?
+				"Разбанен"
+					:
+				Prefs::date2word($data->ban_length) .
+				($data->expired == 1 ? " (истек)" : "")'
+		),
+	),
+));
+?>
+<hr>
 <p class="text-success">
 	<i class="icon-comment"></i>
 	Комментарии
@@ -214,10 +265,8 @@ $this->widget('bootstrap.widgets.TbGridView', array(
 
 	),
 ));
-?>
 
-
-<?php if(Yii::app()->config->use_comment && (!Yii::app()->user->isGuest || Yii::app()->config->comment_all)):?>
+if(Yii::app()->config->use_comment && (!Yii::app()->user->isGuest || Yii::app()->config->comment_all)):?>
 	<div style="width: auto; margin: 0 auto">
 		<?php $this->widget('bootstrap.widgets.TbButton', array(
 			'label'=>'Добавить комментарий',
