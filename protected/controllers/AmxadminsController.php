@@ -219,13 +219,13 @@ class AmxadminsController extends Controller
 		$servers = '';
 
 		// Если есть сервера у админа, выводим сервера
-		if(count($model->servers))
+		if($model->servers)
 		{
 			foreach($model->servers as $server)
 			{
-				if(!$server->name) continue;
+				if(!$server->hostname) continue;
 				$servers .= CHtml::link(
-					$server->name,
+					$server->hostname,
 					Yii::app()->createUrl(
 						'/serverinfo/view',
 						array(
@@ -260,7 +260,7 @@ class AmxadminsController extends Controller
 		$info .= "</table>";
 		$js  = "$('#adminInfo').html('".$info."');";
 		$js .= "$('#adminSteam').html('".($steam ? $steam : '<i>Информация отсутствует</i>')."');";
-		$js .= "$('#adminServers').html('".($servers ? $servers : '<i>Информация отсутствует</i>')."');";
+		$js .= "$('#adminServers').html('".($model->servers ? $servers : '<i>Информация отсутствует</i>')."');";
 		$js .= "$('#loading').hide();";
 		$js .= "$('#adminDetail').modal('show');";
 		// Выводим инфу

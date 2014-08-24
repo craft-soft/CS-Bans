@@ -30,7 +30,7 @@ class Amxadmins extends CActiveRecord
 	//public $accessflags = array();
 	public $change;
 	public $addtake = null;
-	public $servers;
+	//public $servers;
 
 	public static function model($className=__CLASS__)
 	{
