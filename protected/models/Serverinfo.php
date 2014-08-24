@@ -288,6 +288,12 @@ class Serverinfo extends CActiveRecord
 		return $return;
 	}
 
+	public function afterFind() {
+		if(!$this->amxban_motd)
+			$this->amxban_motd = "http://{$_SERVER['HTTP_HOST']}/motd.php?sid=%s&adm=%d&lang=%s";
+		return parent::afterFind();
+	}
+
 	public function afterSave() {
 		if($this->isNewRecord)
 			Syslog::add(Logs::LOG_ADDED, 'Добавлен новый сервер <strong>' . $this->address . '</strong>');
