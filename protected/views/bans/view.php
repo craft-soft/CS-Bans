@@ -217,91 +217,92 @@ $this->widget('bootstrap.widgets.TbGridView', array(
 ?>
 
 
-
-<div style="width: auto; margin: 0 auto">
-	<?php $this->widget('bootstrap.widgets.TbButton', array(
-		'label'=>'Добавить комментарий',
-		'buttonType' => 'button',
-		'size'=>'small', // null, 'large', 'small' or 'mini'
-		'htmlOptions' => array('onclick' => '$("#addcomment").slideToggle("slow");'),
-	)); ?>
-</div>
-<div style="width: 100%; display: none" id="addcomment">
-	<?php echo CHtml::form('','post'); ?>
-	<?php echo CHtml::errorSummary($comments); ?>
-	<table class="table table-bordered">
-		<tr>
-			<td class="span4">
-				<?php echo CHtml::activeLabel(
-						$comments,
-						'email'
-					); ?>
-			</td>
-			<td class="span8">
-				<?php
-				echo CHtml::activeEmailField(
-						$comments,
-						'email',
-						!Yii::app()->user->isGuest ?
-						array(
-							'value' => Yii::app()->user->email,
-							'readonly' => 'readonly'
+<?php if(Yii::app()->config->use_comment && (!Yii::app()->user->isGuest || Yii::app()->config->comment_all)):?>
+	<div style="width: auto; margin: 0 auto">
+		<?php $this->widget('bootstrap.widgets.TbButton', array(
+			'label'=>'Добавить комментарий',
+			'buttonType' => 'button',
+			'size'=>'small', // null, 'large', 'small' or 'mini'
+			'htmlOptions' => array('onclick' => '$("#addcomment").slideToggle("slow");'),
+		)); ?>
+	</div>
+	<div style="width: 100%; display: none" id="addcomment">
+		<?php echo CHtml::form('','post'); ?>
+		<?php echo CHtml::errorSummary($comments); ?>
+		<table class="table table-bordered">
+			<tr>
+				<td class="span4">
+					<?php echo CHtml::activeLabel(
+							$comments,
+							'email'
+						); ?>
+				</td>
+				<td class="span8">
+					<?php
+					echo CHtml::activeEmailField(
+							$comments,
+							'email',
+							!Yii::app()->user->isGuest ?
+							array(
+								'value' => Yii::app()->user->email,
+								'readonly' => 'readonly'
+							)
+							:
+							''
 						)
-						:
-						''
-					)
-				?>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<?php echo CHtml::activeLabel($comments, 'name'); ?>
-			</td>
-			<td>
-				<?php
-				echo CHtml::activeTextField(
-						$comments,
-						'name',
-						!Yii::app()->user->isGuest ?
-						array(
-							'value' => Yii::app()->user->name,
-							'readonly' => 'readonly'
+					?>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<?php echo CHtml::activeLabel($comments, 'name'); ?>
+				</td>
+				<td>
+					<?php
+					echo CHtml::activeTextField(
+							$comments,
+							'name',
+							!Yii::app()->user->isGuest ?
+							array(
+								'value' => Yii::app()->user->name,
+								'readonly' => 'readonly'
+							)
+							:
+							''
 						)
-						:
-						''
-					)
-				?>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<?php echo CHtml::activeLabel($comments, 'comment'); ?>
-			</td>
-			<td>
-				<?php
-				echo CHtml::activeTextArea($comments, 'comment')
-				?>
-			</td>
-		</tr>
-		<?php if(CCaptcha::checkRequirements() && Yii::app()->user->isGuest):?>
-		<tr>
-			<td>
-				<?php echo CHtml::activeLabelEx($comments, 'verifyCode')?>
-			</td>
-			<td>
-				<?php echo CHtml::activeTextField($comments, 'verifyCode')?>
-				<?php $this->widget('CCaptcha')?>
-			</td>
-		</tr>
-		<?php endif?>
-		<tr>
-			<td colspan="2">
-				<?php echo CHtml::submitButton($label = 'Сохранить'); ?>
-			</td>
-		</tr>
-	</table>
-	<?php echo CHtml::endForm(); ?>
-</div>
+					?>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<?php echo CHtml::activeLabel($comments, 'comment'); ?>
+				</td>
+				<td>
+					<?php
+					echo CHtml::activeTextArea($comments, 'comment')
+					?>
+				</td>
+			</tr>
+			<?php if(CCaptcha::checkRequirements() && Yii::app()->user->isGuest):?>
+			<tr>
+				<td>
+					<?php echo CHtml::activeLabelEx($comments, 'verifyCode')?>
+				</td>
+				<td>
+					<?php echo CHtml::activeTextField($comments, 'verifyCode')?>
+					<?php $this->widget('CCaptcha')?>
+				</td>
+			</tr>
+			<?php endif?>
+			<tr>
+				<td colspan="2">
+					<?php echo CHtml::submitButton($label = 'Сохранить'); ?>
+				</td>
+			</tr>
+		</table>
+		<?php echo CHtml::endForm(); ?>
+	</div>
+<?php endif?>
 <hr />
 <p class="text-success">
 	<i class="icon-folder-open"></i>
@@ -377,97 +378,98 @@ $this->widget('bootstrap.widgets.TbGridView', array(
 	),
 ));
 ?>
-<div style="width: auto; margin: 0 auto">
-	<?php $this->widget('bootstrap.widgets.TbButton', array(
-		'label'=>'Добавить файл',
-		'buttonType' => 'button',
-		'size'=>'small', // null, 'large', 'small' or 'mini'
-		'htmlOptions' => array('onclick' => '$(".addfile").slideToggle("slow");'),
-	)); ?>
-</div>
-<div style="width: 100%; display: none; margin: 0 auto" class="addfile">
-	<?php echo CHtml::form('','post', array('id' => 'addfile-form', 'enctype'=>'multipart/form-data')); ?>
-	<?php echo CHtml::errorSummary($files); ?>
-	<table class="table table-bordered">
-		<tr>
-			<td class="span4">
-				<?php echo CHtml::activeLabel(
-						$files,
-						'email'
-					); ?>
-			</td>
-			<td class="span8">
-				<?php
-				echo CHtml::activeEmailField(
-						$files,
-						'email',
-						!Yii::app()->user->isGuest ?
-						array(
-							'value' => Yii::app()->user->email,
-							'readonly' => 'readonly'
+<?php if(Yii::app()->config->use_demo && (!Yii::app()->user->isGuest || Yii::app()->config->demo_all)):?>
+	<div style="width: auto; margin: 0 auto">
+		<?php $this->widget('bootstrap.widgets.TbButton', array(
+			'label'=>'Добавить файл',
+			'buttonType' => 'button',
+			'size'=>'small', // null, 'large', 'small' or 'mini'
+			'htmlOptions' => array('onclick' => '$(".addfile").slideToggle("slow");'),
+		)); ?>
+	</div>
+	<div style="width: 100%; display: none; margin: 0 auto" class="addfile">
+		<?php echo CHtml::form('','post', array('id' => 'addfile-form', 'enctype'=>'multipart/form-data')); ?>
+		<?php echo CHtml::errorSummary($files); ?>
+		<table class="table table-bordered">
+			<tr>
+				<td class="span4">
+					<?php echo CHtml::activeLabel(
+							$files,
+							'email'
+						); ?>
+				</td>
+				<td class="span8">
+					<?php
+					echo CHtml::activeEmailField(
+							$files,
+							'email',
+							!Yii::app()->user->isGuest ?
+							array(
+								'value' => Yii::app()->user->email,
+								'readonly' => 'readonly'
+							)
+							:
+							''
 						)
-						:
-						''
-					)
-				?>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<?php echo CHtml::activeLabel($files, 'name'); ?>
-			</td>
-			<td>
-				<?php
-				echo CHtml::activeTextField(
-						$files,
-						'name',
-						!Yii::app()->user->isGuest ?
-						array(
-							'value' => Yii::app()->user->name,
-							'readonly' => 'readonly'
+					?>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<?php echo CHtml::activeLabel($files, 'name'); ?>
+				</td>
+				<td>
+					<?php
+					echo CHtml::activeTextField(
+							$files,
+							'name',
+							!Yii::app()->user->isGuest ?
+							array(
+								'value' => Yii::app()->user->name,
+								'readonly' => 'readonly'
+							)
+							:
+							''
 						)
-						:
-						''
-					)
-				?>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<?php echo CHtml::activeLabel($files, 'demo_real'); ?>
-			</td>
-			<td>
-				<?php echo CHtml::activeFileField($files, 'demo_real') ?>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<?php echo CHtml::activeLabel($files, 'comment'); ?>
-			</td>
-			<td>
-				<?php echo CHtml::activeTextArea($files, 'comment'); ?>
-			</td>
-		</tr>
-		<?php if(CCaptcha::checkRequirements() && Yii::app()->user->isGuest):?>
-		<tr>
-			<td>
-				<?php echo CHtml::activeLabel($files, 'verifyCode'); ?>
-			</td>
-			<td>
-				<?php echo CHtml::activeTextField($files, 'verifyCode') ?>
-				<?php $this->widget('CCaptcha')?>
-			</td>
-		</tr>
-		<?php endif?>
-		<tr>
-			<td colspan="2">
-				<?php echo CHtml::submitButton('Сохранить'); ?>
-			</td>
-		</tr>
-	</table>
-	<?php echo CHtml::endForm(); ?>
-</div>
-
+					?>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<?php echo CHtml::activeLabel($files, 'demo_real'); ?>
+				</td>
+				<td>
+					<?php echo CHtml::activeFileField($files, 'demo_real') ?>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<?php echo CHtml::activeLabel($files, 'comment'); ?>
+				</td>
+				<td>
+					<?php echo CHtml::activeTextArea($files, 'comment'); ?>
+				</td>
+			</tr>
+			<?php if(CCaptcha::checkRequirements() && Yii::app()->user->isGuest):?>
+			<tr>
+				<td>
+					<?php echo CHtml::activeLabel($files, 'verifyCode'); ?>
+				</td>
+				<td>
+					<?php echo CHtml::activeTextField($files, 'verifyCode') ?>
+					<?php $this->widget('CCaptcha')?>
+				</td>
+			</tr>
+			<?php endif?>
+			<tr>
+				<td colspan="2">
+					<?php echo CHtml::submitButton('Сохранить'); ?>
+				</td>
+			</tr>
+		</table>
+		<?php echo CHtml::endForm(); ?>
+	</div>
+<?php endif;?>
 <?php if($ipaccess): ?>
 
 <?php $this->beginWidget('bootstrap.widgets.TbModal',
