@@ -12,8 +12,7 @@
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru  «Attribution-NonCommercial-ShareAlike»
  */
 
-?>
-<?php
+
 Yii::app()->clientScript->registerScript('adminactions', '
 	var days = $("#Amxadmins_days");
 	var flags = $("#Amxadmins_flags");
@@ -77,41 +76,54 @@ Yii::app()->clientScript->registerScript('adminactions', '
 		$("#flagsmodal").modal("hide");
 		return false;
 	});
+	$("#checkAllFlags").click(function(){
+		if(!$(this).attr("checked"))
+			$(".adminflag").removeAttr("checked");
+		else
+			$(".adminflag:not(:last)").attr("checked", true);
+	});
+	$(".adminflag").live("click", function(){
+		var allCB	= $(".adminflag").size();
+		var chCB	= $(".adminflag:checked").size();
+		if(allCB == chCB)
+			$("#checkAllFlags").attr("checked", true);
+		else
+			$("#checkAllFlags").removeAttr("checked");
+	});
 ');
-?>
 
-<?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
+$form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 	'id'=>'amxadmins-form',
 	'enableAjaxValidation'=>TRUE,
-)); ?>
-
-	<?php echo $form->errorSummary($model); ?>
-	<?php
+));
+	echo $form->errorSummary($model);
 	if($model->isNewRecord)
 		echo $form->errorSummary($webadmins);
-	?>
 
-	<?php
 	echo $form->dropDownListRow(
-			$model,
-			'flags',
-			Amxadmins::getAuthType(),
-			array(
-				'class' => 'span6',
-				'maxlength'=>32,
-			)
-		);
-	?>
-
-	<?php echo $form->textFieldRow($model,'nickname',array('class' => 'span6','maxlength'=>32)); ?>
-
-	<?php echo $form->textFieldRow($model,'steamid',array('class' => 'span6','maxlength'=>32)); ?>
-
-	<?php echo $form->textFieldRow($model,'username',array('class' => 'span6','maxlength'=>32)); ?>
-
-	<?php echo $form->passwordFieldRow($model,'password',array('class' => 'span6','maxlength'=>50, 'disabled' => 'disabled', 'value' => '')); ?>
-
-	<?php
+		$model,
+		'flags',
+		Amxadmins::getAuthType(),
+		array(
+			'class' => 'span6',
+			'maxlength'=>32,
+		)
+	);
+	
+	echo $form->textFieldRow($model,'nickname',array('class' => 'span6','maxlength'=>32));
+	echo $form->textFieldRow($model,'steamid',array('class' => 'span6','maxlength'=>32));
+	echo $form->textFieldRow($model,'username',array('class' => 'span6','maxlength'=>32));
+	echo $form->passwordFieldRow(
+		$model,
+		'password',
+		array(
+			'class' => 'span6',
+			'maxlength'=>50,
+			'disabled' => 'disabled',
+			'value' => ''
+		)
+	);
+	
 	echo $form->textFieldRow(
 		$model,
 		'access',
@@ -120,38 +132,45 @@ Yii::app()->clientScript->registerScript('adminactions', '
 			'append' => '<span id="flagsselector" style="cursor: pointer">Выбрать</span>'
 		)
 	);
-	?>
-
-	<?php echo $form->textFieldRow($model,'icq',array('class' => 'span6',)); ?>
-
-	<?php echo $form->dropDownListRow($model,'ashow', array('Нет', 'Да'),array('class' => 'span6',)); ?>
-
-	<?php
+	
+	echo $form->textFieldRow($model,'icq',array('class' => 'span6',));
+	echo $form->dropDownListRow($model,'ashow', array('Нет', 'Да'),array('class' => 'span6',));
+	
 	if($model->isNewRecord):
-	echo $form->textFieldRow(
-		$model,
-		'days',
-		array(
-			'class' => 'span6',
-			'value' => '30',
-			'append' => CHtml::checkBox('', false, array('id' => 'forever')) . ' навсегда'
-		)
-	);
+		echo $form->textFieldRow(
+			$model,
+			'days',
+			array(
+				'class' => 'span6',
+				'value' => '30',
+				'append' => CHtml::checkBox('', false, array('id' => 'forever')) . ' навсегда'
+			)
+		);
 
-	echo $form->checkBoxListRow($model, 'servers', CHtml::listData(Serverinfo::model()->findAll(), 'id', 'hostname'), array('multiple'=>true));
+		echo $form->checkBoxListRow(
+			$model,
+			'servers',
+			CHtml::listData(
+				Serverinfo::model()->findAll(),
+				'id',
+				'hostname'
+			),
+			array(
+				'multiple'=>true
+			)
+		);
 
 	else:
-	if($model->expired != 0):
-	echo $form->textFieldRow(
-		$model,
-		'long',
-		array(
-			'class' => 'span6',
-			'disabled' => 'disabled'
-		)
-	);
-	endif;
-	?>
+		if($model->expired != 0):
+		echo $form->textFieldRow(
+			$model,
+			'long',
+			array(
+				'class' => 'span6',
+				'disabled' => 'disabled'
+			)
+		);
+	endif;?>
 	<label for="Amxadmins_change">Изменить срок админки</label>
 	<div class="row-fluid">
 		<div class="span2">
@@ -188,8 +207,11 @@ Yii::app()->clientScript->registerScript('adminactions', '
 		<h4>Выбор флагов доступа</h4>
 	</div>
 	<div class="modal-body">
+		<label class="checkbox">
+			<input type="checkbox" id="checkAllFlags"> Выбрать все (кроме z)
+		</label>
 		<?php
-			echo $form->checkboxListRow($model, 'accessflags', Amxadmins::getFlags());
+			echo $form->checkboxListRow($model, 'accessflags', Amxadmins::getFlags(), array('class' => 'adminflag'));
 		?>
 	</div>
 	<div class="modal-footer">
@@ -199,8 +221,8 @@ Yii::app()->clientScript->registerScript('adminactions', '
 			'htmlOptions'=>array(
 				'id'=>'setFlags',
 			),
-		)); ?>
-		<?php $this->widget('bootstrap.widgets.TbButton', array(
+		));
+		$this->widget('bootstrap.widgets.TbButton', array(
 			'label'=>'Отмена',
 			'url'=>'#',
 			'htmlOptions'=>array(
@@ -208,17 +230,18 @@ Yii::app()->clientScript->registerScript('adminactions', '
 			),
 		)); ?>
 	</div>
-	<?php $this->endWidget(); ?>
-
-	<?php if($model->isNewRecord):?>
-	<hr class="row-divider">
-	<button class="btn btn-info" type="button" onclick="$('#webrights').slideToggle('slow');">Добавить WEB админа</button>
-	<div id="webrights" style="display: none"><br>
-		<?php echo $form->textFieldRow($webadmins,'username',array('class' => 'span6','size'=>32,'maxlength'=>32, 'value' => 'Будет использован ник Amx админа', 'disabled' => 'disabled'));?>
-		<?php echo $form->passwordFieldRow($webadmins,'password',array('class' => 'span6','size'=>32,'maxlength'=>32, 'value' => '')); ?>
-		<?php echo $form->textFieldRow($webadmins,'email',array('class' => 'span6','size'=>60,'maxlength'=>64)); ?>
-		<?php echo $form->dropdownListRow($webadmins,'level', Levels::getList(), array('class' => 'span6')); ?>
-	</div>
+	<?php
+	$this->endWidget();
+	
+	if($model->isNewRecord):?>
+		<hr class="row-divider">
+		<button class="btn btn-info" type="button" onclick="$('#webrights').slideToggle('slow');">Добавить WEB админа</button>
+		<div id="webrights" style="display: none"><br>
+			<?php echo $form->textFieldRow($webadmins,'username',array('class' => 'span6','size'=>32,'maxlength'=>32, 'value' => 'Будет использован ник Amx админа', 'disabled' => 'disabled'));?>
+			<?php echo $form->passwordFieldRow($webadmins,'password',array('class' => 'span6','size'=>32,'maxlength'=>32, 'value' => '')); ?>
+			<?php echo $form->textFieldRow($webadmins,'email',array('class' => 'span6','size'=>60,'maxlength'=>64)); ?>
+			<?php echo $form->dropdownListRow($webadmins,'level', Levels::getList(), array('class' => 'span6')); ?>
+		</div>
 	<?php endif;?>
 
 
