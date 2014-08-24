@@ -207,7 +207,7 @@ $this->widget('bootstrap.widgets.TbGridView', array(
 	</tr>
 	<tr class="odd">
 		<td>
-			<b>Истекает</b>
+			<b>Срок</b>
 		</td>
 		<td id="bandetail-expired">
 		</td>
