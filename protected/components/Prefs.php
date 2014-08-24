@@ -123,16 +123,16 @@ class Prefs extends CApplicationComponent {
 	 * @return string
 	 * @author AmxBans Team <amxbans.de>
 	 */
-	public static function date2word($dif, $short=false)
+	public static function date2word($dif, $short=FALSE, $server = FALSE)
 	{
 		if($dif == 0) {
-			return 'Навсегда';
+			return $server ? '' : 'Навсегда';
 		}
 		if($dif == '-1') {
 			return 'Разбанен';
 		}
 
-		$dif = $dif * 60;
+		$dif = $server ? $dif : $dif * 60;
 
 		if($dif) {
 			$s = '';
