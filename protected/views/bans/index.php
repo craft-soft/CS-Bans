@@ -76,7 +76,7 @@ $this->widget('bootstrap.widgets.TbGridView', array(
 	'rowHtmlOptionsExpression'=>'array(
 		"id" => "ban_$data->bid",
 		"style" => "cursor:pointer;",
-		"class" => $data->expired == 1 ? "bantr success" : "bantr"
+		"class" => $data->unbanned == 1 ? "bantr success" : "bantr"
 	)',
 	'pager' => array(
 		'class'=>'bootstrap.widgets.TbPager',
