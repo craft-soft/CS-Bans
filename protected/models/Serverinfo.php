@@ -55,6 +55,15 @@ class Serverinfo extends CActiveRecord
 		return '{{serverinfo}}';
 	}
 
+	public function scopes()
+    {
+        return array(
+            'sort'=>array(
+                'order'=>'`hostname` ASC'
+            ),
+        );
+    }
+	
 	public function rules()
 	{
 		return array(
@@ -105,7 +114,7 @@ class Serverinfo extends CActiveRecord
 		$criteria->compare('amxban_menu',$this->amxban_menu);
 		$criteria->compare('reasons',$this->reasons);
 		$criteria->compare('timezone_fixx',$this->timezone_fixx);
-
+		$criteria->order = '`hostname` ASC';
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 		));
@@ -261,7 +270,7 @@ class Serverinfo extends CActiveRecord
 
 	public static function getAllServers($all = TRUE, $id = false)
 	{
-		$model = Serverinfo::model()->findAll();
+		$model = Serverinfo::model()->findAll(array('order' => 'hostname ASC'));
 
 		$return = array();
 

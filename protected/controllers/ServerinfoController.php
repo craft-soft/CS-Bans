@@ -207,18 +207,12 @@ class ServerinfoController extends Controller
 		if(isset($_GET['Serverinfo']))
 			$model->attributes=$_GET['Serverinfo'];
 
-		$servers=new CActiveDataProvider('Serverinfo', array(
-			'pagination' => array(
-				 'pageSize' => Yii::app()->config->bans_per_page,
-			),)
-		 );
-
 		$allbans = Bans::model()->cache(600)->count();
 		$activebans = Bans::model()->cache(600)->count('((ban_created+(ban_length*60)) > :time OR ban_length = 0) AND `expired` = 0', array(':time' => time()));
 		$permbans = Bans::model()->cache(600)->count('ban_length = 0');
 
 		$this->render('index',array(
-			'servers'=>Serverinfo::model()->cache(600)->findAll(),
+			'servers'=>Serverinfo::model()->cache(600)->findAll(array('order' => '`hostname` ASC')),
 			'info' => array(
 				'bancount' => $allbans,
 				'actbans' => $activebans,
