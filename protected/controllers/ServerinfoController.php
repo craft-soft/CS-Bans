@@ -275,7 +275,7 @@ class ServerinfoController extends Controller
 				$players .= "<tr class=\"odd\">";
 				$players .= "<td width=\"70%\">" . CHtml::encode($player['name']) . "</td>";
 				$players .= "<td style=\"text-align:center\">" . intval($player['score'], ENT_QUOTES) . "</td>";
-				$players .= "<td>" . Prefs::date2word(intval($player['time'])) . "</td>";
+				$players .= "<td>" . (function_exists('query_live') ? $player['time'] : Prefs::date2word(intval($player['time']), FALSE, TRUE)) . "</td>";
 				$players .= "</tr>";
 			}
 			$players .= "</table>";
