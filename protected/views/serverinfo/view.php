@@ -232,4 +232,3 @@ endif;
 	</div>
 	<?php endif; ?>
 </div>
-<pre><?php echo print_r($info['playersinfo'], TRUE)?></pre>
