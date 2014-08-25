@@ -144,7 +144,7 @@ endif;
 						<tr class="context-menu-one" id="<?php echo CHtml::encode($player['name'])?>">
 							<td><?php echo CHtml::encode($player['name'])?></td>
 							<td style="text-align: center"><?php echo CHtml::encode($player['score'])?></td>
-							<td style="text-align: center"><?php echo Prefs::date2word(intval($player['time']), FALSE, TRUE)?></td>
+							<td style="text-align: center"><?php echo function_exists('query_live') ? $player['time'] : Prefs::date2word(intval($player['time']), FALSE, TRUE)?></td>
 						</tr>
 					<?php endforeach;?>
 				</tbody>
@@ -232,3 +232,4 @@ endif;
 	</div>
 	<?php endif; ?>
 </div>
+<pre><?php echo print_r($info['playersinfo'], TRUE)?></pre>
