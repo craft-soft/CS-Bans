@@ -68,7 +68,7 @@ class Prefs extends CApplicationComponent {
 	*/
 	public static function steam_convert($id, $url = FALSE, $xml = FALSE) {
 
-		$RightSteam = "/^(STEAM_0)\:([0-1])\:([0-9]{4,8})$/";
+		$RightSteam = "/^(STEAM_[0-9])\:([0-9])\:([0-9]{4,8})$/";
 		$RightNumber = "/^(7656119)([0-9]{10})$/";
 
 		if (!$id) { return FALSE; }
