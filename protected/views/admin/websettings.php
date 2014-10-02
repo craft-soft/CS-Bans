@@ -49,7 +49,7 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
 		'/site/index' => 'Главная',
 		'/bans/index' => 'Банлист',
 		'/serverinfo/index' => 'Серверы',
-		'/amxadmins/index' => 'Аддмины',
+		'/amxadmins/index' => 'Админы',
 	));
 	?>
 	<legend>Комментарии</legend>
