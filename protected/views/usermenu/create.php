@@ -20,7 +20,7 @@ $this->breadcrumbs=array(
 );
 
 $this->menu=array(
-	array('label'=>'Упрпавление ссылками','url'=>array('admin')),
+	array('label'=>'Управление ссылками','url'=>array('admin')),
 );
 $this->renderPartial('/admin/mainmenu', array('active' =>'site', 'activebtn' => 'webmainmenu'));
 ?>
