@@ -60,7 +60,7 @@ class Bans extends CActiveRecord
 			array('player_nick', 'required'),
 			array('ban_length, imported', 'numerical', 'integerOnly'=>true),
 			array('player_ip', 'match', 'pattern' => '/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/'),
-			array('player_id', 'match', 'pattern' => '/^STEAM_([0-9]):([0-9]):\d{1,21}$/'),
+			array('player_id', 'match', 'pattern' => '/^(STEAM|VALVE)_([0-9]):([0-9]):\d{1,21}$/'),
 			array('player_nick, ban_reason, cs_ban_reason', 'length', 'max'=>100),
 			array('ban_type', 'in', 'range' => array('S', 'SI')),
 			//array('expiredTime', 'safe'),
