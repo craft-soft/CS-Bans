@@ -108,11 +108,16 @@ class Files extends CActiveRecord
 	{
 		if (parent::beforeDelete())
 		{
-			if ($this->demo_real)
-				@unlink(Yii::getPathOfAlias('webroot.demos') . DIRECTORY_SEPARATOR . $this->demo_file);
+                    if (
+                        $this->demo_real
+                            &&
+                        @unlink(Yii::getPathOfAlias('webroot.include.files') . DIRECTORY_SEPARATOR . $this->demo_file)    
+                    ) {
 			return true;
+                    }
 		}
-		else return false;
+                
+                return false;
 	}
 
 	protected function beforeValidate() {
