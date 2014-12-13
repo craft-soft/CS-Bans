@@ -26,7 +26,7 @@
     <link href="<?php echo Yii::app()->theme->baseUrl; ?>/css/bootstrap-responsive.min.css" rel="stylesheet">
 
     <link href="<?php echo Yii::app()->theme->baseUrl; ?>/css/font-awesome.min.css" rel="stylesheet">
-    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,800italic,400,600,800&subset=latin,cyrillic" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,800italic,400,600,800&subset=latin,cyrillic" rel="stylesheet">
 
     <link href="<?php echo Yii::app()->theme->baseUrl; ?>/css/style.css" rel="stylesheet">
     <link href="<?php echo Yii::app()->theme->baseUrl; ?>/css/style-responsive.css" rel="stylesheet">
