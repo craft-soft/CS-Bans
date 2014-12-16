@@ -107,7 +107,7 @@ if($geo)
 			'name' => 'player_id',
 			'type' => 'raw',
 			'value' => Prefs::steam_convert($model->player_id, TRUE)
-				? CHtml::link($model->player_id, 'http://steamcommunity.com/profiles/'
+				? CHtml::link($model->player_id, '//steamcommunity.com/profiles/'
 						. Prefs::steam_convert($model->player_id), array('target' => '_blank'))
 				: $model->player_id,
 		),
@@ -159,7 +159,7 @@ $this->widget('bootstrap.widgets.TbGridView',array(
 			'name' => 'player_id',
 			'type' => 'raw',
 			'value' => 'Prefs::steam_convert($data->player_id, TRUE)
-				? CHtml::link($data->player_id, "http://steamcommunity.com/profiles/"
+				? CHtml::link($data->player_id, "//steamcommunity.com/profiles/"
 						. Prefs::steam_convert($data->player_id), array("target" => "_blank"))
 				: $data->player_id',
 		),
