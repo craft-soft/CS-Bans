@@ -20,7 +20,7 @@ $this->breadcrumbs=array(
 );
 if($geo)
 {
-	Yii::app()->clientScript->registerScriptFile('http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU',CClientScript::POS_END);
+	Yii::app()->clientScript->registerScriptFile('//api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU',CClientScript::POS_END);
 	Yii::app()->clientScript->registerScript('yandexmap', "
 		ymaps.ready(inityamaps);
 		function inityamaps () {

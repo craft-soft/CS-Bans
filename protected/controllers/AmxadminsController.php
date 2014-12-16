@@ -246,7 +246,7 @@ class AmxadminsController extends Controller
 		$info .= "<td>".CHtml::encode($model->nickname)."</td>";
 		$info .= "</tr><tr>";
 		$info .= "<td><b>Контакты</b></td>";
-		$info .= "<td>" . ($model->icq ? CHtml::image("http://icq-rus.com/icq/3/".$model->icq.".gif"). " " . $model->icq : 'Не задан') . "</td>";
+		$info .= "<td>" . ($model->icq ? CHtml::image("//icq-rus.com/icq/3/".$model->icq.".gif"). " " . $model->icq : 'Не задан') . "</td>";
 		$info .= "</tr><tr>";
 		$info .= "<td><b>Доступ</b></td>";
 		$info .= "<td>".$model->access."</td>";
