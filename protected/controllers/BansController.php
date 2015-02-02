@@ -71,16 +71,24 @@ class BansController extends Controller
 		$ipaccess = Webadmins::checkAccess('ip_view');
 		if($ipaccess)
 		{
+	            $geo = array(
+	                'city' => 'Н/А',
+	                'region' => 'Не определен',
+	                'country' => 'Не определен',
+	                'lat' => 0,
+	                'lng' => 0,
+	            );
 			$get = @file_get_contents('http://ipgeobase.ru:7020/geo?ip=' . $model->player_ip);
-
-			$xml = @simplexml_load_string($get);
-
-			$geo = array();
-			$geo['city'] = $xml->ip->city;
-			$geo['region'] = $xml->ip->region;
-			$geo['country'] = $xml->ip->country;
-			$geo['lat'] = $xml->ip->lat;
-			$geo['lng'] = $xml->ip->lng;
+	            if($get) {
+	                $xml = @simplexml_load_string($get);
+	                if(!empty($xml->ip)) {
+	                    $geo['city'] = $xml->ip->city;
+	                    $geo['region'] = $xml->ip->region;
+	                    $geo['country'] = $xml->ip->country;
+	                    $geo['lat'] = $xml->ip->lat;
+	                    $geo['lng'] = $xml->ip->lng;
+	                }
+	            }
 		}
 
 		// Добавление файла
