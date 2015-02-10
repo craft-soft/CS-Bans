@@ -72,29 +72,37 @@ class Bans extends CActiveRecord
 	{
 		return array(
 			'commentsCount' => array(
-					self::STAT,
-					'Comments',
-					'bid',
-					'defaultValue' => 0,
-				),
+                self::STAT,
+                'Comments',
+                'bid',
+                'defaultValue' => 0,
+            ),
 			'comments' => array(
-					self::HAS_MANY,
-					'Comments',
-					'bid',
-					'order' => 'comments.id DESC',
-				),
+                self::HAS_MANY,
+                'Comments',
+                'bid',
+                'order' => 'comments.id DESC',
+            ),
 			'filesCount' => array(
-					self::STAT,
-					'Files',
-					'bid',
-					'defaultValue' => 0,
-				),
+                self::STAT,
+                'Files',
+                'bid',
+                'defaultValue' => 0,
+            ),
 			'files' => array(
-					self::HAS_MANY,
-					'Files',
-					'bid',
-					'order' => 'files.id DESC',
-				),
+                self::HAS_MANY,
+                'Files',
+                'bid',
+                'order' => 'files.id DESC',
+            ),
+            'admin' => array(
+                self::HAS_ONE,
+                'Amxadmins',
+                '',
+                'on' => '`admin`.`steamid` = `t`.`admin_nick` OR '
+                    . '`admin`.`steamid` = `t`.`admin_ip` OR '
+                    . '`admin`.`steamid` = `t`.`admin_id`'
+            )
 		);
 	}
 
@@ -128,43 +136,36 @@ class Bans extends CActiveRecord
 	}
 	
 	protected function afterFind() {
-		parent::afterFind();
-
 		$country = strtolower(Yii::app()->IpToCountry->lookup($this->player_ip));
-		$this->country = CHtml::image(Yii::app()->urlManager->baseUrl . '/images/country/' . ($country != 'zz' ? $country : 'clear') . '.png');
+		$this->country = CHtml::image(
+            Yii::app()->urlManager->baseUrl 
+            . '/images/country/' 
+            . ($country != 'zz' ? $country : 'clear') . '.png'
+        );
+        return parent::afterFind();
 	}
 
 	protected function beforeSave() {
 		if($this->isNewRecord) {
 			$this->ban_created = time();
-		}
-		else
-		{
-			$unbanned = $this->ban_length == '-1' || $this->expired == 1 || ($this->ban_created + ($this->ban_length * 60)) < time();
-			
-			if($unbanned)
-			{
-				//exit($this->bid);
+		} else {
+			if($this->getUnbanned()) {
 				$this->expired = time() + $this->ban_length * 60;
-			}
-
-			 else
-			 {
-				 //exit($this->bid);
+			} else {
 				 $oldban = self::model()->findByPk($this->bid);
 				 $this->expired = $oldban->expired + $this->ban_length * 60;
 			 }
 		}
-
-		return parent::beforeSave();;
+		return parent::beforeSave();
 	}
 
 	public function afterSave() {
-		if($this->isNewRecord)
-			Syslog::add(Logs::LOG_ADDED, 'Добавлен новый бан игрока <strong>' . $this->player_nick . '</strong>');
-		else
-			Syslog::add(Logs::LOG_EDITED, 'Изменены детали бана игрока <strong>' . $this->player_nick . '</strong>');
-		return parent::afterSave();
+		if ($this->isNewRecord) {
+            Syslog::add(Logs::LOG_ADDED, 'Добавлен новый бан игрока <strong>' . $this->player_nick . '</strong>');
+        } else {
+            Syslog::add(Logs::LOG_EDITED, 'Изменены детали бана игрока <strong>' . $this->player_nick . '</strong>');
+        }
+        return parent::afterSave();
 	}
 
 	public function afterDelete() {
@@ -173,12 +174,12 @@ class Bans extends CActiveRecord
 	}
 
 	protected function beforeValidate() {
-		if($this->isNewRecord)
-		{
-			if(!filter_var($this->player_ip, FILTER_VALIDATE_IP, array('flags' => FILTER_FLAG_IPV4)))
-				return $this->addError($this->player_ip, 'Неверно введен IP');
-			
-			if($this->player_id && Bans::model()->count('`player_ip` = :ip AND (`ban_length` = 0 OR `ban_created` + (`ban_length` * 60) >= UNIX_TIMESTAMP())', array(
+		if($this->isNewRecord) {
+			if (!filter_var($this->player_ip, FILTER_VALIDATE_IP, array('flags' => FILTER_FLAG_IPV4))) {
+                return $this->addError($this->player_ip, 'Неверно введен IP');
+            }
+
+            if($this->player_ip && Bans::model()->count('`player_ip` = :ip AND (`ban_length` = 0 OR `ban_created` + (`ban_length` * 60) >= UNIX_TIMESTAMP())', array(
 					':ip' => $this->player_ip
 				)))
 			{
@@ -232,7 +233,7 @@ class Bans extends CActiveRecord
 	{
 		return Prefs::getExpired($this->ban_created, $this->ban_length);
 	}
-
+    
 	/**
 	 * Настройки поиска
 	 * @return \CActiveDataProvider
@@ -247,14 +248,18 @@ class Bans extends CActiveRecord
 		$criteria->addSearchCondition('player_nick',$this->player_nick);
 		$criteria->compare('admin_ip',$this->admin_ip,true);
 		$criteria->compare('admin_id',$this->admin_id,true);
-		if($this->admin_nick) $criteria->compare('admin_nick',$this->admin_nick,true);
-		$criteria->compare('ban_type',$this->ban_type,true);
+		if ($this->admin_nick) {
+            $criteria->compare('admin_nick', $this->admin_nick, true);
+        }
+        $criteria->compare('ban_type',$this->ban_type,true);
 		$criteria->addSearchCondition('ban_reason',$this->ban_reason);
 		$criteria->compare('cs_ban_reason',$this->cs_ban_reason,true);
-		//$criteria->compare('ban_created',$this->ban_created);
-		if($this->ban_created)
-			$criteria->addBetweenCondition('ban_created', strtotime("{$this->ban_created} 00:00:00"), strtotime("{$this->ban_created} 23:59:59"));
-		$criteria->compare('ban_length',$this->ban_length);
+		if ($this->ban_created) {
+            $start = strtotime("{$this->ban_created} 00:00:00");
+            $end = strtotime("{$this->ban_created} 23:59:59");
+            $criteria->addBetweenCondition('ban_created', $start, $end);
+        }
+        $criteria->compare('ban_length',$this->ban_length);
 		$criteria->compare('server_ip',$this->server_ip,true);
 		$criteria->compare('server_name',$this->server_name,true);
 		$criteria->compare('ban_kicks',$this->ban_kicks);
