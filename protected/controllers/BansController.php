@@ -37,21 +37,21 @@ class BansController extends Controller
 		$model = $this->loadModel($id);
 
 		// Проверка прав
-		if(!Webadmins::checkAccess('bans_unban', $model->admin_nick))
-			throw new CHttpException(403, "У Вас недостаточно прав");
+		if (!Webadmins::checkAccess('bans_unban', $model->admin_nick)) {
+            throw new CHttpException(403, "У Вас недостаточно прав");
+        }
 
-		$model->ban_length = '-1';
+        $model->ban_length = '-1';
 		$model->expired = 1;
 
-		if($model->save(FALSE))
-			Yii::app ()->end('Игрок разбанен');
+		if ($model->save(FALSE)) {
+            Yii::app()->end('Игрок разбанен');
+        }
 
-		Yii::app ()->end(CHtml::errorSummary($model));
-
-		//Yii::app()->end($id);
+        Yii::app ()->end(CHtml::errorSummary($model));
 	}
 
-		/**
+	/**
 	 * Вывод инфы о бане
 	 * @param integer $id ID бана
 	 */
@@ -69,49 +69,45 @@ class BansController extends Controller
 		$geo = false;
 		// Проверка прав на просмотр IP
 		$ipaccess = Webadmins::checkAccess('ip_view');
-		if($ipaccess)
-		{
-	            $geo = array(
-	                'city' => 'Н/А',
-	                'region' => 'Не определен',
-	                'country' => 'Не определен',
-	                'lat' => 0,
-	                'lng' => 0,
-	            );
+		if($ipaccess) {
+            $geo = array(
+                'city' => 'Н/А',
+                'region' => 'Не определен',
+                'country' => 'Не определен',
+                'lat' => 0,
+                'lng' => 0,
+            );
 			$get = @file_get_contents('http://ipgeobase.ru:7020/geo?ip=' . $model->player_ip);
-	            if($get) {
-	                $xml = @simplexml_load_string($get);
-	                if(!empty($xml->ip)) {
-	                    $geo['city'] = $xml->ip->city;
-	                    $geo['region'] = $xml->ip->region;
-	                    $geo['country'] = $xml->ip->country;
-	                    $geo['lat'] = $xml->ip->lat;
-	                    $geo['lng'] = $xml->ip->lng;
-	                }
-	            }
+            if($get) {
+                $xml = @simplexml_load_string($get);
+                if(!empty($xml->ip)) {
+                    $geo['city'] = $xml->ip->city;
+                    $geo['region'] = $xml->ip->region;
+                    $geo['country'] = $xml->ip->country;
+                    $geo['lat'] = $xml->ip->lat;
+                    $geo['lng'] = $xml->ip->lng;
+                }
+            }
 		}
 
 		// Добавление файла
-		if(isset($_POST['Files']) && !empty($_POST['Files']['name']))
-		{
+		if(isset($_POST['Files']) && !empty($_POST['Files']['name'])) {
 			// Задаем аттрибуты
 			$files->attributes = $_POST['Files'];
 			$files->bid = intval($id);
-
 			$files->save();
-
 			$this->refresh();
 		}
 
 		// Добавление комментария
-		if(isset($_POST['Comments']))
-		{
+		if(isset($_POST['Comments'])) {
 			//exit(print_r($_POST['Comments']));
 			$comments->attributes = $_POST['Comments'];
 			$comments->bid = $id;
-			if($comments->save())
-				$this->refresh();
-		}
+			if ($comments->save()) {
+                $this->refresh();
+            }
+        }
 
 		// Выборка комментариев
 		$c = new CActiveDataProvider($comments, array(
