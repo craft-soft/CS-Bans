@@ -112,7 +112,7 @@ if($geo)
 				: $model->player_id,
 		),
 		'player_nick',
-		'admin_nick',
+		'adminName:html',
 		'ban_reason',
 		array(
 			'name' => 'ban_created',

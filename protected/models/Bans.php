@@ -34,6 +34,7 @@
  * @property Comments[] $comments
  * @property integer $filesCount
  * @property Files[] $files
+ * @property Amxadmins $admin
  */
 class Bans extends CActiveRecord
 {
@@ -116,6 +117,7 @@ class Bans extends CActiveRecord
 			'admin_ip'			=> 'IP админа',
 			'admin_id'			=> 'Steam ID админа',
 			'admin_nick'		=> 'Ник админа',
+			'adminName'         => 'Админ',
 			'ban_type'			=> 'Тип бана',
 			'ban_reason'		=> 'Причина',
 			'cs_ban_reason'		=> 'Доп. Причина',
@@ -131,6 +133,15 @@ class Bans extends CActiveRecord
 		);
 	}
 
+    public function getAdminName()
+    {
+        $return = $this->admin_nick;
+        if(!Yii::app()->user->isGuest && $this->admin) {
+            $return .= ' (<strong>'.$this->admin->nickname.'</strong>)';
+        }
+        return $return;
+    }
+    
 	public function getUnbanned() {
 		return $this->ban_length == '-1' || $this->expired == 1 || ($this->ban_created + ($this->ban_length * 60)) < time();
 	}

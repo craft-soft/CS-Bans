@@ -65,7 +65,10 @@ class BansController extends Controller
 		$comments->unsetAttributes();
 
 		// Подгружаем баны
-		$model = $this->loadModel($id);
+		$model=Bans::model()->with('admin')->findByPk($id);
+		if ($model === null) {
+            throw new CHttpException(404, 'The requested page does not exist.');
+        }
 		$geo = false;
 		// Проверка прав на просмотр IP
 		$ipaccess = Webadmins::checkAccess('ip_view');
@@ -163,22 +166,23 @@ class BansController extends Controller
 	public function actionCreate()
 	{
 		// Проверка прав
-		if(!Webadmins::checkAccess('bans_add'))
-			throw new CHttpException(403, "У Вас недостаточно прав");
+		if (!Webadmins::checkAccess('bans_add')) {
+            throw new CHttpException(403, "У Вас недостаточно прав");
+        }
 
-		$model=new Bans;
+        $model=new Bans;
 
 		// Аякс проверка формы
 		$this->performAjaxValidation($model);
 
-		if(isset($_POST['Bans']))
-		{
+		if(isset($_POST['Bans'])) {
 			$model->attributes=$_POST['Bans'];
 			$model->admin_nick = 'Web';
 			$model->server_name = 'Забанен с сайта';
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->bid));
-		}
+			if ($model->save()) {
+                $this->redirect(array('view', 'id' => $model->bid));
+            }
+        }
 
 		$this->render('create',array(
 			'model'=>$model,
@@ -194,23 +198,23 @@ class BansController extends Controller
 		$model=$this->loadModel($id);
 
 		// Проверка прав
-		if(!Webadmins::checkAccess('bans_edit', $model->admin_nick))
-			throw new CHttpException(403, "У Вас недостаточно прав");
+		if (!Webadmins::checkAccess('bans_edit', $model->admin_nick)) {
+            throw new CHttpException(403, "У Вас недостаточно прав");
+        }
 
-		// Аякс проверка формы
+        // Аякс проверка формы
 		// $this->performAjaxValidation($model);
 
 		// Сохраняем форму
-		if(isset($_POST['Bans']))
-		{
+		if(isset($_POST['Bans'])) {
 			$model->attributes=$_POST['Bans'];
-			if(isset($_POST['selfreasoncheckbox']) && isset($_POST['self_ban_reason']))
-			{
+			if(isset($_POST['selfreasoncheckbox']) && isset($_POST['self_ban_reason'])) {
 				$model->ban_reason = $_POST['self_ban_reason'];
 			}
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->bid));
-		}
+			if ($model->save()) {
+                $this->redirect(array('view', 'id' => $model->bid));
+            }
+        }
 
 		$this->render('update',array(
 			'model'=>$model,
@@ -226,31 +230,30 @@ class BansController extends Controller
 		$model = $this->loadModel($id);
 
 		// Проверка прав
-		if(!Webadmins::checkAccess('bans_delete', $model->admin_nick))
-			throw new CHttpException(403, "У Вас недостаточно прав");
+		if (!Webadmins::checkAccess('bans_delete', $model->admin_nick)) {
+            throw new CHttpException(403, "У Вас недостаточно прав");
+        }
 
-		$model->delete();
+        $model->delete();
 		// Если не аякс запрос, то редиректим
-		if(!isset($_GET['ajax']))
-			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
-	}
+		if (!isset($_GET['ajax'])) {
+            $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+        }
+    }
 
 	/**
 	 * Вывод всех банов
 	 */
 	public function actionIndex()
 	{
-		if(Yii::app()->request->isAjaxRequest && isset($_POST['server']))
-		{
-			if($_POST['server'] == 0)
-			{
+		if(Yii::app()->request->isAjaxRequest && isset($_POST['server'])) {
+			if($_POST['server'] == 0) {
 				Yii::app()->end('$("#Bans_admin_nick").html("<option value=\"0\">Не выбрано</option>");');
 			}
 			$amxadmins = Amxadmins::model()->with('servers')->findAll('`address` = :addr', array(':addr' => $_POST['server']));
 
 			$js = "<option>Любой админ</option>";
-			foreach($amxadmins as $admin)
-			{
+			foreach($amxadmins as $admin) {
 				$js .= "<option value=\"{$admin->steamid}\">{$admin->nickname}</option>";
 			}
 
@@ -259,10 +262,11 @@ class BansController extends Controller
 
 		$model=new Bans('search');
 		$model->unsetAttributes();
-		if(isset($_GET['Bans']))
-			$model->attributes=$_GET['Bans'];
+		if (isset($_GET['Bans'])) {
+            $model->attributes = $_GET['Bans'];
+        }
 
-		$select = "((ban_created+(ban_length*60)) > UNIX_TIMESTAMP() OR ban_length = 0) AND `expired` = 0";
+        $select = "((ban_created+(ban_length*60)) > UNIX_TIMESTAMP() OR ban_length = 0) AND `expired` = 0";
 
 		$dataProvider=new CActiveDataProvider('Bans', array(
 			'criteria'=>array(
@@ -283,8 +287,7 @@ class BansController extends Controller
 		$check = Bans::model()->count(
 			"`player_ip` = :ip AND " . $select,
 			array(
-				':ip'=>$_SERVER['REMOTE_ADDR'],
-				//':time' => time()
+				':ip'=> Prefs::getRealIp(),
 			)
 		);
 		$this->render('index',array(
@@ -300,15 +303,17 @@ class BansController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		if(Yii::app()->user->isGuest)
-			throw new CHttpException(403, "У Вас недостаточно прав");
+		if (Yii::app()->user->isGuest) {
+            throw new CHttpException(403, "У Вас недостаточно прав");
+        }
 
-		$model=new Bans('search');
+        $model=new Bans('search');
 		$model->unsetAttributes();
-		if(isset($_GET['Bans']))
-			$model->attributes=$_GET['Bans'];
+		if (isset($_GET['Bans'])) {
+            $model->attributes = $_GET['Bans'];
+        }
 
-		$this->render('admin',array(
+        $this->render('admin',array(
 			'model'=>$model,
 		));
 	}
@@ -320,7 +325,7 @@ class BansController extends Controller
 	{
 		if(is_numeric($_POST['bid']))
 		{
-			$model = Bans::model()->findByPk($_POST['bid']);
+			$model = Bans::model()->with('admin')->findByPk($_POST['bid']);
 			if($model === null)
 			{
 				Yii::app()->end('alert("Ошибка!")');
@@ -338,7 +343,7 @@ class BansController extends Controller
 					:
 				Prefs::date2word($model->ban_length) .
 				($model->expired == 1 ? ' (истек)' : '')) . "');";
-			$js .= "$('#bandetail-admin').html('" . CHtml::encode($model->admin_nick) . "');";
+			$js .= "$('#bandetail-admin').html('" . $model->adminName . "');";
 			$js .= "$('#bandetail-server').html('" . CHtml::encode($model->server_name) . "');";
 			$js .= "$('#bandetail-kicks').html('" . $model->ban_kicks . "');";
 			$js .= "$('#loading').hide();";
@@ -356,10 +361,11 @@ class BansController extends Controller
 		$sid = (int)SubStr( $sid, 1 );
 
 		$model = Bans::model()->findByPk($sid);
-		if($model===null)
-			Yii::app()->end('Error!');
+		if ($model === null) {
+            Yii::app()->end('Error!');
+        }
 
-		$this->render('motd', array(
+        $this->render('motd', array(
 			'model'=>$model,
 			'show_admin' => $adm == 1 ? TRUE : FALSE
 		));
@@ -372,9 +378,10 @@ class BansController extends Controller
 	public function loadModel($id)
 	{
 		$model=Bans::model()->findByPk($id);
-		if($model===null)
-			throw new CHttpException(404,'The requested page does not exist.');
-		return $model;
+		if ($model === null) {
+            throw new CHttpException(404, 'The requested page does not exist.');
+        }
+        return $model;
 	}
 
 	/**
@@ -382,8 +389,7 @@ class BansController extends Controller
 	 */
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='bans-form')
-		{
+		if(isset($_POST['ajax']) && $_POST['ajax']==='bans-form') {
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
