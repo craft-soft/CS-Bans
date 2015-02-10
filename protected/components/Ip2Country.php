@@ -26,15 +26,18 @@ class Ip2Country extends CApplicationComponent {
         $this->index = array_fill_keys(range(0, 8191), null);
 
         $index = str_split(fread($this->fp, $indexlen), 12);
-        foreach($index as $ix)
+        foreach ($index as $ix) {
             $this->index[self::ipgroup($ix)] .= $ix;
+        }
 
         $lastv = null;
-        foreach($this->index as $k => &$v)
-            if ($v)
+        foreach($this->index as $k => &$v) {
+            if ($v) {
                 $lastv = $v;
-            else
+            } else {
                 $v = $lastv;
+            }
+        }
     }
 
     /**
@@ -42,8 +45,9 @@ class Ip2Country extends CApplicationComponent {
      */
 	public function __destruct()
     {
-        if ($this->fp)
+        if ($this->fp) {
             fclose($this->fp);
+        }
     }
 
     /**
@@ -60,19 +64,21 @@ class Ip2Country extends CApplicationComponent {
      */
     public function preload()
     {
-        if ($this->fp == null)
+        if ($this->fp == null) {
             return;
+        }
 
         fseek($this->fp, $this->offset);
         $data = fread($this->fp, $this->datalen);
 
-        foreach($this->index as $index)
-            foreach(str_split($index, 12) as $ix)
-            {
+        foreach($this->index as $index) {
+            foreach(str_split($index, 12) as $ix) {
                 list(, , $pos, $len) = unpack('L3', $ix);
-                if (!isset($this->data[$pos]))
-                    $this->data[$pos] = substr($data, $pos, $len + 6); // Always one extra record, for upper bound
+                if (!isset($this->data[$pos])) {
+                    $this->data[$pos] = substr($data, $pos, $len + 6);
+                } // Always one extra record, for upper bound
             }
+        }
 
         fclose($this->fp);
         $this->fp = null;
@@ -94,8 +100,7 @@ class Ip2Country extends CApplicationComponent {
         $l = 0;
         $count = strlen($data) / $reclen;
         $h = $count - 1;
-        while ($l <= $h)
-        {
+        while ($l <= $h) {
             $i = ($l + $h) >> 1;
 
             // Get the current record (i) and compare
@@ -103,30 +108,32 @@ class Ip2Country extends CApplicationComponent {
             $c = strcmp($str, substr($rec, 0, 4));
 
             // Equal? I guess we found it.
-            if ($c == 0)
+            if ($c == 0) {
                 return $rec;
+            }
             // If it's more, then compare with the next record to see if that one is less
-            else if ($c > 0)
-            {
+            else if ($c > 0) {
                 // If this was the last record, then return it
-                if ($i+1 >= $count)
+                if ($i + 1 >= $count) {
                     return $rec;
+                }
 
-                $rec1 = substr($data, ($i+1)*$reclen, $reclen + 4);
+                $rec1 = substr($data, ($i + 1) * $reclen, $reclen + 4);
                 $c1 = strcmp($str, substr($rec1, 0, 4));
 
                 // Did we stumble upon the right one?
-                if ($c1 == 0)
-                    // Oops. Equal with the next one. Just return.
+                if ($c1 == 0) {
+                // Oops. Equal with the next one. Just return.
                     return $rec1;
-                else if ($c1 < 0)
-                    // Yep, this is the right one.
+                } else if ($c1 < 0) {
+                // Yep, this is the right one.
                     return $rec;
+                }
 
                 $l = $i + 1;
-            }
-            else
+            } else {
                 $h = $i - 1;
+            }
         }
 
         // Never supposed to end up here - something is wrong.
@@ -141,11 +148,13 @@ class Ip2Country extends CApplicationComponent {
         $group = self::ipgroup($ipbin);
 
         $ix = $this->index[$group];
-        if (strcmp($ipbin, substr($ix, 0, 4)) < 0 && $group > 0)
-            $ix = $this->index[$group-1];
+        if (strcmp($ipbin, substr($ix, 0, 4)) < 0 && $group > 0) {
+            $ix = $this->index[$group - 1];
+        }
 
-        if (strlen($ix) > 12)
+        if (strlen($ix) > 12) {
             $ix = $this->findRecord($ix, $ipbin, 12);
+        }
 
         return $ix;
     }
@@ -157,8 +166,7 @@ class Ip2Country extends CApplicationComponent {
     private function getDataEntry($pos, $len)
     {
         // If it doesn't exist in the cache, load it
-        if (!isset($this->data[$pos]))
-        {
+        if (!isset($this->data[$pos])) {
             fseek($this->fp, $pos + $this->offset);
             $this->data[$pos] = fread($this->fp, $len + 6);  // Always one extra record, for upper bound
         }
@@ -171,8 +179,13 @@ class Ip2Country extends CApplicationComponent {
      */
     public function lookupbin($ipbin)
     {
-        if (strlen($this->lastentry) == 10 && strcmp($ipbin, substr($this->lastentry, 0, 4)) >= 0 && strcmp($ipbin, substr($this->lastentry, 6, 4)) < 0)
+        if (
+            strlen($this->lastentry) == 10 &&
+            strcmp($ipbin, substr($this->lastentry, 0, 4)) >= 0 &&
+            strcmp($ipbin, substr($this->lastentry, 6, 4)) < 0
+        ) {
             return substr($this->lastentry, 4, 2);
+        }
 
         list(, , $pos, $len) = unpack('L3', $this->findIndex($ipbin));
         $data = $this->getDataEntry($pos, $len);
@@ -187,10 +200,9 @@ class Ip2Country extends CApplicationComponent {
      */
     public function lookup($ip = NULL)
     {
-		if(!$ip)
-			return FALSE;
+		if (!$ip) {
+            return FALSE;
+        }
         return $this->lookupbin(inet_pton($ip));
     }
 }
-
-?>
