@@ -27,7 +27,7 @@ class Prefs extends CApplicationComponent {
 
 		$db_size = Yii::app()->cache->get('dbSize');
 
-		if($db_size === FALSE) {
+		if($db_size === false) {
 
 			$query = Yii::app()->db->createCommand("SHOW TABLE STATUS FROM `".Yii::app()->params['dbname']."`")->queryAll();
 			$db_size = 0;
@@ -62,16 +62,16 @@ class Prefs extends CApplicationComponent {
 	/**
 	* Конвертирует steamID в steamcommunityID и обратно
 	* @param string $id steamID/steamcommunityID
-	* @param boolean $url [optional] Добавлять к steamcommunityID URL профиля, по умолчанию FALSE.
+	* @param boolean $url [optional] Добавлять к steamcommunityID URL профиля, по умолчанию false.
 	* @return string|false
 	* @author Kapman <kapman@craft-soft.ru>
 	*/
-	public static function steam_convert($id, $url = FALSE, $xml = FALSE) {
+	public static function steam_convert($id, $url = false, $xml = false) {
 
 		$RightSteam = "/^(STEAM_[0-9])\:([0-9])\:([0-9]{4,8})$/";
 		$RightNumber = "/^(7656119)([0-9]{10})$/";
 
-		if (!$id) { return FALSE; }
+		if (!$id) { return false; }
 
 		if(preg_match($RightSteam, $id, $match)) {
 
@@ -81,21 +81,16 @@ class Prefs extends CApplicationComponent {
 			$const2 = 7960265728;
 			$answer = $newst1 + $newst2 * 2 + $const2;
 
-			if($xml)
-			{
+			if($xml) {
 				return CHtml::encode('http://steamcommunity.com/profiles/'.$const1 . $answer . '?xml=1');
 			}
 
-			if($url)
-			{
+			if($url) {
 				return CHtml::link($const1 . $answer,'http://steamcommunity.com/profiles/'.$const1 . $answer, array('target' => '_blank'));
 			}
-
 			return $const1 . $answer;
-		}
-		elseif (preg_match($RightNumber, $id, $match)) {
-			if($xml)
-			{
+		} elseif (preg_match($RightNumber, $id, $match)) {
+			if($xml) {
 				return CHtml::encode('http://steamcommunity.com/profiles/'.$id . '?xml=1');
 			}
 			$const1 = 7960265728;
@@ -106,13 +101,11 @@ class Prefs extends CApplicationComponent {
 				$b = ($match[2] - $const1 - $a)/2;
 
 				return $const2.$a.':'.$b;
-			}
-			else {
-				return FALSE;
+			} else {
+				return false;
 			}
 		}
-
-		return FALSE;
+		return false;
 	}
 
 	/**
@@ -123,7 +116,7 @@ class Prefs extends CApplicationComponent {
 	 * @return string
 	 * @author AmxBans Team <amxbans.de>
 	 */
-	public static function date2word($dif, $short=FALSE, $server = FALSE)
+	public static function date2word($dif, $short=false, $server = false)
 	{
 		if($dif == 0) {
 			return $server ? '' : 'Навсегда';
@@ -198,8 +191,7 @@ class Prefs extends CApplicationComponent {
 			}
 
 			return $s;
-		}
-		else {
+		} else {
 			return;
 		}
 	}
@@ -209,29 +201,25 @@ class Prefs extends CApplicationComponent {
 	 * @author Onotole <webmaster@mix-game.pro>
 	 * @param intval $create Дата создания в секундах
 	 * @param intval $lenght Срок бана в минутах
-	 * @return string Дату окончания бана в Unix формате
+	 * @return string Дату окончания бана
 	 */
 	public static function getExpired($create, $lenght)
 	{
-		if($lenght == 0)
-			return 'Никогда';
+		if ($lenght == 0) {
+            return 'Никогда';
+        }
 
-		if($lenght == '-1')
-			return 'Разбанен';
+        if ($lenght == '-1') {
+            return 'Разбанен';
+        }
 
-		$lenght = $lenght * 60;
-
-		$expired = $create + $lenght;
-
-		$minutes = intval(($create + $lenght - time()) / 60);
+        $lenght = $lenght * 60;
 		return date('d.m.Y - H:i:s', $create + $lenght);
-
 	}
 
 	/**
 	 * Проверка значения на валидность
 	 * @author SeToY & |PJ|ShOrTy
-	 * @param STRING $value: значение
 	 * @param STRING $types: Тип (email, steamid, ip, amxxaccess, amxxflags)
 	 * @return boolean
 	 * @author SourceBans Team <sourcebans.com>
@@ -241,36 +229,13 @@ class Prefs extends CApplicationComponent {
 
 		switch($type) {
 			case 'email':
-				if(!preg_match("/^[a-zA-Z0-9-_.]{2,}@[a-zA-Z0-9-_.]{2,}.[a-zA-Z]{2,6}$/",$value))
-				{
-					return false;
-				}
-				return true;
-				break;
-
+				return preg_match("/^[a-zA-Z0-9-_.]{2,}@[a-zA-Z0-9-_.]{2,}.[a-zA-Z]{2,6}$/",$value);
 			case 'steamid':
-				if(!preg_match("/^(STEAM|VALVE)_[0-9]:[0-9]:[0-9]{1,15}$/",$value))
-				{
-					return false;
-				}
-				return true;
-				break;
-
+				return preg_match("/^(STEAM|VALVE)_[0-9]:[0-9]:[0-9]{1,15}$/",$value);
 			case 'ip':
-				if(!preg_match("/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/",$value))
-				{
-					return false;
-				}
-				return true;
-				break;
-
+				return preg_match("/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/",$value);
 			case 'amxxaccess':
-				if(!preg_match("/^[a-u,z]{1,22}$/",$value)) {
-					return false;
-				}
-				return true;
-				break;
-
+				return preg_match("/^[a-u,z]{1,22}$/",$value);
 			case 'amxxflags':
 				if((strrpos($value,"b")!==false && strrpos($value,"c")!==false)
 					||
@@ -291,18 +256,11 @@ class Prefs extends CApplicationComponent {
 				{
 					return false;
 				}
-				if(!preg_match("/^[a-e,k]{1,4}$/",$value))
-				{
-					return false;
-				}
-				return true;
-				break;
+				return preg_match("/^[a-e,k]{1,4}$/",$value);
 			default:
 				return false;
-				break;
 		}
 		return false;
-
 	}
 
 	/**
@@ -310,36 +268,22 @@ class Prefs extends CApplicationComponent {
 	 * @param intval $data
 	 * @return string
 	 */
-	public static function formatfilesize( $data ) {
+    public static function formatfilesize($data) {
+        if ($data < 1024) {
+            return $data . " b.";
+        }
+        if ($data < 1024000) {
+            return round(($data / 1024), 2) . "Kb";
+        }
+        return round(($data / 1024000), 2) . " Mb";
+    }
 
-		// bytes
-		if( $data < 1024 ) {
-
-			return $data . " b.";
-
-		}
-		// kilobytes
-		else if( $data < 1024000 ) {
-
-			return round( ( $data / 1024 ), 2 ) . "Kb";
-
-		}
-		// megabytes
-		else {
-
-			return round( ( $data / 1024000 ), 2 ) . " Mb";
-
-		}
-
-	}
-
-	/**
+    /**
 	 * Получение информации о сервере/сайте
 	 * @return string
 	 */
 	public static function sysprefs()
 	{
-
 		return array(
 			'info' => array(
 				//'Версия сайта'			=> self::getVersion(),
@@ -370,25 +314,30 @@ class Prefs extends CApplicationComponent {
 	 * Проверяет и выводит версию
 	 */
 	public static function getVersion() {
-
 		$current = Yii::app()->params['Version'];
-
-		if( ($last = Yii::app()->cache->get('getVersion')) === FALSE ) {
+		if( ($last = Yii::app()->cache->get('getVersion')) === false ) {
 			$last = @file_get_contents('http://craft-soft.ru/goods/version.html?id=csbans');
 		}
-
 		if(!$last) {
 			return "{$current} <span class='text-warning'>(не удалось проверить версию)</span>";
 		}
 		Yii::app()->cache->set('getVersion', $last, 21600);
-
 		if(version_compare($current, $last, '<')) {
 			return "{$current} <span class='text-error'>(доступна новая версия)</span>";
 		}
-
 		return "{$current} <span class='text-success'>(вы используете последнюю версию)</span>";
 	}
-
+    
+    public static function getRealIp() {
+		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} elseif(!empty($_SERVER['HTTP_X_REAL_IP'])) {
+			$ip = $_SERVER['HTTP_X_REAL_IP'];
+		}else {
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+		return substr($ip, 0, 16);
+	}
 }
-
-?>
