@@ -133,7 +133,7 @@ class Amxadmins extends CActiveRecord
 		));
 	}
 
-	public static function getFlags($adminlist = FALSE)
+	public static function getFlags($adminlist = false)
 	{
 		if($adminlist)
 		{
@@ -192,35 +192,45 @@ class Amxadmins extends CActiveRecord
 	protected function beforeDelete() {
 		parent::beforeDelete();
 		$servers = AdminsServers::model()->findByAttributes(array('admin_id' => $this->id));
-		if($servers !== NULL)
-			$servers->deleteAllByAttributes(array('admin_id' => $this->id));
+		if ($servers !== null) {
+            $servers->deleteAllByAttributes(array('admin_id' => $this->id));
+        }
 
-		return TRUE;
+        return true;
 	}
 
 	protected function beforeSave() {
-		//exit(print_r($this->servers));
-		if($this->isNewRecord)
-		{
+        $removePwd = filter_input(INPUT_POST, 'removePwd', FILTER_VALIDATE_BOOLEAN);
+        if($removePwd) {
+            $this->password = '';
+        }
+        
+		if($this->isNewRecord) {
 			$this->created = time();
-			$this->password = $this->scenario == 'buy' ? $this->password : md5($this->password);
+            if($this->password && $this->scenario != 'buy') {
+                $this->password = md5($this->password);
+            }
+            if($this->flags != 'a' && !$this->password) {
+                $this->flags .= 'e';
+            }
 			$this->expired = $this->days != 0 ? ($this->days * 86400) + time() : 0;
-		}
-		else
-		{
-			$oldadmin = Amxadmins::model()->findByPk($this->id);
-			if(!empty($this->password))
-				$this->password = md5($this->password);
-			else
-				$this->password = $oldadmin->password;
+		} else {
+			if ($this->password) {
+                $this->password = md5($this->password);
+            } else {
+                $oldadmin = Amxadmins::model()->findByPk($this->id);
+                if ($oldadmin->password && !$removePwd) {
+                    $this->password = $oldadmin->password;
+                } elseif($this->flags != 'a') {
+                    $this->flags .= 'e';
+                }
+            }
 
-			if($this->expired == 0)
-			{
+            if($this->expired == 0) {
 				$this->expired = time();
 			}
 
-			switch($this->addtake)
-			{
+			switch($this->addtake) {
 				case '1':
 					$this->expired = $this->expired - ($this->change *86400);
 					$this->days = $this->days - $this->change;
@@ -237,63 +247,64 @@ class Amxadmins extends CActiveRecord
 		return parent::beforeSave();
 	}
 
-	protected function beforeValidate() {
-		parent::beforeValidate();
-		//exit(var_dump($this->servers));
-		if($this->scenario == 'buy') return TRUE;
+	protected function afterValidate() {
+		
+		if ($this->scenario == 'buy') {
+            return true;
+        }
 
-		/*if($this->addtake && $this->long <= 0)
-			return $this->addError ('change', 'Ошибка. Нельзя забрать дни админки. Этот админ просрочен');*/
+        if (!$this->access) {
+            $this->addError('access', 'Выберите флаги доступа');
+        }
 
-		if(!$this->access)
-			return $this->addError ('access', 'Выберите флаги доступа');
+        if($this->flags === 'a' && !$this->password) {
+            $this->addError('password', 'Для админки по нику нужно обязательно указывать пароль');
+        }
+        
+		if ($this->flags === 'd' && !filter_var($this->steamid, FILTER_VALIDATE_IP, array('flags' => FILTER_FLAG_IPV4))) {
+            $this->addError('steamid', 'Неверно введен IP');
+        }
 
-		if
-		(
-			(
-				$this->isNewRecord
-					||
-				!empty($this->password)
-			)
-				&&
-			(
-				$this->flags === 'a'
-					&&
-				!preg_match('#^([a-z0-9]+)$#i', $this->password)
-			)
-		)
+        if ($this->flags === 'c' && !Prefs::validate_value($this->steamid, 'steamid')) {
+            $this->addError('steamid', 'Неверно введен SteamID');
+        }
+
+        if ($this->password && !preg_match('#^([a-z0-9]+)$#i', $this->password)) {
+			$this->addError ('password', 'Пароль может содержать только буквы латинского алфавита и цифры');
+		}
+        
+        if(!$this->isNewRecord && $this->days < $this->change && $this->addtake === '1')
 		{
-			return $this->addError ('password', 'Пароль может содержать только буквы латинского алфавита и цифры');
+			$this->addError ('', 'Ошибка! Нельзя забрать дней больше, чем у него уже есть');
 		}
 
-		if($this->flags === 'de' && !filter_var($this->steamid, FILTER_VALIDATE_IP, array('flags' => FILTER_FLAG_IPV4)))
-			return $this->addError ('steamid', 'Неверно введен IP');
-
-		if($this->flags === 'ce' && !Prefs::validate_value($this->steamid, 'steamid'))
-			return $this->addError ('steamid', 'Неверно введен SteamID');
-
-		if(!$this->isNewRecord && $this->days < $this->change && $this->addtake === '1')
-		{
-			return $this->addError ('', 'Ошибка! Нельзя забрать дней больше, чем у него уже есть');
-		}
-
-		return TRUE;
+        if(empty($this->servers)) {
+            $this->addError ('servers', 'Выберите хотябы один сервер');
+        }
+        
+        if($this->hasErrors()) {
+            return $this->getErrors();
+        }
+        
+		return parent::afterValidate();
 	}
 
-	public static function getAuthType($get = FALSE)
+	public static function getAuthType($get = false)
 	{
 		$flags = array(
-			'a' => 'Ник + пароль',
-			'ce' => 'SteamID',
-			'de' => 'IP'
+			'a' => 'Ник',
+			'c' => 'SteamID',
+			'd' => 'IP'
 		);
-
-		if($get)
-		{
-			if(array_key_exists($get, $flags)) {
-				return $flags[$get];
+		if($get) {
+            $flag = $get{0};
+			if(isset($flags[$flag])) {
+                $return = $flags[$flag];
+                if(!isset($get{1})) {
+                    $return .= ' + пароль';
+                }
+				return $return;
 			}
-
 			return 'Неизвестно';
 		}
 		return $flags;
@@ -302,36 +313,38 @@ class Amxadmins extends CActiveRecord
 	public function getLong()
 	{
 		$long = $this->expired - time();
-		if($this->expired == 0 || $long < 0)
-			return FALSE;
+		if ($this->expired == 0 || $long < 0) {
+            return false;
+        }
 
-		return intval($long / 86400);
+        return intval($long / 86400);
 	}
 
 	public function afterSave() {
 
-		if(isset($this->servers) && $this->isNewRecord)
-		{
-			foreach($this->servers as $is)
-			{
+		if(!empty($this->servers) && $this->isNewRecord) {
+			foreach($this->servers as $is) {
 				$inservers = new AdminsServers;
 				$inservers->unsetAttributes();
-				if(!Serverinfo::model()->findByPk($is))
-					continue;
+				if (!Serverinfo::model()->findByPk($is)) {
+                    continue;
+                }
 
-				$inservers->admin_id = $this->id;
+                $inservers->admin_id = $this->id;
 				$inservers->server_id = intval($is);
 				$inservers->use_static_bantime = 'no';
-				if(!$inservers->save())
-					continue;
-			}
+				if (!$inservers->save()) {
+                    continue;
+                }
+            }
 		}
 
-		if($this->isNewRecord)
-			Syslog::add(Logs::LOG_ADDED, 'Добавлен новый AmxModX админ <strong>' . $this->nickname . '</strong>');
-		else
-			Syslog::add(Logs::LOG_EDITED, 'Изменены детали AmxModX админа <strong>' . $this->nickname . '</strong>');
-		return parent::afterSave();
+		if ($this->isNewRecord) {
+            Syslog::add(Logs::LOG_ADDED, 'Добавлен новый AmxModX админ <strong>' . $this->nickname . '</strong>');
+        } else {
+            Syslog::add(Logs::LOG_EDITED, 'Изменены детали AmxModX админа <strong>' . $this->nickname . '</strong>');
+        }
+        return parent::afterSave();
 	}
 
 	public function afterDelete() {

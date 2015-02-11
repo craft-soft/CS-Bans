@@ -1,5 +1,6 @@
 <?php
 /**
+ * @var Bans $model
  * Форма добавления/редактирования AmxModX админа
  */
 
@@ -20,49 +21,39 @@ Yii::app()->clientScript->registerScript('adminactions', '
 	var forever = $("#forever");
 	var placeholder;
 
-	if(days.val() == 0)
-	{
+	if(days.val() == 0) {
 		days.attr("disabled", "disabled");
 		forever.prop("checked", "checked");
 	}
 
-	if(flags.val() == "a")
-		password.removeAttr("disabled");
-
-	forever.click(function(){
-		if($(this).prop("checked"))
-		{
+	forever.click(function() {
+		if($(this).prop("checked")) {
 			days.val("0");
 			days.attr("readonly", "readonly");
-		}
-
-		else
-		{
+		} else {
 			days.removeAttr("readonly");
 			days.val("30");
 		}
 	});
 
 	flags.change(function(){
-		switch($(this).val())
-		{
-			case "de":
+        $("#removePwd").removeAttr("disabled");
+		switch($(this).val()) {
+			case "d":
 				placeholder = "127.0.0.1";
-				password.attr("disabled", "disabled");
 				break;
-			case "ce":
+			case "c":
 				placeholder = "STEAM_0:0:00000000";
-				password.attr("disabled", "disabled");
 				break;
 			case "a":
 				placeholder = "";
-				password.removeAttr("disabled");
+				$("#removePwd").attr("disabled", true);
 				break;
 		}
 		$("#Amxadmins_steamid").attr("placeholder", placeholder);
 	});
 
-	$("#flagsselector").click(function(){
+	$("#flagsselector").click(function() {
 		$("#flagsmodal").modal("show");
 		return false;
 	});
@@ -90,17 +81,29 @@ Yii::app()->clientScript->registerScript('adminactions', '
 		else
 			$("#checkAllFlags").removeAttr("checked");
 	});
+    $("#removePwd").click(function(){
+        if($(this).attr("checked")) {
+            $("#Amxadmins_password").attr("disabled", true);
+        } else {
+            $("#Amxadmins_password").removeAttr("disabled");
+        }
+    });
 ');
+
+if(!$model->isNewRecord) {
+    $model->flags = $model->flags{0};
+}
 
 $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 	'id'=>'amxadmins-form',
-	'enableAjaxValidation'=>TRUE,
+	'enableAjaxValidation'=>false,
 ));
 	echo $form->errorSummary($model);
-	if($model->isNewRecord)
-		echo $form->errorSummary($webadmins);
+	if ($model->isNewRecord) {
+        echo $form->errorSummary($webadmins);
+    }
 
-	echo $form->dropDownListRow(
+    echo $form->dropDownListRow(
 		$model,
 		'flags',
 		Amxadmins::getAuthType(),
@@ -113,15 +116,24 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 	echo $form->textFieldRow($model,'nickname',array('class' => 'span6','maxlength'=>32));
 	echo $form->textFieldRow($model,'steamid',array('class' => 'span6','maxlength'=>32));
 	echo $form->textFieldRow($model,'username',array('class' => 'span6','maxlength'=>32));
+    
+    if(!$model->isNewRecord && $model->flags != 'a' && $model->password) {
+        $htmlOptions = array(
+            'append' => '<label>'.CHtml::checkBox('removePwd') . ' Удалить пароль</label>',
+            'style' => 'width: 167px',
+            'value' => isset($_POST['Amxadmins']['password']) ? CHtml::encode($_POST['Amxadmins']['password']) : '',
+        );
+    } else {
+        $htmlOptions = array(
+            'class' => 'span6',
+            'value' => isset($_POST['Amxadmins']['password']) ? CHtml::encode($_POST['Amxadmins']['password']) : '',
+        );
+    }
+    
 	echo $form->passwordFieldRow(
 		$model,
 		'password',
-		array(
-			'class' => 'span6',
-			'maxlength'=>50,
-			'disabled' => 'disabled',
-			'value' => ''
-		)
+		$htmlOptions
 	);
 	
 	echo $form->textFieldRow(
@@ -143,7 +155,7 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 			array(
 				'class' => 'span6',
 				'value' => '30',
-				'append' => CHtml::checkBox('', false, array('id' => 'forever')) . ' навсегда'
+				'append' => '<label>'.CHtml::checkBox('', false, array('id' => 'forever')) . ' навсегда</label>'
 			)
 		);
 
