@@ -161,6 +161,6 @@ return array(
 	'params'=>array(
 		'adminEmail'=>'webmaster@example.com',
 		'dbname' => $config->db_db,
-		'Version' => '1.2',
+		'Version' => '1.3',
 	),
 );
