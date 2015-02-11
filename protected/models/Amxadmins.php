@@ -257,7 +257,7 @@ class Amxadmins extends CActiveRecord
             $this->addError('access', 'Выберите флаги доступа');
         }
 
-        if($this->flags === 'a' && !$this->password) {
+        if($this->isNewRecord && $this->flags === 'a' && !$this->password) {
             $this->addError('password', 'Для админки по нику нужно обязательно указывать пароль');
         }
         
