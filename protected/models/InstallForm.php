@@ -76,11 +76,8 @@ class InstallForm extends CFormModel
 		return array(
 			array('db_host, db_db, db_user, db_pass', 'required'),
 			array('db_prefix', 'default', 'value' => 'amx'),
-			array('db_host, db_db, db_user, db_pass, db_prefix', 'match',
-					'pattern' => '#^[a-z0-9-_\.]+$#i'),
-
 			array('login, password, email', 'required', 'except' => 'test'),
-			array('login', 'match', 'pattern' => '#^[a-z0-9]+$#', 'except' => 'test'),
+			array('login', 'match', 'pattern' => '#^[a-z0-9]+$#i', 'except' => 'test'),
 			array('email', 'email', 'except' => 'test'),
 
 			array('license', 'boolean'),
