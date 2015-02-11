@@ -47,8 +47,7 @@ if($geo)
 	?>
 	&nbsp;
 	<?php
-	$unbanned = $model->ban_length == '-1' || $model->expired == 1 || ($model->ban_created + ($model->ban_length * 60)) < time();
-	if(Webadmins::checkAccess('bans_unban', $model->admin_nick) && !$unbanned):
+	if(Webadmins::checkAccess('bans_unban', $model->admin_nick) && !$model->unbanned):
 	echo CHtml::ajaxLink(
 		'<i class="icon-remove"></i>',
 		$this->createUrl('/bans/unban', array('id' => $model->bid)),
