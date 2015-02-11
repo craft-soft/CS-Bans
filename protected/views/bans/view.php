@@ -18,8 +18,7 @@ $this->breadcrumbs=array(
 	$page=>array('index'),
 	$model->player_nick,
 );
-if($geo)
-{
+if($geo) {
 	Yii::app()->clientScript->registerScriptFile('//api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU',CClientScript::POS_END);
 	Yii::app()->clientScript->registerScript('yandexmap', "
 		ymaps.ready(inityamaps);
@@ -28,10 +27,24 @@ if($geo)
 		}
 	",CClientScript::POS_END);
 }
+
+if($model->ban_length == '-1') {
+    $length = 'Разбанен';
+} else {
+    $length = Prefs::date2word($model->ban_length);
+    if($model->unbanned) {
+        $length .= '(Истек)';
+    } elseif(Yii::app()->hasModule('billing')) {
+        $length .= CHtml::link(
+            'Купить разбан',
+			array('/billing/unban', 'id' => $model->primaryKey),
+			array('class' => 'btn btn-mini btn-success pull-right')
+        );
+    }
+}
 ?>
 
-<h2>Детали бана <i><?php echo CHtml::encode($model->player_nick); ?></i></h2>
-
+<h2>Подробности бана <i><?php echo CHtml::encode($model->player_nick); ?></i></h2>
 <div style="float: right">
 	<?php
 	if(Webadmins::checkAccess('bans_edit', $model->admin_nick)):
@@ -120,15 +133,7 @@ if($geo)
 		array(
 			'name' => 'ban_length',
 			'type' => 'raw',
-			'value' =>
-				$model->ban_length == '-1'
-					?
-				'Разбанен'
-					:
-				Prefs::date2word($model->ban_length) .
-				($model->expired == 1 ? ' (истек)' : Yii::app()->hasModule('billing') ? CHtml::link('Купить разбан',
-						array('/billing/unban', 'id' => $model->primaryKey),
-						array('class' => 'btn btn-mini btn-success pull-right')) : '')
+			'value' => $length
 		),
 		'expiredTime',
 		'server_name',
