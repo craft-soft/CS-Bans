@@ -348,6 +348,7 @@ class Amxadmins extends CActiveRecord
 	}
 
 	public function afterDelete() {
+        AdminsServers::model()->deleteAllByAttributes(array('admin_id' => $this->id));
 		Syslog::add(Logs::LOG_DELETED, 'Удален AmxModX админ <strong>' . $this->nickname . '</strong>');
 		return parent::afterDelete();
 	}
