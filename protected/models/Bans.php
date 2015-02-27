@@ -137,7 +137,7 @@ class Bans extends CActiveRecord
     {
         $return = $this->admin_nick;
         if(!Yii::app()->user->isGuest && $this->admin) {
-            $return .= ' (<strong>'.$this->admin->nickname.'</strong>)';
+            $return .= ' (<strong>'.CHtml::encode($this->admin->nickname).'</strong>)';
         }
         return $return;
     }
