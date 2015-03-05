@@ -82,16 +82,16 @@ class Prefs extends CApplicationComponent {
 			$answer = $newst1 + $newst2 * 2 + $const2;
 
 			if($xml) {
-				return CHtml::encode('http://steamcommunity.com/profiles/'.$const1 . $answer . '?xml=1');
+				return CHtml::encode('//steamcommunity.com/profiles/'.$const1 . $answer . '?xml=1');
 			}
 
 			if($url) {
-				return CHtml::link($const1 . $answer,'http://steamcommunity.com/profiles/'.$const1 . $answer, array('target' => '_blank'));
+				return CHtml::link($const1 . $answer,'//steamcommunity.com/profiles/'.$const1 . $answer, array('target' => '_blank'));
 			}
 			return $const1 . $answer;
 		} elseif (preg_match($RightNumber, $id, $match)) {
 			if($xml) {
-				return CHtml::encode('http://steamcommunity.com/profiles/'.$id . '?xml=1');
+				return CHtml::encode('//steamcommunity.com/profiles/'.$id . '?xml=1');
 			}
 			$const1 = 7960265728;
 			$const2 = "STEAM_0:";
