@@ -106,10 +106,8 @@ class InstallForm extends CFormModel
 	 */
 	public function testConnect($close = TRUE, $minVer = '5.0') {
 
-		$this->conn = new CDbConnection('mysql:host='.
-				preg_replace('#[^a-z0-9\.-_]#', '', $this->db_host).';dbname='.
-				preg_replace('#[^a-z0-9_]#', '', $this->db_db),
-				$this->db_user, $this->db_pass);
+		$dsn = 'mysql:host='.$this->db_host.';dbname='.$this->db_db;
+		$this->conn = new CDbConnection($dsn, $this->db_user, $this->db_pass);
 
 		$this->conn->charset = 'utf8';
 
