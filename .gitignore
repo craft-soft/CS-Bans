@@ -1,6 +1,10 @@
+.idea
 nbproject
-
 include/files/*
-
 assets/*
+!assets/.gitkeep
 protected/runtime/*
+!protected/runtime/.gitkeep
+/include/db.config.inc.local.php
+/protected/config/main.local.php
+/index_local.php
