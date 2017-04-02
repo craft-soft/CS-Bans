@@ -1,5 +1,5 @@
-<!DOCTYPE html>
 <?php
+/* @var $this Controller */
 /**
  * Тема default для сайта CS:Bans
  * Главный шаблон сайта
@@ -14,6 +14,7 @@
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru  «Attribution-NonCommercial-ShareAlike»
  */
 ?>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -54,7 +55,7 @@
 	<div id="nav" class="clearfix">
 		<div class="container">
 			<ul class="main-nav">
-				<?php foreach(Usermenu::getMenu() as $item):?>
+				<?php foreach($this->menuLinks as $item):?>
 				<li>
 					<?php echo CHtml::link(
 							CHtml::encode($item['label']),
