@@ -73,6 +73,12 @@ return array(
 	'modules'=>array_replace($modules, array(
 		
 	)),
+    
+    'onBeginRequest' => function() {
+        if(!Yii::app()->db->username) {
+			Yii::app()->catchAllRequest = array('site/install');
+		}
+    },
 
 	// Компоненты приложения
 	'components'=>array(

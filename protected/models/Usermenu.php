@@ -79,24 +79,17 @@ class Usermenu extends CActiveRecord
 		));
 	}
 
-	public static function getMenu()
+	public static function getMenu($install = false)
 	{
-		if(
-				in_array(Yii::app()->controller->action->id, array('install', 'license'))
-					||
-				defined('NOREDIRECT')
-		) {
-			return array(
+        if($install) {
+            return array(
 				array(
 					'label' => 'Главная',
-					'url' => '../',
+					'url' => Yii::app()->homeUrl,
 				)
 			);
-		}
-		elseif(!Yii::app()->db->username) {
-			Yii::app()->controller->redirect(array('/site/install'));
-		}
-
+        }
+        
 		// Получаем модель
 		$model = self::model()->findAll('`activ` = 1');
 
