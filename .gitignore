@@ -1,6 +1,9 @@
-nbproject
-
-include/files/*
-
-assets/*
-protected/runtime/*
+/nbproject/
+/.idea/
+/include/db.config.inc.php
+/include/files/*
+!/include/files/.gitkeep
+/assets/*
+!/assets/.gitkeep
+/protected/runtime/*
+!/protected/runtime/.gitkeep
