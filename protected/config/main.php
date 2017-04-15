@@ -15,20 +15,7 @@
 /**
  * Класс-заглушка, чтобы нормально использовать переменную $config из старого AmxBans
  */
-class conf
-{
-	public $db_host = null;
-	public $db_user = null;
-	public $db_pass = null;
-	public $db_db = null;
-	public $db_prefix = null;
-	public $robo_login = null;
-	public $robo_pass1 = null;
-	public $robo_pass2 = null;
-	public $robo_testing = FALSE;
-	public $code = NULL;
-}
-$config = new conf;
+$config = new stdClass();
 
 // Подключаем конфиг старого AmxBans
 require_once ROOTPATH . '/include/db.config.inc.php';
@@ -64,9 +51,6 @@ return array(
 	'import'=>array(
 		'application.models.*',
 		'application.components.*',
-		'application.components.gameq.*',
-		'application.components.gameq.protocols.*',
-		'application.components.gameq.filters.*',
 		'ext.editable.*'
 	),
 	
@@ -135,8 +119,7 @@ return array(
 			'schemaCachingDuration' => 1000,
 		),
 		'cache'=>array(
-			//'class'=>'system.caching.CDummyCache',
-			'class'=>'system.caching.CFileCache',
+			'class'=>'FileCache'
 		),
 		// Обработка ошибок
 		'errorHandler'=>array(
