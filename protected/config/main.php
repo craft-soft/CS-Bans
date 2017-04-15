@@ -15,7 +15,20 @@
 /**
  * Класс-заглушка, чтобы нормально использовать переменную $config из старого AmxBans
  */
-$config = new stdClass();
+class conf
+{
+	public $db_host = null;
+	public $db_user = null;
+	public $db_pass = null;
+	public $db_db = null;
+	public $db_prefix = null;
+	public $robo_login = null;
+	public $robo_pass1 = null;
+	public $robo_pass2 = null;
+	public $robo_testing = FALSE;
+	public $code = NULL;
+}
+$config = new conf;
 
 // Подключаем конфиг старого AmxBans
 require_once ROOTPATH . '/include/db.config.inc.php';
@@ -46,6 +59,7 @@ return array(
 		'log',
 		'DConfig',
 		'Ip2Country',
+        'MainBootstrap'
 		),
 	// Автозагружаемые модели и компоненты
 	'import'=>array(
