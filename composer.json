@@ -1,0 +1,18 @@
+{
+    "name": "CraftSoft/csbans",
+    "description": "Система управления банами и админами для игровых серверов на движке Half-Life 1 (Counter Strike 1.6 и ему подобные)",
+    "authors": [
+        {
+            "name": "Santiago",
+            "email": "me@santiago.su"
+        },
+        {
+            "name": "Kapman",
+            "email": "me@kapman.ru"
+        }
+    ],
+    "require": {
+        "yiisoft/yii": "1.1.17",
+        "austinb/gameq": "~3.0"
+    }
+}
