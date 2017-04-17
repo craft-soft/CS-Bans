@@ -56,7 +56,7 @@ class Prefs extends CApplicationComponent {
 			case 'SI':
 				return 'SteamID + IP';
 		}
-		return false;
+		return null;
 	}
 
 	/**
