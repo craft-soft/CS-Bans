@@ -16,30 +16,8 @@ date_default_timezone_set('Europe/Moscow');
 
 define('ROOTPATH', __DIR__);
 
-// Дебаг
-//defined('YII_DEBUG') or define('YII_DEBUG', true);
-// Кол-во стак трейсов ошибок
-//defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL', 3);
-
 // Ядро
-require_once(ROOTPATH . '/include/yii/framework/yii.php');
+require_once(ROOTPATH . '/vendor/autoload.php');
 
 // Создаем приложение
-Yii::createWebApplication(ROOTPATH . '/protected/config/main.php');
-$app = Yii::app();
-
-if(Yii::app()->db->username) {
-
-	// Здаем главную страницу
-	if($app->config->start_page !== '/site/index')
-		$app->homeUrl = array($app->config->start_page);
-
-	// Задаем шаблон
-	if(is_dir(ROOTPATH . '/themes/' . $app->config->design))
-		$app->setTheme($app->config->design);
-}
-
-Yii::app()->db->autoConnect = TRUE;
-
-// Запускаем приложение
-$app->run();
+Yii::createWebApplication(ROOTPATH . '/protected/config/main.php')->run();

@@ -50,7 +50,7 @@ define('MODULES_MATCHES', implode('|', array_keys($modules)));
 // Главные параметры приложения
 return array(
 	'basePath'=>ROOTPATH . DIRECTORY_SEPARATOR . 'protected',
-	'name'=>'СS:Bans 1.3',
+	'name'=>'СS:Bans 1.4',
 	'sourceLanguage' => 'ru',
 	'language'=>'ru',
 
@@ -58,8 +58,7 @@ return array(
 	'preload'=>array(
 		'log',
 		'DConfig',
-		'Ip2Country',
-        'MainBootstrap'
+		'Ip2Country'
 		),
 	// Автозагружаемые модели и компоненты
 	'import'=>array(
@@ -75,9 +74,21 @@ return array(
     'onBeginRequest' => function() {
         if(!Yii::app()->db->username) {
 			Yii::app()->catchAllRequest = array('site/install');
+            return Yii::app()->end();
 		}
-    },
-
+        // Здаем главную страницу
+        try {
+            if (Yii::app()->config->start_page !== '/site/index') {
+                Yii::app()->homeUrl = array(Yii::app()->config->start_page);
+            }
+            if (is_dir(ROOTPATH . '/themes/' . Yii::app()->config->design)) {
+                Yii::app()->setTheme(Yii::app()->config->design);
+            }
+        } catch(Exception $e) {
+            throw new CHttpException(500, 'Проблемы с базой данных. Похоже отсутствуют необходимые таблицы базы данных');
+        }
+        Yii::app()->db->autoConnect = true;
+    },  
 	// Компоненты приложения
 	'components'=>array(
 		// Бутстрап
@@ -164,6 +175,6 @@ return array(
 	'params'=>array(
 		'adminEmail'=>'webmaster@example.com',
 		'dbname' => $config->db_db,
-		'Version' => '1.3',
+		'Version' => '1.4',
 	),
 );
