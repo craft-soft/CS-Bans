@@ -73,7 +73,7 @@ Yii::app()->clientScript->registerScript('adminactions', '
 		else
 			$(".adminflag:not(:last)").attr("checked", true);
 	});
-	$(".adminflag").live("click", function(){
+	$(document).on("click", ".adminflag", function(){
 		var allCB	= $(".adminflag").size();
 		var chCB	= $(".adminflag:checked").size();
 		if(allCB == chCB)

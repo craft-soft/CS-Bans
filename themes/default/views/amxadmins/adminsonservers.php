@@ -22,9 +22,14 @@ $this->renderPartial('/admin/mainmenu', array('active' =>'server', 'activebtn' =
 ?>
 <h2>Управление админами серверов</h2>
 <?php
-
+Yii::app()->clientScript->registerCss('serverViewCss', '
+    .servtr {
+        cursor: pointer
+    }
+');
 Yii::app()->clientScript->registerScript('serverview', '
-$(".servtr").css("cursor", "pointer").live("click", function(){
+    
+$(document).on("click", ".servtr", function(){
 	$("#loading").show();
 	var sid = this.id.substr(6);
 	$.post(

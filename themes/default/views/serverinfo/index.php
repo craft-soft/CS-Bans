@@ -19,7 +19,7 @@ $this->breadcrumbs=array(
 );
 
 Yii::app()->clientScript->registerScript('serverview', '
-$(".servtr").live("click", function(){
+$(document).on("click", ".servtr", function(){
 	$("#loading").show();
 	var sid = this.id.substr(6);
 	$.post(
