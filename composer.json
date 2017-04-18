@@ -13,6 +13,7 @@
     ],
     "require": {
         "yiisoft/yii": "1.1.17",
-        "austinb/gameq": "~3.0"
+        "austinb/gameq": "~3.0",
+        "guzzlehttp/guzzle": "6.2.3"
     }
 }
