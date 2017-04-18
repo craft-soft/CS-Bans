@@ -19,6 +19,37 @@
  */
 class Prefs extends CApplicationComponent
 {
+    public static function steamLink($steamId)
+    {
+        if(self::steam_convert($steamId, true)) {
+            return CHtml::link(
+                $steamId,
+                "http://steamcommunity.com/profiles/" . Prefs::steam_convert($steamId),
+                array("target" => "_blank")
+            );
+        }
+        return $steamId;
+    }
+    
+    public static function dataFromProvider(CDataProvider $dataProvider)
+    {
+        $pagination = $dataProvider->getPagination();
+        $count = $dataProvider->getItemCount();
+        $total=$dataProvider->getTotalItemCount();
+        $start=$pagination->currentPage * $pagination->pageSize + 1;
+        $end=$start+$count-1;
+        return [
+            'models'=>$dataProvider->getData(),
+            'sort' => $dataProvider->getSort(),
+            'pagination' => $pagination,
+            'start' =>$start,
+            'end' => $end,
+            'count' => $total,
+            'page' => $pagination->getCurrentPage() + 1,
+            'pages' => $pagination->getPageCount(),
+        ];
+    }
+    
     public function registerGridAssets($gridId, CPagination $pagination, $selectedRows = false)
     {
         $cs = Yii::app()->getClientScript();
