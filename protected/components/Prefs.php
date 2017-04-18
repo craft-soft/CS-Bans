@@ -17,8 +17,34 @@
  * @steam_convert Конвертирует steamID в steamcommunityID и обратно
  * @date2word Конвертация даты в строковый формат
  */
-class Prefs extends CApplicationComponent {
-
+class Prefs extends CApplicationComponent
+{
+    public function registerGridAssets($gridId, CPagination $pagination, $selectedRows = false)
+    {
+        $cs = Yii::app()->getClientScript();
+        $cs->registerScriptFile(
+            Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('zii.widgets.assets.gridview')).'/jquery.yiigridview.js',
+            CClientScript::POS_END
+        );
+        $cs->registerCoreScript('jquery');
+        $cs->registerCoreScript('bbq');
+        $cs->registerCoreScript('history');
+        $options=array(
+			'ajaxUpdate'=>[strtolower($gridId)],
+			'ajaxVar'=>'ajax',
+			'pagerClass'=>'pagination',
+			'loadingClass'=>'grid-view-loading',
+			'filterClass'=>'filters',
+			'tableClass'=>'items table table-striped table-bordered table-condensed',
+			'selectableRows'=>(bool)$selectedRows,
+			'enableHistory'=>true,
+			'updateSelector'=>'{page}, {sort}',
+			'filterSelector'=>'{filter}',
+            'pageVar' => $pagination->pageVar
+		);
+        $options=CJavaScript::encode($options);
+        $cs->registerScript(__CLASS__."#{$gridId}", "jQuery('#{$gridId}').yiiGridView({$options});");
+    }
 	/**
 	 * Размер базы
 	 * @return string размер базы данных

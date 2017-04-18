@@ -91,6 +91,9 @@ return array(
     },  
 	// Компоненты приложения
 	'components'=>array(
+        'prefs' => array(
+            'class' => 'application.components.Prefs'
+        ),
 		// Бутстрап
 		'bootstrap'=>array(
 			'class'=>'bootstrap.components.Bootstrap',
