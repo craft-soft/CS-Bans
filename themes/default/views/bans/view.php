@@ -18,6 +18,33 @@ $this->breadcrumbs=array(
 	$page=>array('index'),
 	$model->player_nick,
 );
+
+Yii::app()->clientScript->registerScript('viewBan', "
+    jQuery('body').on('click','a[data-action]',function(e){
+        e.preventDefault();
+        var actionLink = $(this),
+            beforeSend;
+        if(actionLink.data('confirm')) {
+            beforeSend = function() {
+                if(!confirm(actionLink.data('confirm'))) {
+                    return false;
+                }
+            };
+        }
+        jQuery.ajax({
+            'type':'post',
+            'beforeSend':beforeSend,
+            'success':function() {
+                document.location.href='".$this->createUrl('/bans/index')."'
+            },
+            'url':actionLink.attr('href'),
+            'cache':false
+        });
+        return false;
+    }
+);
+", CClientScript::POS_END);
+
 if($geo) {
 	Yii::app()->clientScript->registerScriptFile('//api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU',CClientScript::POS_END);
 	Yii::app()->clientScript->registerScript('yandexmap', "
@@ -28,256 +55,218 @@ if($geo) {
 	",CClientScript::POS_END);
 }
 
-if($model->ban_length == '-1') {
-    $length = 'Разбанен';
-} else {
-    $length = Prefs::date2word($model->ban_length);
-    if($model->unbanned) {
-        $length .= '(Истек)';
-    } elseif(Yii::app()->hasModule('billing')) {
-        $length .= CHtml::link(
-            'Купить разбан',
-			array('/billing/unban', 'id' => $model->primaryKey),
-			array('class' => 'btn btn-mini btn-success pull-right')
-        );
-    }
-}
+
 ?>
 
 <h2>Подробности бана <i><?php echo CHtml::encode($model->player_nick); ?></i></h2>
 <div style="float: right">
-	<?php
-	if(Webadmins::checkAccess('bans_edit', $model->admin_nick)):
-	echo CHtml::link(
-		'<i class="icon-edit"></i>',
-		$this->createUrl('/bans/update', array('id' => $model->bid)),
-		array(
-			'rel' => 'tooltip',
-			'title' => 'Редактировать',
-		)
-	);
-	endif;
-	?>
-	&nbsp;
-	<?php
-	if(Webadmins::checkAccess('bans_unban', $model->admin_nick) && !$model->unbanned):
-	echo CHtml::ajaxLink(
-		'<i class="icon-remove"></i>',
-		$this->createUrl('/bans/unban', array('id' => $model->bid)),
-		array(
-			'type' => 'post',
-			'beforeSend' => 'function() {if(!confirm("Разбанить игрока '.$model->player_nick.'?")) {return false;} }',
-			'success' => 'function(data) {alert(data); document.location.href="'.$this->createUrl('/bans/index').'";}'
-		),
-		array(
-			'rel' => 'tooltip',
-			'title' => 'Разбанить',
-		)
-	);
-	endif;
-	?>
-	&nbsp;
-	<?php
-	if(Webadmins::checkAccess('bans_delete', $model->admin_nick)):
-	echo CHtml::ajaxLink(
-		'<i class="icon-trash"></i>',
-		$this->createUrl('/bans/delete', array('id' => $model->bid, 'ajax' => 1)),
-		array(
-			'type' => 'post',
-			'beforeSend' => 'function() {if(!confirm("Удалить бан?")) {return false;} }',
-			'success' => 'function() {alert("Бан удален"); document.location.href="'.$this->createUrl('/bans/index').'"}'
-		),
-		array(
-			'rel' => 'tooltip',
-			'title' => 'Удалить бан',
-		)
-	);
-	endif;
-	?>
+	<?php if($canEditBan):?>
+        <a
+            href="<?= $this->createUrl('/bans/update', array('id' => $model->bid))?>"
+            rel="tooltip"
+            title="Редактировать"><i class="icon-edit"></i></a>
+	<?php endif;?>
+	<?php if($canUnbanBan && !$model->unbanned):?>
+        <a
+            href="<?= $this->createUrl('/bans/unban', ['id' => $model->bid, 'ajax' => 1])?>"
+            rel="tooltip"
+            title="Разбанить"
+            data-action="unban"
+            data-confirm="Разбанить игрока?"><i class="icon-remove"></i></a>
+	<?php endif;?>
+	<?php if($canDeleteBan):?>
+        <a
+            href="<?= $this->createUrl('/bans/delete', ['id' => $model->bid, 'ajax' => 1])?>"
+            rel="tooltip"
+            title="Удалить"
+            data-action="delete"
+            data-confirm="Удалить бан?"><i class="icon-trash"></i></a>
+	<?php endif;?>
 </div>
-
-<?php $this->widget('bootstrap.widgets.TbDetailView', array(
-	'data'=>$model,
-	'type' => array('condensed', 'bordered'),
-	'htmlOptions' => array('style'=>'text-align: left'),
-	'attributes'=>array(
-		array(
-			'name' => 'player_ip',
-			'type' => 'raw',
-			'value' => $geo['city'] ? CHtml::link(
-					$model->player_ip,
-					'#',
-					array(
-						'onclick' => '$("#modal-map").modal("show");',
-						'rel' => 'tooltip',
-						'title' => 'Подробности IP адреса'
-					)
-				) : $model->player_ip,
-			'visible' => ($ipaccess)
-		),
-		array(
-			'name' => 'player_id',
-			'type' => 'raw',
-			'value' => Prefs::steam_convert($model->player_id, TRUE)
-				? CHtml::link($model->player_id, 'http://steamcommunity.com/profiles/'
-						. Prefs::steam_convert($model->player_id), array('target' => '_blank'))
-				: $model->player_id,
-		),
-		'player_nick',
-		'adminName:html',
-		'ban_reason',
-		array(
-			'name' => 'ban_created',
-			'value' => date('d.m.Y - H:i:s', $model->ban_created),
-		),
-		array(
-			'name' => 'ban_length',
-			'type' => 'raw',
-			'value' => $length
-		),
-		'expiredTime',
-		'server_name',
-		'ban_kicks',
-	),
-)); ?>
-
+<table class="table table-condensed table-bordered text-left">
+    <tr class="odd">
+        <th>IP игрока</th>
+        <td>
+            <?php if($geo):?>
+                <a
+                    href="#"
+                    onclick="$('#modal-map').modal('show');"
+                    rel="tooltip"
+                    title="Подробности IP адреса"><?= CHtml::encode($model->player_ip)?></a>
+            <?php else:?>
+                <?= CHtml::encode($model->player_ip)?>
+            <?php endif;?>
+        </td>
+    </tr>
+    <tr class="even">
+        <th>Steam  игрока</th>
+        <td><?= $playerSteam?></td>
+    </tr>
+    <tr class="odd">
+        <th>Ник игрока</th>
+        <td><?= CHtml::encode($model->player_nick)?></td>
+    </tr>
+    <tr class="even">
+        <th>Админ</th>
+        <td><?= $model->adminName?></td>
+    </tr>
+    <tr class="odd">
+        <th>Причина</th>
+        <td><?= CHtml::encode($model->ban_reason)?></td>
+    </tr>
+    <tr class="even">
+        <th>Дата</th>
+        <td><?= date('d.m.Y - H:i:s', $model->ban_created)?></td>
+    </tr>
+    <tr class="odd">
+        <th>Срок бана</th>
+        <td>
+            <?php if($model->ban_length == '-1'):?>
+                Разбанен
+            <?php else:?>
+                <?= Prefs::date2word($model->ban_length)?>
+                <?php if($model->unbanned):?>
+                    (Истек)
+                <?php elseif(Yii::app()->hasModule('billing')):?>
+                    <a
+                        href="<?= $this->createUrl('/billing/unban', ['id' => $model->primaryKey])?>"
+                        class="btn btn-mini btn-success pull-right">Купить разбан</a>
+                <?php endif;?>
+            <?php endif;?>
+        </td>
+    </tr>
+    <tr class="even">
+        <th>Истекает</th>
+        <td><?= $model->expiredTime?></td>
+    </tr>
+    <tr class="odd">
+        <th>Название сервера</th>
+        <td><?= CHtml::encode($model->server_name)?></td>
+    </tr>
+    <tr class="even">
+        <th>Кики</th>
+        <td><?= intval($model->ban_kicks)?></td>
+    </tr>
+</table>
 <hr>
 <p class="text-success">
 	<i class="icon-calendar"></i>
 	История банов
 </p>
-<?php
-$this->widget('bootstrap.widgets.TbGridView',array(
-	'type' => 'bordered stripped',
-	'id'=>'ban-history-grid',
-	'dataProvider'=>$history,
-	'enableSorting' => FALSE,
-	'template' => '{items} {pager}',
-	'columns'=>array(
-		array(
-			'name' => 'player_nick',
-			'type' => 'html',
-			'value' => 'Chtml::link($data->player_nick, Yii::app()->createUrl("/bans/view", array("id" => $data->bid)))'
-		),
-		array(
-			'name' => 'player_id',
-			'type' => 'raw',
-			'value' => 'Prefs::steam_convert($data->player_id, TRUE)
-				? CHtml::link($data->player_id, "http://steamcommunity.com/profiles/"
-						. Prefs::steam_convert($data->player_id), array("target" => "_blank"))
-				: $data->player_id',
-		),
-		array(
-			'name' => 'player_ip',
-			'value' => '$data->player_ip',
-			'visible' => $ipaccess
-		),
-		array(
-			'name' => 'ban_created',
-			'value' => 'date("d.m.Y - H:i:s", $data->ban_created)',
-		),
-		'ban_reason',
-		
-		array(
-			'name' => 'ban_length',
-			'type' => 'raw',
-			'value' =>
-				'$data->ban_length == "-1"
-					?
-				"Разбанен"
-					:
-				Prefs::date2word($data->ban_length) .
-				($data->expired == 1 ? " (истек)" : "")'
-		),
-	),
-));
-?>
+<div id="ban-history-grid" class="grid-view">
+    <table class="items table table-bordered">
+        <thead>
+            <tr>
+                <th>Ник игрока</th>
+                <th>Steam  игрока</th>
+                <?php if($ipaccess):?>
+                    <th>IP игрока</th>
+                <?php endif;?>
+                <th>Дата</th>
+                <th>Причина</th>
+                <th>Срок бана</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach($historyProvider['models'] as $item):?>
+            <tr>
+                <td>
+                    <a href="<?= $this->createUrl("/bans/view", array("id" => $item->bid))?>"><?= CHtml::encode($item->player_nick)?></a>
+                </td>
+                <td>
+                    <?= Prefs::steamLink($item->player_id)?>
+                </td>
+                <?php if($ipaccess):?>
+                <td>
+                    <?= $item->player_ip?>
+                </td>
+                <?php endif;?>
+                <td>
+                    <?= date("d.m.Y - H:i:s", $item->ban_created)?>
+                </td>
+                <td>
+                    <?= CHtml::encode($item->ban_reason)?>
+                </td>
+                <td>
+                    <?php if($item->ban_length == "-1"):?>
+                        Разбанен
+                    <?php else:?>
+                        <?= Prefs::date2word($item->ban_length)?>
+                        <?php if($item->expired == 1):?>
+                            (истек)
+                        <?php endif;?>
+                    <?php endif;?>
+                </td>
+            </tr>
+            <?php endforeach;?>
+        </tbody>
+    </table>
+</div>
+
 <hr>
 <p class="text-success">
 	<i class="icon-comment"></i>
 	Комментарии
 </p>
+<div id="comments-grid" class="grid-view">
+    <table class="items table table-bordered">
+        <colgroup>
+            <col style="width: 80px">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Комментарий</th>
+                <?php if($ipaccess):?>
+                    <th>Адрес</th>
+                <?php endif;?>
+                <th>E-mail</th>
+                <?php if($canEditBan):?>
+                    <th></th>
+                <?php endif;?>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach($commentsProvider['models'] as $item):?>
+            <tr id="<?= $item->id?>">
+                <td>
+                    <?= date("d.m.Y", $item->date)?>
+                </td>
+                <td>
+                    <?= CHtml::encode($item->comment)?>
+                </td>
+                <td>
+                    <?= CHtml::encode($item->name)?>
+                </td>
+                <?php if($ipaccess):?>
+                <td>
+                    <?= CHtml::encode($item->addr)?>
+                </td>
+                <?php endif;?>
+                <td>
+                    <?= CHtml::encode($item->email)?>
+                </td>
+                <?php if($canEditBan):?>
+                <td>
+                    <a
+                        href="<?= $this->createUrl("/comments/update", array("id"=>$item->id, "bid" => $item->bid))?>"
+                        rel="tooltip"
+                        title="Редактировать"><i class="icon-pencil"></i></a>
+                    <a
+                        href="<?= $this->createUrl("/comments/delete", array("id"=>$item->id))?>"
+                        rel="tooltip"
+                        title="Удалить"><i class="icon-trash"></i></a>
+                </td>
+                <?php endif;?>
+            </tr>
+            <?php endforeach;?>
+        </tbody>
+    </table>
+</div>
 
-<?php
-$this->widget('bootstrap.widgets.TbGridView', array(
-	'type'=>'striped bordered condensed',
-	'id'=>'comments-grid',
-	'template' => '{items}',
-	'dataProvider'=> $c,
-	'enableSorting' => FALSE,
-	'rowHtmlOptionsExpression' => 'array(
-		"id" => "$data->id"
-	)',
-	'columns'=>array(
-
-		array(
-			'header' => 'Дата',
-			'value'=>'date("d.m.Y", $data->date)',
-			'htmlOptions' => array(
-				'style' => 'width:80px'
-			)
-		),
-
-		array(
-			'header' => 'Комментарий',
-			'value'=>'$data->comment',
-		),
-
-		'name',
-		array(
-			'name' => 'addr',
-			'value' => '$data->addr',
-			'htmlOptions' => array(
-				'style' => 'width:100px'
-			),
-			'visible' => $ipaccess
-		),
-		array(
-			'name' => 'email',
-			'value' => '$data->email',
-			'htmlOptions' => array(
-				'style' => 'width:200px'
-			)
-		),
-		//'email',
-
-		array(
-            'class'=>'bootstrap.widgets.TbButtonColumn',
-			'header' => 'Действия',
-            'template'=>'{update} {delete}',
-            'buttons'=>array
-            (
-                'delete' => array
-                (
-                    'label'=>'Удалить',
-                    'icon'=>'trash',
-                    'url'=>'Yii::app()->createUrl("/comments/delete", array("id"=>$data->id))',
-                ),
-				'update' => array
-                (
-                    'label'=>'Редактировать',
-                    'icon'=>'pencil',
-                    'url'=>'Yii::app()->createUrl("/comments/update", array("id"=>$data->id, "bid" => $data->bid))',
-                ),
-
-            ),
-            'htmlOptions'=>array(
-                'style'=>'width: 80px; text-align:center',
-            ),
-			'visible' => Webadmins::checkAccess('bans_edit', $model->admin_nick)
-        )
-
-	),
-));
-
-if(Yii::app()->config->use_comment && (!Yii::app()->user->isGuest || Yii::app()->config->comment_all)):?>
+<?php if($canAddComment):?>
 	<div style="width: auto; margin: 0 auto">
-		<?php $this->widget('bootstrap.widgets.TbButton', array(
-			'label'=>'Добавить комментарий',
-			'buttonType' => 'button',
-			'size'=>'small', // null, 'large', 'small' or 'mini'
-			'htmlOptions' => array('onclick' => '$("#addcomment").slideToggle("slow");'),
-		)); ?>
+        <button type="button" class="btn btn-small" onclick="$('#addcomment').slideToggle('slow');">Добавить комментарий</button>
 	</div>
 	<div style="width: 100%; display: none" id="addcomment">
 		<?php echo CHtml::form('','post'); ?>
@@ -361,84 +350,78 @@ if(Yii::app()->config->use_comment && (!Yii::app()->user->isGuest || Yii::app()-
 	<i class="icon-folder-open"></i>
 	Файлы
 </p>
+<div id="files-grid" class="grid-view">
+    <table class="items table table-bordered">
+        <colgroup>
+            <col style="width: 80px">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Демо</th>
+                <th>Размер</th>
+                <th>Комментарий</th>
+                <th>Автор</th>
+                <?php if($ipaccess):?>
+                    <th>Адрес</th>
+                <?php endif;?>
+                <th>Скачек</th>
+                <?php if($canEditBan):?>
+                    <th></th>
+                <?php endif;?>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach($filesProvider['models'] as $item):?>
+            <tr id="<?= $item->id?>">
+                <td>
+                    <?= date("d.m.Y", $item->date)?>
+                </td>
+                <td>
+                    <?= CHtml::encode($item->demo_real)?>
+                </td>
+                <td>
+                    <?= Prefs::formatfilesize($item->file_size)?>
+                </td>
+                <td>
+                    <?= CHtml::encode($item->comment)?>
+                </td>
+                <td>
+                    <?= CHtml::encode($item->name)?>
+                </td>
+                <?php if($ipaccess):?>
+                <td>
+                    <?= CHtml::encode($item->addr)?>
+                </td>
+                <?php endif;?>
+                <td>
+                    <?= intval($item->down_count)?>
+                </td>
+                <td>
+                    <a
+                        href="<?= $this->createUrl("/files/download", array("id"=>$item->id))?>"
+                        rel="tooltip"
+                        title="Скачать"><i class="icon-download-alt"></i></a>
+                    <?php if(Webadmins::checkAccess('bans_edit', $item->name)):?>
+                    <a
+                        href="<?= $this->createUrl("/files/update", array("id"=>$item->id))?>"
+                        rel="tooltip"
+                        title="Редактировать"><i class="icon-pencil"></i></a>
+                    <a
+                        href="<?= $this->createUrl("/files/delete", array("id"=>$item->id))?>"
+                        rel="tooltip"
+                        title="Удалить"><i class="icon-trash"></i></a>
+                    <?php endif;?>
+                </td>
+            </tr>
+            <?php endforeach;?>
+        </tbody>
+    </table>
+</div>
 
-<?php
-$this->widget('bootstrap.widgets.TbGridView', array(
-	'type'=>'striped bordered condensed',
-	'id'=>'files-grid',
-	'template' => '{items}',
-	'dataProvider'=>$f,
-	'enableSorting' => FALSE,
-	'columns'=>array(
-
-		array(
-			'header' => 'Дата',
-			'value'=>'date("d.m.Y", $data->upload_time)',
-		),
-
-		'demo_real',
-
-		array(
-			'header' => 'Размер',
-			'value'=>'Prefs::formatfilesize($data->file_size)',
-		),
-
-		array(
-			'header' => 'Комментарий',
-			'value'=>'$data->comment',
-		),
-
-		'name',
-		array(
-			'name' => 'addr',
-			'value' => '$data->addr',
-			'visible' => $ipaccess
-		),
-		'down_count',
-
-		array(
-            'class'=>'bootstrap.widgets.TbButtonColumn',
-			'header' => 'Действия',
-            'template'=>'{download} {update} {delete}',
-            'buttons'=>array
-            (
-                'download' => array
-                (
-                    'label'=>'Скачать',
-                    'icon'=>'download-alt',
-                    'url'=>'Yii::app()->createUrl("/files/download", array("id"=>$data->id))',
-                ),
-                'update' => array
-                (
-                    'label'=>'Редактировать',
-                    'icon'=>'pencil',
-                    'url'=>'Yii::app()->createUrl("/files/update", array("id"=>$data->id))',
-					'visible' => 'Webadmins::checkAccess(\'bans_edit\', $data->name)'
-                ),
-				'delete' => array
-                (
-                    'label'=>'Удалить',
-                    'icon'=>'trash',
-                    'url'=>'Yii::app()->createUrl("/files/delete", array("id"=>$data->id, "YII_CSRF_TOKEN" => Yii::app()->request->csrfToken))',
-					'visible' => 'Webadmins::checkAccess(\'bans_edit\', $data->name)'
-                ),
-            ),
-            'htmlOptions'=>array(
-                'style'=>'width: 120px; text-align:center',
-            ),
-        )
-
-	),
-));
-?>
-<?php if(Yii::app()->config->use_demo && (!Yii::app()->user->isGuest || Yii::app()->config->demo_all)):?>
+<?php if($canAddDemo):?>
 	<div style="width: auto; margin: 0 auto">
-		<?php $this->widget('bootstrap.widgets.TbButton', array(
-			'label'=>'Добавить файл',
-			'buttonType' => 'button',
-			'size'=>'small', // null, 'large', 'small' or 'mini'
-			'htmlOptions' => array('onclick' => '$(".addfile").slideToggle("slow");'),
-		)); ?>
+        <button type="button" class="btn btn-small" onclick="$('.addfile').slideToggle('slow');">Добавить файл</button>
 	</div>
 	<div style="width: 100%; display: none; margin: 0 auto" class="addfile">
 		<?php echo CHtml::form('','post', array('id' => 'addfile-form', 'enctype'=>'multipart/form-data')); ?>
@@ -524,36 +507,37 @@ $this->widget('bootstrap.widgets.TbGridView', array(
 	</div>
 <?php endif;?>
 <?php if($ipaccess): ?>
-
-<?php $this->beginWidget('bootstrap.widgets.TbModal',
-	array(
-		'id'=>'modal-map',
-		'htmlOptions'=> array('style'=>' width:860px; margin-left: -430px;height: 600px'),
-)); ?>
-
-<div class="modal-header">
-    <a class="close" data-dismiss="modal">&times;</a>
-	<h3>Информация об IP "<?php echo $model->player_ip ?>"</h3>
-</div>
-<div class="modal-body" style="min-height: 460px">
-	<div id="map" style="width:800px; height:400px; marg: 0 auto"></div>
-	<div style="top: -30px">
-		<b>Страна: </b>
-		<?php echo $geo['country'] ?>
-		<br>
-		<b>Регион: </b>
-		<?php echo $geo['region'] ?>
-		<br>
-		<b>Город: </b>
-		<?php echo $geo['city'] ?>
-	</div>
-</div>
-<div class="modal-footer">
-    <?php $this->widget('bootstrap.widgets.TbButton', array(
-        'label'=>'Закрыть',
-        'url'=>'#',
-        'htmlOptions'=>array('data-dismiss'=>'modal'),
-    )); ?>
-</div>
-<?php $this->endWidget(); ?>
+    <div
+        id="modal-map"
+        class="modal hide fade"
+        style="width:860px; margin-left: -430px;height: 600px"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">&times;</a>
+            <h3>Информация об IP "<?php echo $model->player_ip ?>"</h3>
+        </div>
+        <div class="modal-body" style="min-height: 460px">
+            <div id="map" style="width:800px; height:400px; marg: 0 auto"></div>
+            <div style="top: -30px">
+                <b>Страна: </b>
+                <?php echo $geo['country'] ?>
+                <br>
+                <b>Регион: </b>
+                <?php echo $geo['region'] ?>
+                <br>
+                <b>Город: </b>
+                <?php echo $geo['city'] ?>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <?php $this->widget('bootstrap.widgets.TbButton', array(
+                'label'=>'Закрыть',
+                'url'=>'#',
+                'htmlOptions'=>array('data-dismiss'=>'modal'),
+            )); ?>
+        </div>
+    </div>
 <?php endif; ?>

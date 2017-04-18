@@ -59,16 +59,13 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<div class="alert alert-<?php echo $check ? 'error' : 'success' ?>">
+<div class="alert alert-<?php echo $clientFindedInBans ? 'error' : 'success' ?>">
 	<a href="#" class="close" data-dismiss="alert">&times;</a>
-	<?php 
-	$ip = $_SERVER['REMOTE_ADDR'];
-	echo $check
-			?
-		'<strong>Внимание!</strong> Ваш IP (<strong>'.$ip.'</strong>) забанен'
-			:
-		'Ваш IP (<strong>'.$ip.'</strong>) не забанен'
-	?>
+    <?php if($clientFindedInBans):?>
+        <strong>Внимание!</strong> Ваш IP (<strong><?= CHtml::encode($clientIp)?></strong>) забанен
+    <?php else:?>
+        Ваш IP (<strong><?= CHtml::encode($clientIp)?></strong>) не забанен
+    <?php endif;?>
 </div>
 
 <?php echo CHtml::link('Поиск','#',array('class'=>'search-button btn btn-small')); ?>
@@ -80,11 +77,23 @@ $('.search-form form').submit(function(){
 <div style="width: 100%" id="bans-grid" class="grid-view">
     <div class="summary">Показано с <?= $start?> по <?= $end?> банов из <?= $count?>. Страница <?= $page?> из <?= $pages?></div>
     <table class="items table table-striped table-bordered table-condensed">
-        <col style="width: 70px">
-        <col style="width: 180px">
-        <col>
-        <col>
-        <col style="width: 130px">
+        <colgroup>
+            <col style="width: 70px">
+            <col style="width: 180px">
+            <col>
+            <col>
+            <col style="width: 130px">
+            <?php if(Yii::app()->config->show_comment_count):?>
+                <col>
+            <?php endif;?>
+            <?php if(Yii::app()->config->show_demo_count):?>
+                <col>
+            <?php endif;?>
+            <?php if(Yii::app()->config->show_kick_count):?>
+                <col>
+            <?php endif;?>
+            <col style="width: 25px">
+        </colgroup>
         <thead>
             <tr>
                 <th>Дата</th>
@@ -101,7 +110,7 @@ $('.search-form form').submit(function(){
                 <?php if(Yii::app()->config->show_kick_count):?>
                     <th>Кики</th>
                 <?php endif;?>
-                <th class="button-column" id="bans-grid_c8">&nbsp;</th>
+                <th class="button-column">&nbsp;</th>
             </tr>
         </thead>
         <tbody>

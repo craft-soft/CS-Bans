@@ -72,23 +72,47 @@ class BansController extends Controller
 		$geo = false;
 		// Проверка прав на просмотр IP
 		$ipaccess = Webadmins::checkAccess('ip_view');
-		if($ipaccess) {
-            $geo = array(
-                'city' => 'Н/А',
-                'region' => 'Не определен',
-                'country' => 'Не определен',
-                'lat' => 0,
-                'lng' => 0,
-            );
-			$get = @file_get_contents('http://ipgeobase.ru:7020/geo?ip=' . $model->player_ip);
-            if($get) {
-                $xml = @simplexml_load_string($get);
-                if(!empty($xml->ip)) {
-                    $geo['city'] = $xml->ip->city;
-                    $geo['region'] = $xml->ip->region;
-                    $geo['country'] = $xml->ip->country;
-                    $geo['lat'] = $xml->ip->lat;
-                    $geo['lng'] = $xml->ip->lng;
+		if($model->player_ip && $ipaccess) {
+            $cacheKey = md5('player_ip_'.$model->player_ip);
+            $cache = Yii::app()->cache->get($cacheKey);
+            if($cache) {
+                $geo = $cache;
+            } else {
+                $geo = array(
+                    'city' => 'Н/А',
+                    'region' => 'Не определен',
+                    'country' => 'Не определен',
+                    'lat' => 0,
+                    'lng' => 0,
+                );
+                $client = new \GuzzleHttp\Client([
+                    'connect_timeout' => 1,
+                    'base_uri' => 'http://ipgeobase.ru:7020'
+                ]);
+                try {
+                    $response = $client->get('/geo', [
+                        'query' => ['ip' => $model->player_ip]
+                    ]);
+                } catch(\GuzzleHttp\Exception\RequestException $e) {
+                    return $geo;
+                }
+
+                if($response instanceof \GuzzleHttp\Psr7\Response && $response->getStatusCode() === 200) {
+                    $content = (string)$response->getBody();
+                } else {
+                    return $geo;
+                }
+
+                if($content) {
+                    $xml = @simplexml_load_string($content);
+                    if(!empty($xml->ip)) {
+                        $geo['city'] = (string)$xml->ip->city;
+                        $geo['region'] = (string)$xml->ip->region;
+                        $geo['country'] = (string)$xml->ip->country;
+                        $geo['lat'] = (string)$xml->ip->lat;
+                        $geo['lng'] = (string)$xml->ip->lng;
+                        Yii::app()->cache->set($cacheKey, $geo);
+                    }
                 }
             }
 		}
@@ -154,9 +178,18 @@ class BansController extends Controller
 			'model'=>$model,
 			'files' => $files,
 			'comments'=> $comments,
-			'f' => $f,
-			'c' => $c,
-			'history' => $history
+			'filesProvider' => Prefs::dataFromProvider($f),
+			'commentsProvider' => Prefs::dataFromProvider($c),
+			'historyProvider' => Prefs::dataFromProvider($history),
+            'canEditBan' => Webadmins::checkAccess('bans_edit', $model->admin_nick),
+            'canUnbanBan' => Webadmins::checkAccess('bans_unban', $model->admin_nick),
+            'canDeleteBan' => Webadmins::checkAccess('bans_delete', $model->admin_nick),
+            'canAddComment' => Yii::app()->config->use_comment && (!Yii::app()->user->isGuest || Yii::app()->config->comment_all),
+            'canAddDemo' => Yii::app()->config->use_demo && (!Yii::app()->user->isGuest || Yii::app()->config->demo_all),
+            'playerSteam' => Prefs::steam_convert($model->player_id, TRUE)
+				? CHtml::link($model->player_id, 'http://steamcommunity.com/profiles/'
+						. Prefs::steam_convert($model->player_id), array('target' => '_blank'))
+				: $model->player_id
 		));
 	}
 
@@ -287,33 +320,20 @@ class BansController extends Controller
                 ),)
              );
         }
-
+        $clientIp = Prefs::getRealIp();
 		// Проверяем IP посетителя, есть ли он в активных банах
 		$check = Bans::model()->count(
 			"`player_ip` = :ip AND " . $select,
 			array(
-				':ip'=> Prefs::getRealIp(),
+				':ip'=> $clientIp,
 			)
 		);
-        
-        $pagination = $dataProvider->getPagination();
-        $count = $dataProvider->getItemCount();
-        $total=$dataProvider->getTotalItemCount();
-        $start=$pagination->currentPage * $pagination->pageSize + 1;
-        $end=$start+$count-1;
-        
-		$this->render('index',array(
-			'models'=>$dataProvider->getData(),
-            'sort' => $dataProvider->getSort(),
-            'pagination' => $pagination,
-            'start' =>$start,
-            'end' => $end,
-            'count' => $total,
-            'page' => $pagination->getCurrentPage() + 1,
-            'pages' => $pagination->getPageCount(),
+
+		$this->render('index',array_merge(Prefs::dataFromProvider($dataProvider), array(
 			'searchModel'=>$model,
-			'check' => $check > 0 ? true : false,
-		));
+            'clientIp' => $clientIp,
+            'clientFindedInBans' => $check > 0
+		)));
 
 	}
 
