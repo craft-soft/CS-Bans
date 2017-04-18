@@ -158,7 +158,7 @@ class AdminController   extends Controller
 				Yii::app()->end("$('#loading').hide();alert('Таблица банов успешно очищена');");
 
 			case 'clearcache':
-				$dir = ROOTPATH."/assets";
+                $dir = Yii::getPathOfAlias('webroot.assets');
 				self::removeDirRec($dir);
 				Yii::app()->cache->flush();
 				Yii::app()->end("$('#loading').hide();alert('Кэш очищен');");
@@ -167,9 +167,10 @@ class AdminController   extends Controller
 				$query = Yii::app()->db->createCommand("SHOW TABLES FROM `" . Yii::app()->params['dbname']. "` LIKE '".Yii::app()->db->tablePrefix."%'")->queryAll();
 				$tables = "";
 				foreach($query as $tmp) {
-					foreach ($tmp as $key=>$val)
-						$tables.=($tables != "" ? "," : "")."`".$val."`";
-				}
+					foreach ($tmp as $key => $val) {
+                        $tables .= ($tables != "" ? "," : "") . "`" . $val . "`";
+                    }
+                }
 				$optimize = Yii::app()->db->createCommand("OPTIMIZE TABLES ".$tables)->query();
 				$alert = $optimize ? "База оптимизирована" : "Ошибка оптимизации";
 				Yii::app()->end("$('#loading').hide();alert('". $alert."');");
@@ -348,8 +349,8 @@ class AdminController   extends Controller
 		$themes = array();
 
 		// Ищем папки тем в themes
-		foreach(glob(ROOTPATH . '/themes/*') as $t)
-		{
+        $themesPath = Yii::getPathOfAlias('webroot.themes') . DIRECTORY_SEPARATOR;
+		foreach(glob($themesPath . '*') as $t) {
 			$themes[basename($t)] = basename($t);
 		}
 

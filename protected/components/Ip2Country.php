@@ -15,7 +15,7 @@ class Ip2Country extends CApplicationComponent {
      */
     public function __construct()
     {
-        $datafile = ROOTPATH . '/include/ip2country.dat';
+        $datafile = Yii::getPathOfAlias('webroot.include') . DIRECTORY_SEPARATOR . 'ip2country.dat';
 
         $this->fp = fopen($datafile, 'r');
 

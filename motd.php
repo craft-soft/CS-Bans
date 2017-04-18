@@ -12,9 +12,8 @@
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru  «Attribution-NonCommercial-ShareAlike»
  */
 
-define('ROOTPATH', dirname(__FILE__));
+// Ядро
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
-// Подключаем ядро
-require_once(ROOTPATH . '/include/yii/framework/yii.php');
 // Создаем приложение
-Yii::createWebApplication(ROOTPATH . '/protected/config/motd.php')->run();
+Yii::createWebApplication(__DIR__ . DIRECTORY_SEPARATOR . 'protected' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'motd.php')->run();

@@ -163,7 +163,7 @@ class Serverinfo extends CActiveRecord
 
         if (!$info['online']) {
             $mapimage = Yii::app()->urlManager->baseUrl . "/images/maps/noresponse.jpg";
-        } elseif (is_file(ROOTPATH . DIRECTORY_SEPARATOR ."images". DIRECTORY_SEPARATOR ."maps".DIRECTORY_SEPARATOR.$game . DIRECTORY_SEPARATOR . $info['map'] . ".jpg")) {
+        } elseif (is_file(Yii::getPathOfAlias("webroot.images.maps.{$game}.{$info['map']}") . '.jpg')) {
             $mapimage = Yii::app()->urlManager->baseUrl . "/images/maps/{$game}/{$info['map']}.jpg";
         } else {
             $mapimage = Yii::app()->urlManager->baseUrl . "/images/maps/noimage.jpg";

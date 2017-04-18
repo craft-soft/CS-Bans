@@ -30,13 +30,26 @@ class conf
 }
 $config = new conf;
 
+$basePath = dirname(dirname(__DIR__));
+
 // Подключаем конфиг старого AmxBans
-require_once ROOTPATH . '/include/db.config.inc.php';
+require_once $basePath . DIRECTORY_SEPARATOR . 'include' . DIRECTORY_SEPARATOR . 'db.config.inc.php';
 
 // Подключаем bootstrap
-Yii::setPathOfAlias('bootstrap', dirname(__FILE__).'/../extensions/bootstrap');
+Yii::setPathOfAlias(
+    'bootstrap',
+    realpath(
+        dirname(__FILE__)
+            . DIRECTORY_SEPARATOR
+            . '..'
+            . DIRECTORY_SEPARATOR
+            . 'extensions'
+            . DIRECTORY_SEPARATOR
+            . 'bootstrap'
+    )
+);
 
-$dirs = scandir(dirname(__FILE__).'/../modules');
+$dirs = scandir(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'modules');
 
 $modules = array();
 foreach ($dirs as $name){
@@ -49,7 +62,7 @@ define('MODULES_MATCHES', implode('|', array_keys($modules)));
 
 // Главные параметры приложения
 return array(
-	'basePath'=>ROOTPATH . DIRECTORY_SEPARATOR . 'protected',
+	'basePath'=>$basePath . DIRECTORY_SEPARATOR . 'protected',
 	'name'=>'СS:Bans 1.4',
 	'sourceLanguage' => 'ru',
 	'language'=>'ru',
@@ -71,7 +84,7 @@ return array(
 		
 	)),
     
-    'onBeginRequest' => function() {
+    'onBeginRequest' => function() use ($basePath) {
         if(!Yii::app()->db->username) {
 			Yii::app()->catchAllRequest = array('site/install');
             return Yii::app()->end();
@@ -81,7 +94,7 @@ return array(
             if (Yii::app()->config->start_page !== '/site/index') {
                 Yii::app()->homeUrl = array(Yii::app()->config->start_page);
             }
-            if (is_dir(ROOTPATH . '/themes/' . Yii::app()->config->design)) {
+            if (is_dir($basePath . DIRECTORY_SEPARATOR . 'themes' . DIRECTORY_SEPARATOR . Yii::app()->config->design)) {
                 Yii::app()->setTheme(Yii::app()->config->design);
             }
         } catch(Exception $e) {
@@ -161,10 +174,6 @@ return array(
 					'class'=>'CFileLogRoute',
 					'levels'=>'error, warning',
 				),
-				// Раскомментировать, если хотите, чтобы ошибки были выведены на страницах
-				//array(
-				//	'class'=>'CWebLogRoute',
-				//),
 			),
 		),
 	),

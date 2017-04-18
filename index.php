@@ -14,10 +14,8 @@
 
 date_default_timezone_set('Europe/Moscow');
 
-define('ROOTPATH', __DIR__);
-
 // Ядро
-require_once(ROOTPATH . '/vendor/autoload.php');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
 // Создаем приложение
-Yii::createWebApplication(ROOTPATH . '/protected/config/main.php')->run();
+Yii::createWebApplication(__DIR__ . DIRECTORY_SEPARATOR . 'protected' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'main.php')->run();
