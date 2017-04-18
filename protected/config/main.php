@@ -87,7 +87,7 @@ return array(
     'onBeginRequest' => function() use ($basePath) {
         if(!Yii::app()->db->username) {
 			Yii::app()->catchAllRequest = array('site/install');
-            return Yii::app()->end();
+            return;
 		}
         // Здаем главную страницу
         try {
@@ -130,7 +130,11 @@ return array(
 			'urlSuffix'=>'.html',
 			'rules'=>array(
 				'/'=>'site/index',
-				
+				array(
+                    'bans/motd',
+                    'pattern' => 'motd',
+                    'urlSuffix' => '.php'
+                ),
 				'billing/unban/<id:\d+>' => 'billing/default/unban',
 				'billing/<controller:\w+>/<action:\w+>/<id:\d+>' => 'billing/<controller>/<action>',
                 'billing/<controller:\w+>/<action:\w+>' => 'billing/<controller>/<action>',
