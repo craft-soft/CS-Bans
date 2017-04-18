@@ -1,4 +1,16 @@
 <?php
+
+/* @var $this BansController */
+/* @var $models Bans[] */
+/* @var $searchModel Bans */
+/* @var $sort CSort */
+/* @var $pagination CPagination */
+/* @var $start intval */
+/* @var $end intval */
+/* @var $count intval */
+/* @var $page intval */
+/* @var $pages intval */
+
 /**
  * Вьюшка главной страницы банов
  */
@@ -12,25 +24,28 @@
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru  «Attribution-NonCommercial-ShareAlike»
  */
 
-$page = 'Банлист';
-$this->pageTitle = Yii::app()->name . ' - ' . $page;
+$this->pageTitle = Yii::app()->name . ' - Банлист';
 
 $this->breadcrumbs=array(
-	$page,
+	'Банлист',
 );
+
+Yii::app()->prefs->registerGridAssets('bans-grid', $pagination);
 
 Yii::app()->clientScript->registerScript('banlist', "
 $(document).on('click', '.bantr', function(){
 	$('#loading').show();
 	var bid = this.id.substr(4);
-	$.post('".Yii::app()->createUrl('bans/bandetail/')."', {'bid': bid}, function(data){
-		eval(data);
-	});
-})
-");
-
-
-Yii::app()->clientScript->registerScript('search', "
+	$.post(
+        '".$this->createUrl('/bans/bandetail')."',
+        {'bid': bid},
+        function(response){
+            $('#loading').hide();
+            $('#BanDetail div.modal-body').html(response);
+            $('#BanDetail').modal('show');
+        }
+    );
+});
 $('.search-button').click(function(){
     $('.search-form').slideToggle(1500);
     return false;
@@ -59,89 +74,95 @@ $('.search-form form').submit(function(){
 <?php echo CHtml::link('Поиск','#',array('class'=>'search-button btn btn-small')); ?>
 <div class="search-form" style="display:none">
 <?php $this->renderPartial('_search',array(
-    'model'=>$model,
+    'model'=>$searchModel,
 )); ?>
 </div>
-<?php
-
-$this->widget('bootstrap.widgets.TbGridView', array(
-    'type'=>'striped bordered condensed',
-	'id'=>'bans-grid',
-    'dataProvider'=>isset($_GET['Bans']) ? $model->search() : $dataProvider,
-	//'template' => '{items} {pager}',
-	'summaryText' => 'Показано с {start} по {end} банов из {count}. Страница {page} из {pages}',
-	'htmlOptions' => array(
-		'style' => 'width: 100%'
-	),
-	'rowHtmlOptionsExpression'=>'array(
-		"id" => "ban_$data->bid",
-		"style" => "cursor:pointer;",
-		"class" => $data->unbanned == 1 ? "bantr success" : "bantr"
-	)',
-	'pager' => array(
-		'class'=>'bootstrap.widgets.TbPager',
-		'displayFirstAndLast' => true,
-	),
-    'columns'=>array(
-
-		array(
-			'header' => 'Дата',
-			'value'=>'date("d.m.Y", $data->ban_created)',
-			'htmlOptions' => array('style' => 'width:70px'),
-		),
-		array(
-			'header' => 'Ник',
-			'type' => 'raw',
-			'value' => '$data->country . " " . CHtml::encode(mb_substr($data->player_nick, 0, 18, "UTF-8"))',
-			'htmlOptions' => array(
-				'style' => 'width: 180px'
-			)
-		),
-
-		array(
-			'header' => 'Админ',
-			'value' => '$data->admin_nick',
-		),
-
-		array(
-			'header' => 'Причина',
-			'value' => 'mb_strlen($data->ban_reason, "UTF-8") > 25 ? mb_substr($data->ban_reason, 0, 25, "UTF-8") . "..." : $data->ban_reason'
-		),
-
-		array(
-			'header' => 'Срок',
-			'value' => '$data->ban_length == \'-1\' ? \'Разбанен\' : Prefs::date2word($data->ban_length) . ($data->expired == 1 ? \' (истек)\' : \'\')',
-			'htmlOptions' => array('style' => 'width:130px'),
-		),
-
-		array(
-			'header' => 'Комментарии',
-			'value'=>'$data->commentsCount',
-			'htmlOptions' => array('style'=>'text-align: center'),
-			'visible' => Yii::app()->config->show_comment_count,
-		),
-
-		array(
-			'header' => 'Файлы',
-			'value'=>'$data->filesCount',
-			'htmlOptions' => array('style'=>'text-align: center'),
-			'visible' => Yii::app()->config->show_demo_count,
-		),
-
-		array(
-			'header' => 'Кики',
-			'value' => '$data->ban_kicks',
-			'htmlOptions' => array('style'=>'text-align: center'),
-			'visible' => Yii::app()->config->show_kick_count,
-		) ,
-		array(
-			'class'=>'bootstrap.widgets.TbButtonColumn',
-			'header' => '',
-			'template'=>'{view}',
-		)
-	),
-));
-?>
+<div style="width: 100%" id="bans-grid" class="grid-view">
+    <div class="summary">Показано с <?= $start?> по <?= $end?> банов из <?= $count?>. Страница <?= $page?> из <?= $pages?></div>
+    <table class="items table table-striped table-bordered table-condensed">
+        <col style="width: 70px">
+        <col style="width: 180px">
+        <col>
+        <col>
+        <col style="width: 130px">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Ник</th>
+                <th>Админ</th>
+                <th>Причина</th>
+                <th>Срок</th>
+                <?php if(Yii::app()->config->show_comment_count):?>
+                    <th>Комментарии</th>
+                <?php endif;?>
+                <?php if(Yii::app()->config->show_demo_count):?>
+                    <th>Файлы</th>
+                <?php endif;?>
+                <?php if(Yii::app()->config->show_kick_count):?>
+                    <th>Кики</th>
+                <?php endif;?>
+                <th class="button-column" id="bans-grid_c8">&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach($models as $key => $model):?>
+            <tr id="ban_<?= $model->bid?>" class="bantr<?php if($model->unbanned == 1) echo ' success';?> <?= $key % 2 == 0 ? 'odd' : 'even'?>" style="cursor:pointer;">
+                <td>
+                    <?= Yii::app()->format->formatDate($model->ban_created)?>
+                </td>
+                <td>
+                    <?= $model->country?>
+                    <?= CHtml::encode(mb_substr($model->player_nick, 0, 18, "UTF-8"))?>
+                </td>
+                <td>
+                    <?= CHtml::encode($model->admin_nick)?>
+                </td>
+                <td>
+                    <?php if(mb_strlen($model->ban_reason, "UTF-8") > 25):?>
+                        <?= CHtml::encode(mb_substr($model->ban_reason, 0, 25, "UTF-8"))?>...
+                    <?php else:?>
+                        <?= CHtml::encode($model->ban_reason)?>
+                    <?php endif;?>
+                </td>
+                <td>
+                    <?php if($model->ban_length == '-1'):?>
+                        Разбанен
+                    <?php else:?>
+                        <?= Prefs::date2word($model->ban_length)?>
+                        <?php if($model->expired == 1):?>
+                            (истек)
+                        <?php endif;?>
+                    <?php endif;?>
+                </td>
+                <?php if(Yii::app()->config->show_comment_count):?>
+                <td class="text-center">
+                    <?= intval($model->commentsCount)?>
+                </td>
+                <?php endif;?>
+                <?php if(Yii::app()->config->show_demo_count):?>
+                <td class="text-center">
+                    <?= intval($model->filesCount)?>
+                </td>
+                <?php endif;?>
+                <?php if(Yii::app()->config->show_kick_count):?>
+                <td class="text-center">
+                    <?= intval($model->ban_kicks)?>
+                </td>
+                <?php endif;?>
+                <td class="button-column">
+                    <a class="view" title="Просмотреть" rel="tooltip" href="<?= $this->createUrl('/bans/view', ['id' => $model->bid])?>"><i class="icon-eye-open"></i></a>
+                </td>
+            </tr>
+        <?php endforeach;?>
+        </tbody>
+    </table>
+    <div class="pagination">
+        <?php $this->widget('bootstrap.widgets.TbPager', [
+            'pages' => $pagination,
+            'displayFirstAndLast' => true
+        ])?>
+    </div>
+</div>
 
 <?php $this->beginWidget('bootstrap.widgets.TbModal',
 	array(
@@ -154,98 +175,7 @@ $this->widget('bootstrap.widgets.TbGridView', array(
     <h4>Подробности бана </h4>
 </div>
 
-<div class="modal-body" id="ban_name">
-<table class="items table table-bordered table-condensed" style="width:500px; margin: 0 auto">
-	<tr class="odd">
-		<td class="span3">
-			<b>Ник</b>
-		</td>
-		<td class="span6" id="bandetail-nick">
-		</td>
-	</tr>
-	<tr class="odd">
-		<td>
-			<b>Steam ID</b>
-		</td>
-		<td id="bandetail-steam">
-		</td>
-	</tr>
-	<tr class="odd">
-		<td>
-			<b>Steam Community</b>
-		</td>
-		<td id="bandetail-steamcommynity">
-		</td>
-	</tr>
-	<tr class="odd">
-		<td>
-			<b>IP адрес</b>
-		</td>
-		<td id="bandetail-ip">
-		</td>
-	</tr>
-	<tr class="odd">
-		<td>
-			<b>Тип бана</b>
-		</td>
-		<td id="bandetail-type">
-		</td>
-	</tr>
-	<tr class="odd">
-		<td>
-			<b>Причина</b>
-		</td>
-		<td id="bandetail-reason">
-		</td>
-	</tr>
-	<tr class="odd">
-		<td>
-			<b>Дата/Время</b>
-		</td>
-		<td id="bandetail-datetime">
-		</td>
-	</tr>
-	<tr class="odd">
-		<td>
-			<b>Срок</b>
-		</td>
-		<td id="bandetail-expired">
-		</td>
-	</tr>
-	<tr class="odd">
-		<td>
-			<b>Админ</b>
-		</td>
-		<td id="bandetail-admin">
-		</td>
-	</tr>
-	<tr class="odd">
-		<td>
-			<b>Сервер</b>
-		</td>
-		<td id="bandetail-server">
-		</td>
-	</tr>
-	<tr class="odd">
-		<td>
-			<b>Кол-во киков</b>
-		</td>
-		<td id="bandetail-kicks">
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2" style="text-align: center">
-			<?php $this->widget('bootstrap.widgets.TbButton', array(
-				'label'=>'Показать подробности',
-				'url'=> '#',
-				'htmlOptions'=>array('id' => 'viewban'),
-			)); ?>
-		</td>
-	</tr>
-</table>
-<br>
-
-</div>
+<div class="modal-body" id="ban_name"></div>
 
 <div class="modal-footer">
     <?php $this->widget('bootstrap.widgets.TbButton', array(

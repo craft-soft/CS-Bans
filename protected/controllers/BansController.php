@@ -268,20 +268,25 @@ class BansController extends Controller
 
         $select = "((ban_created+(ban_length*60)) > UNIX_TIMESTAMP() OR ban_length = 0) AND `expired` = 0";
 
-		$dataProvider=new CActiveDataProvider('Bans', array(
-			'criteria'=>array(
-				'condition' => Yii::app()->config->auto_prune
-					?
-				$select
-					:
-				null,
-				'order' => '`ban_created` DESC',
-            ),
-			'pagination' => array(
-				'pageSize' =>  Yii::app()->config->bans_per_page,
+        /* @var $dataProvider CActiveDataProvider */
+        if(isset($_GET['Bans'])) {
+            $dataProvider = $model->search();
+        } else {
+            $dataProvider=new CActiveDataProvider('Bans', array(
+                'criteria'=>array(
+                    'condition' => Yii::app()->config->auto_prune
+                        ?
+                    $select
+                        :
+                    null,
+                    'order' => '`ban_created` DESC',
+                ),
+                'pagination' => array(
+                    'pageSize' =>  Yii::app()->config->bans_per_page,
 
-			),)
-		 );
+                ),)
+             );
+        }
 
 		// Проверяем IP посетителя, есть ли он в активных банах
 		$check = Bans::model()->count(
@@ -290,9 +295,23 @@ class BansController extends Controller
 				':ip'=> Prefs::getRealIp(),
 			)
 		);
+        
+        $pagination = $dataProvider->getPagination();
+        $count = $dataProvider->getItemCount();
+        $total=$dataProvider->getTotalItemCount();
+        $start=$pagination->currentPage * $pagination->pageSize + 1;
+        $end=$start+$count-1;
+        
 		$this->render('index',array(
-			'dataProvider'=>$dataProvider,
-			'model'=>$model,
+			'models'=>$dataProvider->getData(),
+            'sort' => $dataProvider->getSort(),
+            'pagination' => $pagination,
+            'start' =>$start,
+            'end' => $end,
+            'count' => $total,
+            'page' => $pagination->getCurrentPage() + 1,
+            'pages' => $pagination->getPageCount(),
+			'searchModel'=>$model,
 			'check' => $check > 0 ? true : false,
 		));
 
@@ -323,35 +342,18 @@ class BansController extends Controller
 	 */
 	public function actionBandetail()
 	{
-		if(is_numeric($_POST['bid']))
-		{
-			$model = Bans::model()->with('admin')->findByPk($_POST['bid']);
-			if($model === null)
-			{
-				Yii::app()->end('alert("Ошибка!")');
-			}
-			$js = "$('#bandetail-nick').html('" .  CHtml::encode($model->player_nick) . "');";
-			$js .= "$('#bandetail-steam').html('" . $model->player_id . "');";
-			$js .= "$('#bandetail-steamcommynity').html('" . Prefs::steam_convert($model->player_id, true) . "');";
-			$js .= "$('#bandetail-ip').html('" . (Webadmins::checkAccess('ip_view') ? $model->player_ip : 'Cкрыт') . "');";
-			$js .= "$('#bandetail-type').html('" . Prefs::getBanType($model->ban_type) . "');";
-			$js .= "$('#bandetail-reason').html('" . $model->ban_reason . "');";
-			$js .= "$('#bandetail-datetime').html('" . date('d.m.y - H:i:s',$model->ban_created) . "');";
-			$js .= "$('#bandetail-expired').html('" . ($model->ban_length == '-1'
-					?
-				'Разбанен'
-					:
-				Prefs::date2word($model->ban_length) .
-				($model->expired == 1 ? ' (истек)' : '')) . "');";
-			$js .= "$('#bandetail-admin').html('" . $model->adminName . "');";
-			$js .= "$('#bandetail-server').html('" . CHtml::encode($model->server_name) . "');";
-			$js .= "$('#bandetail-kicks').html('" . $model->ban_kicks . "');";
-			$js .= "$('#loading').hide();";
-			$js .= "$('#viewban').attr({'href': '".Yii::app()->urlManager->createUrl('/bans/view', array('id' => $_POST['bid']))."'});";
-			$js .= "$('#BanDetail').modal('show');";
-			echo $js;
-		}
-		Yii::app()->end();
+        if(!is_numeric($_POST['bid'])) {
+            throw new CHttpException(400, 'Не передан bid');
+        }
+        $model = Bans::model()->with('admin')->findByPk($_POST['bid']);
+        if($model === null) {
+            $response = 'Ошибка. Бан не найден';
+        } else {
+            $response = $this->renderPartial('_ban_modal', [
+                'model' => $model
+            ]);
+        }
+        Yii::app()->end($response);
 	}
 
 	public function actionMotd($sid, $adm = 0, $lang = 'ru')
