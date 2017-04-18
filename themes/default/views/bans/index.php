@@ -33,9 +33,9 @@ $this->breadcrumbs=array(
 Yii::app()->prefs->registerGridAssets('bans-grid', $pagination);
 
 Yii::app()->clientScript->registerScript('banlist', "
-$(document).on('click', '.bantr', function(){
+$(document).on('click', 'tr.bantr td:not(:last-child)', function(){
 	$('#loading').show();
-	var bid = this.id.substr(4);
+	var bid = $(this).closest('tr').prop('id').substr(4);
 	$.post(
         '".$this->createUrl('/bans/bandetail')."',
         {'bid': bid},
@@ -149,7 +149,7 @@ $('.search-form form').submit(function(){
                     <?= intval($model->ban_kicks)?>
                 </td>
                 <?php endif;?>
-                <td class="button-column">
+                <td class="button-column text-center">
                     <a class="view" title="Просмотреть" rel="tooltip" href="<?= $this->createUrl('/bans/view', ['id' => $model->bid])?>"><i class="icon-eye-open"></i></a>
                 </td>
             </tr>
