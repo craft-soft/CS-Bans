@@ -47,6 +47,9 @@ $('.search-form form').submit(function(){
 <div class="alert alert-<?php echo $check ? 'error' : 'success' ?>">
 	<a href="#" class="close" data-dismiss="alert">&times;</a>
 	<?php 
+	if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
+		$_SERVER['REMOTE_ADDR'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
+	}
 	$ip = $_SERVER['REMOTE_ADDR'];
 	echo $check
 			?
