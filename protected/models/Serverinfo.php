@@ -152,24 +152,24 @@ class Serverinfo extends CActiveRecord
         $info['game'] = $s['game_dir'];
         $info['os'] = $s['os'] == 'l' ? 'Linux' : 'Windows';
         $info['secure'] = $s['secure'] == 0 ? false : true;
-        $info['playersinfo'] = isset($s['players']) && is_array($s['players']) ? $s['players'] : null();
+        $info['playersinfo'] = isset($s['players']) && is_array($s['players']) ? $s['players'] : null;
         $info['timeleft'] = isset($s['mp_timeleft']) ? $s['mp_timeleft'] : isset($s['amx_timeleft']) ? $s['amx_timeleft'] : null;
         $info['nextmap'] = isset($s['amx_nextmap']) ? $s['amx_nextmap'] : null;
         $info['contact'] = isset($s['sv_contact']) ? $s['sv_contact'] : null;
         $game = $this->gametype ? $this->gametype : $info['game'];
         $info['modimg'] = Yii::app()->urlManager->baseUrl . "/images/games/{$game}.gif";
-        $info['vacimg'] = Yii::app()->urlManager->baseUrl . "images/" . ($info['secure'] ? "vac.png" : "no_vac.png");
-        $info['osimg'] = Yii::app()->urlManager->baseUrl . "images/os/{$info['os']}.png";
+        $info['vacimg'] = Yii::app()->urlManager->baseUrl . "/images/" . ($info['secure'] ? "vac.png" : "no_vac.png");
+        $info['osimg'] = Yii::app()->urlManager->baseUrl . "/images/os/{$info['os']}.png";
 
         if (!$info['online']) {
-            $mapimage = Yii::app()->urlManager->baseUrl . "/images/maps/noresponse.jpg";
+            $info['mapimage'] = Yii::app()->urlManager->baseUrl . "/images/maps/noresponse.jpg";
         } elseif (is_file(Yii::getPathOfAlias("webroot.images.maps.{$game}.{$info['map']}") . '.jpg')) {
-            $mapimage = Yii::app()->urlManager->baseUrl . "/images/maps/{$game}/{$info['map']}.jpg";
+            $info['mapimage'] = Yii::app()->urlManager->baseUrl . "/images/maps/{$game}/{$info['map']}.jpg";
         } else {
-            $mapimage = Yii::app()->urlManager->baseUrl . "/images/maps/noimage.jpg";
+            $info['mapimage'] = Yii::app()->urlManager->baseUrl . "/images/maps/noimage.jpg";
         }
 
-        $info['mapimg'] = CHtml::image($mapimage, $info['map'], array('title' => $info['map'], 'class' => 'img-polaroid'));
+        $info['mapimg'] = CHtml::image($info['mapimage'], $info['map'], array('title' => $info['map'], 'class' => 'img-polaroid'));
         return $info;
     }
 

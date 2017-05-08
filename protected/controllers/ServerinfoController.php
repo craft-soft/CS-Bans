@@ -45,18 +45,17 @@ class ServerinfoController extends Controller
 			else
 				$return = 'Ошибка отправки команды';
 
-			Yii::app()->end(CHtml::encode($response));
+			Yii::app()->end(CHtml::encode($return));
 		}
 	}
 
-	/**
-	 * Вывод информации о серверах аяксом.
-	 * @param integer|false $limit Количество вывода серверов
-	 * @return string Возвращает Javascript для аякса
-	 */
+    /**
+     * Вывод информации о серверах аяксом.
+     * @return string Возвращает Javascript для аякса
+     * @internal param false|int $limit Количество вывода серверов
+     */
 	public function actionGetinfo()
 	{
-		
 		$id = filter_input(INPUT_POST, 'server');
 		$server = $this->loadModel($id);
 		
@@ -66,12 +65,15 @@ class ServerinfoController extends Controller
 		Yii::app()->end(json_encode($server->getInfo()));
 	}
 
-	/**
-	 * Экшн для Ajax запросов действий над игроком
-	 * @param intval $id ID сервера
-	 * @param string $action Действие (Бан, кик, сообщение, профиль)
-	 * @return false
-	 */
+    /**
+     * Экшн для Ajax запросов действий над игроком
+     *
+     * @param int $id ID сервера
+     *
+     * @return mixed
+     * @throws CHttpException
+     * @internal param string $action Действие (Бан, кик, сообщение, профиль)
+     */
 	public function actionContext($id)
 	{
 		if(!Webadmins::checkAccess('servers_edit'))
@@ -102,7 +104,6 @@ class ServerinfoController extends Controller
 		}
 
 		$server = Serverinfo::model()->findByPk(intval($id));
-		$return = $server->RconCommand($command);
 		if($server->RconCommand($command))
 			$return = 'Команда отправлена успешно';
 
@@ -242,6 +243,12 @@ class ServerinfoController extends Controller
 		));
 	}
 
+    /**
+     * @param $id
+     *
+     * @return Serverinfo
+     * @throws CHttpException
+     */
 	public function loadModel($id)
 	{
 		$model=Serverinfo::model()->findByPk($id);
