@@ -51,10 +51,11 @@ class BansController extends Controller
         Yii::app ()->end(CHtml::errorSummary($model));
 	}
 
-	/**
-	 * Вывод инфы о бане
-	 * @param integer $id ID бана
-	 */
+    /**
+     * Вывод инфы о бане
+     * @param integer $id ID бана
+     * @throws CHttpException
+     */
 	public function actionView($id)
 	{
 		// Подгружаем комментарии и файлы
@@ -222,10 +223,11 @@ class BansController extends Controller
 		));
 	}
 
-	/**
-	 * Редактировать бан
-	 * @param integer $id ID бана
-	 */
+    /**
+     * Редактировать бан
+     * @param integer $id ID бана
+     * @throws CHttpException
+     */
 	public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
@@ -254,10 +256,11 @@ class BansController extends Controller
 		));
 	}
 
-	/**
-	 * Удаление бана
-	 * @param integer $id ID бана
-	 */
+    /**
+     * Удаление бана
+     * @param integer $id ID бана
+     * @throws CHttpException
+     */
 	public function actionDelete($id)
 	{
 		$model = $this->loadModel($id);
@@ -379,10 +382,13 @@ class BansController extends Controller
 		));
 	}
 
-	/**
-	 * Загрузка модели по ID
-	 * @param integer ID бана
-	 */
+    /**
+     * Загрузка модели по ID
+     * @param $id
+     * @return static
+     * @throws CHttpException
+     * @internal param ID $integer бана
+     */
 	public function loadModel($id)
 	{
 		$model=Bans::model()->findByPk($id);
@@ -392,9 +398,10 @@ class BansController extends Controller
         return $model;
 	}
 
-	/**
-	 * Аякс проверка формы
-	 */
+    /**
+     * Аякс проверка формы
+     * @param $model
+     */
 	protected function performAjaxValidation($model)
 	{
 		if(isset($_POST['ajax']) && $_POST['ajax']==='bans-form') {
