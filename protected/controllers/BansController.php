@@ -279,20 +279,6 @@ class BansController extends Controller
 	 */
 	public function actionIndex()
 	{
-		if(Yii::app()->request->isAjaxRequest && isset($_POST['server'])) {
-			if($_POST['server'] == 0) {
-				Yii::app()->end('$("#Bans_admin_nick").html("<option value=\"0\">Не выбрано</option>");');
-			}
-			$amxadmins = Amxadmins::model()->with('servers')->findAll('`address` = :addr', array(':addr' => $_POST['server']));
-
-			$js = "<option>Любой админ</option>";
-			foreach($amxadmins as $admin) {
-				$js .= "<option value=\"{$admin->steamid}\">{$admin->nickname}</option>";
-			}
-
-			Yii::app()->end("$('#Bans_admin_nick').html('{$js}')");
-		}
-
 		$model=new Bans('search');
 		$model->unsetAttributes();
 		if (isset($_GET['Bans'])) {
