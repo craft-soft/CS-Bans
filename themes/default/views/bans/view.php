@@ -34,6 +34,8 @@ $this->breadcrumbs=array(
 	$model->player_nick,
 );
 
+Yii::app()->prefs->registerGridAssets('ban-history-grid', $historyProvider['pagination']);
+
 Yii::app()->clientScript->registerScript('viewBan', "
     jQuery('body').on('click','a[data-action]',function(e){
         e.preventDefault();
@@ -216,6 +218,11 @@ if($geo) {
             <?php endforeach;?>
         </tbody>
     </table>
+    <div class="pagination">
+        <?php $this->widget('bootstrap.widgets.TbPager', [
+            'pages' => $historyProvider['pagination']
+        ])?>
+    </div>
 </div>
 
 <hr>
