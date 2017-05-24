@@ -52,6 +52,7 @@ class Prefs extends CApplicationComponent
     
     public function registerGridAssets($gridId, CPagination $pagination, $selectedRows = false)
     {
+        /** @var CClientScript $cs */
         $cs = Yii::app()->getClientScript();
         $cs->registerScriptFile(
             Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('zii.widgets.assets.gridview')).'/jquery.yiigridview.js',
@@ -101,7 +102,7 @@ class Prefs extends CApplicationComponent
 
 	/**
 	 * Получение типа бана
-	 * @param type $type
+	 * @param string $type
 	 * @return string|boolean тип бана
 	 */
 	public static function getBanType($type)
@@ -165,14 +166,15 @@ class Prefs extends CApplicationComponent
 		return false;
 	}
 
-	/**
-	 * Конвертирует время в минутах в человеко-понятный формат
-	 * @author SeToY & |PJ|ShOrTy
-	 * @param intval $dif
-	 * @param boolean $short
-	 * @return string
-	 * @author AmxBans Team <amxbans.de>
-	 */
+    /**
+     * Конвертирует время в минутах в человеко-понятный формат
+     * @author SeToY & |PJ|ShOrTy
+     * @param int $dif
+     * @param boolean $short
+     * @param bool $server
+     * @return string
+     * @author AmxBans Team <amxbans.de>
+     */
 	public static function date2word($dif, $short=false, $server = false)
 	{
 		if($dif == 0) {
@@ -249,15 +251,15 @@ class Prefs extends CApplicationComponent
 
 			return $s;
 		} else {
-			return;
+			return null;
 		}
 	}
 
 	/**
 	 * Вывод даты окончания бана
 	 * @author Onotole <webmaster@mix-game.pro>
-	 * @param intval $create Дата создания в секундах
-	 * @param intval $lenght Срок бана в минутах
+	 * @param integer $create Дата создания в секундах
+	 * @param integer $lenght Срок бана в минутах
 	 * @return string Дату окончания бана
 	 */
 	public static function getExpired($create, $lenght)
@@ -274,15 +276,16 @@ class Prefs extends CApplicationComponent
 		return date('d.m.Y - H:i:s', $create + $lenght);
 	}
 
-	/**
-	 * Проверка значения на валидность
-	 * @author SeToY & |PJ|ShOrTy
-	 * @param STRING $types: Тип (email, steamid, ip, amxxaccess, amxxflags)
-	 * @return boolean
-	 * @author SourceBans Team <sourcebans.com>
-	 */
+    /**
+     * Проверка значения на валидность
+     * @author SeToY & |PJ|ShOrTy
+     * @param string $value
+     * @param string $type
+     * @return bool
+     * @author SourceBans Team <sourcebans.com>
+     */
 
-	public static function validate_value($value,$type='steamid') {
+	public static function validate_value($value, $type='steamid') {
 
 		switch($type) {
 			case 'email':
@@ -317,17 +320,16 @@ class Prefs extends CApplicationComponent
 			default:
 				return false;
 		}
-		return false;
 	}
 
 	/**
 	 * Возвращает размер файла в человеко-понятном формате
-	 * @param intval $data
+	 * @param integer $data
 	 * @return string
 	 */
     public static function formatfilesize($data) {
         if ($data < 1024) {
-            return $data . " b.";
+            return (string)$data . " b.";
         }
         if ($data < 1024000) {
             return round(($data / 1024), 2) . "Kb";
@@ -337,7 +339,7 @@ class Prefs extends CApplicationComponent
 
     /**
 	 * Получение информации о сервере/сайте
-	 * @return string
+	 * @return array
 	 */
 	public static function sysprefs()
 	{
