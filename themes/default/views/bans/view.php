@@ -3,6 +3,21 @@
  * Вьюшка просмотра деталей бана
  */
 
+/** @var Bans $model */
+/** @var array $geo */
+/** @var bool $ipaccess */
+/** @var bool $canEditBan */
+/** @var bool $canUnbanBan */
+/** @var bool $canDeleteBan */
+/** @var bool $canAddComment */
+/** @var bool $canAddDemo */
+/** @var string $playerSteam */
+/** @var CActiveDataProvider $commentsProvider */
+/** @var CActiveDataProvider $filesProvider */
+/** @var CActiveDataProvider $historyProvider */
+/** @var Comments $comments */
+/** @var Files $files */
+
 /**
  * @author Craft-Soft Team
  * @package CS:Bans
@@ -445,7 +460,7 @@ if($geo) {
 								'readonly' => 'readonly'
 							)
 							:
-							''
+							array()
 						)
 					?>
 				</td>
@@ -465,7 +480,7 @@ if($geo) {
 								'readonly' => 'readonly'
 							)
 							:
-							''
+							array()
 						)
 					?>
 				</td>
@@ -520,7 +535,7 @@ if($geo) {
             <h3>Информация об IP "<?php echo $model->player_ip ?>"</h3>
         </div>
         <div class="modal-body" style="min-height: 460px">
-            <div id="map" style="width:800px; height:400px; marg: 0 auto"></div>
+            <div id="map" style="width:800px; height:400px; margin: 0 auto"></div>
             <div style="top: -30px">
                 <b>Страна: </b>
                 <?php echo $geo['country'] ?>
