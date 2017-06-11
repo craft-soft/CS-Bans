@@ -58,14 +58,13 @@ foreach ($dirs as $name){
 	}
 }
 
-define('MODULES_MATCHES', implode('|', array_keys($modules)));
-
 // Главные параметры приложения
 return array(
 	'basePath'=>$basePath . DIRECTORY_SEPARATOR . 'protected',
 	'name'=>'СS:Bans 1.4',
 	'sourceLanguage' => 'ru',
 	'language'=>'ru',
+    'version' => '1.4.0',
 
 	// Предзагружаемые компоненты
 	'preload'=>array(
