@@ -71,6 +71,7 @@ $webConfig = [
                 'intval' => 'intval',
                 'printr' => 'print_r',
                 'date2word' => 'Prefs::date2word',
+                'vardump' => 'CVarDumper::dumpAsString',
             ),
         ),
     ],
