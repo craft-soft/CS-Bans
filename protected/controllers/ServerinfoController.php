@@ -35,7 +35,7 @@ class ServerinfoController extends Controller
 		{
 			$server = $this->loadModel($id);
 
-			$response = $server->RconCommand(CHtml::encode($_POST['command']));
+			$response = $server->RconCommand($_POST['command']);
 
 			if ($_POST['command'] == 'amx_reloadadmins' && $server->RconCommand('echo Hi') === 'Hi') {
                 $response = 'Список админов обновлен';
