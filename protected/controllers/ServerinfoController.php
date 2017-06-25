@@ -79,10 +79,6 @@ class ServerinfoController extends Controller
      */
 	public function actionContext($id)
 	{
-		if (!Webadmins::checkAccess('servers_edit')) {
-            throw new CHttpException(403, 'У Вас недостаточно прав');
-        }
-
         // Проверяем права
 		if (!Webadmins::checkAccess('bans_add')) {
             throw new CHttpException(403, "У Вас недостаточно прав");
