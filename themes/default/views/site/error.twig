@@ -1,0 +1,6 @@
+{{ title(App.name ~ ' :: Ошибка') }}
+{{ breadcrumbs(['Ошибка']) }}
+<h2>Ошибка {{ code }}</h2>
+<div class="alert alert-error error">
+    {{ message|encode }}
+</div>

@@ -1,0 +1,19 @@
+{{ title(App.name ~ ' :: Обновление') }}
+{{ breadcrumbs(['Обновление']) }}
+<h2>Обновление</h2>
+
+{% if step2 %}
+    {{ html.form }}
+	<p>
+        <label class="checkbox">
+            <input type="checkbox" name="license">
+            Я принимаю условия
+            <a href="{{ this.createUrl('/site/license') }}" target="_blank">лицензионного соглашения</a>
+        </label>
+    </p>
+    <button type="submit" class="btn btn-primary">Обновить</button>
+    {{ html.endForm }}
+
+{% else %}
+	<div class="alert alert-success">Обновление прошло успешно!</div>
+{% endif %}

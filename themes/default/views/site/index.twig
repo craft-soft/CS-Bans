@@ -1,0 +1,73 @@
+{{ title(App.name) }}
+{{ void(App.clientScript.registerScriptFile(App.theme.baseUrl ~ '/js/index.js', 2)) }}
+<div
+    class="hero-unit"
+    {% if App.config.get('banner') %}
+    style="background: #c1c1c1 url({{ App.urlManager.baseUrl }}/images/banner/{{ App.config.get('banner') }});color:#fff;text-shadow: 2px 2px 3px #1b1b1b;"
+    {% endif %}
+    >
+    <h1>{{ App.name|encode }}</h1>
+    <p>{{ App.name|encode }} установлен.</p>
+</div>
+<div class="row-fluid">
+    <div class="span6">
+        <div class="alert alert-info">
+            <h4>Последние 10 банов</h4>
+        </div>
+        <div id="bans-grid" class="grid-view">
+            <table class="items table table-striped table-bordered table-condensed">
+                <thead>
+                    <tr>
+                        <th>Ник игрока</th>
+                        <th>Дата</th>
+                        <th>Срок бана</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ban in bans %}
+                    <tr
+                        style="cursor:pointer;"
+                        class="bantr odd{% if ban.unbanned %} success{% endif %}"
+                        data-url="{{ this.createUrl('/bans/view', {'id': ban.bid}) }}">
+                        <td>{{ ban.player_nick|encode }}</td>
+                        <td>{{ ban.ban_created|date('d.m.Y') }}</td>
+                        <td style="width: 130px">{{ ban.ban_length|date2word }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="span6">
+		<div class="alert alert-info">
+            <h4>Сервера</h4>
+        </div>
+		<table id="servers" class="table table-bordered table-condensed table-striped" data-info-url="{{ this.createUrl('/serverinfo/getinfo') }}">
+			<thead>
+				<tr>
+					<th>Имя сервера</th>
+					<th>Игроки</th>
+					<th>Карта</th>
+				</tr>
+			</thead>
+			<tbody>
+                {% for server in servers %}
+				<tr 
+					class="warning" 
+					style="cursor: pointer"
+                    data-server-id="{{ server.id|intval }}"
+                    data-server-hostname="{{ server.hostname|encode }}"
+                    data-url="{{ this.createUrl('/serverinfo/view', {'id': server.id}) }}">
+					<td class="nick">
+                        {{ server.hostname|encode }}
+						&nbsp;
+                        <img src="{{ App.baseUrl }}/images/loading.gif">
+					</td>
+                    <td class="players"></td>
+                    <td class="map"></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>

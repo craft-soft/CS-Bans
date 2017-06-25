@@ -1,0 +1,29 @@
+{{ title(App.name ~ ' :: Вход') }}
+{{ breadcrumbs(['Вход']) }}
+<h2>Вход</h2>
+<p>Пожалуйста, заполните следующую форму:</p>
+{% set form = this.beginWidget('bootstrap.widgets.TbActiveForm', {
+    'id': 'login-form',
+    'type': 'horizontal',
+	'enableClientValidation': true,
+	'clientOptions': {
+		'validateOnSubmit': true,
+	}
+}, true) %}
+    <p class="note">Поля отмеченные <span class="required">*</span> обязательны для заполнения.</p>
+    {{ form.textFieldRow(model, 'username') }}
+    {{ form.passwordFieldRow(model, 'password') }}
+    {{ form.checkBoxRow(model, 'rememberMe') }}
+    {% if captchaRequired %}
+        <div class="control-group">
+            <label class="control-label" for="verify">Проверочный код</label>
+			<div class="controls">
+                <p>
+                    <input type="text" name="verify">
+                </p>
+                {{ void(this.widget('ext.kcaptcha.KCaptcha', {showRefreshButton: false})) }}
+			</div>
+		</div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Войти</button>
+{{ void(this.endWidget) }}

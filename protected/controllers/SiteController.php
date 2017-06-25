@@ -32,20 +32,18 @@ class SiteController extends Controller
 	 */
 	public function actionIndex()
 	{
-		// Вытаскиваем 10 последних банов
-		$dependecy = new CDbCacheDependency('SELECT MAX(`bid`) FROM {{bans}}');
-
-		$bans = new CActiveDataProvider(Bans::model()->cache(300, $dependecy), array(
-			'criteria' => array(
-				'condition' => Yii::app()->config->auto_prune ? 'expired = 0' : null,
-				'order' => 'bid DESC',
-				'limit' => 10,
-			),
-			'pagination' => false,
-		));
+        if (Yii::app()->config->start_page !== '/site/index') {
+            $this->redirect(array(Yii::app()->config->start_page));
+            Yii::app()->end();
+        }
 
 		$this->render('index',array(
-			'bans' => $bans,
+			'bans' => Bans::model()->findAll(array(
+				'condition' => Yii::app()->config->auto_prune ? 'expired = 0' : null,
+                'select' => ['bid', 'player_nick', 'ban_created', 'ban_length', 'expired'],
+				'order' => 'bid DESC',
+				'limit' => 10,
+			)),
 			'servers' => Serverinfo::model()->findAll(),
 		));
 	}
@@ -90,7 +88,10 @@ class SiteController extends Controller
                             $this->redirect(Yii::app()->request->urlReferrer);
             }
             // Вывод формы
-            $this->render('login',array('model'=>$model));
+            $this->render('login',array(
+                'model'=>$model,
+                'captchaRequired' => CCaptcha::checkRequirements() && Yii::app()->request->cookies['captcha_auth']
+            ));
 	}
 
 	/**
@@ -221,9 +222,9 @@ class SiteController extends Controller
 
 			throw new CHttpException(404, 'Нет обновлений');
 		}
-
+        $step2 = false;
 		if(isset($_POST['license'])) {
-
+            $step2 = true;
 			$file = __DIR__ . '/../data/update.sql';
 			$cmd = explode(';', file_get_contents($file));
 			//if(!count($cmd)) return FALSE;
@@ -247,7 +248,9 @@ class SiteController extends Controller
 			}
 		}
 
-		$this->render('update');
+		$this->render('update', [
+            'step2' => $step2
+        ]);
 	}
 
 	public function actionLicense() {

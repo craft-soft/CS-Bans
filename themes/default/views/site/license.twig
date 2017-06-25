@@ -1,25 +1,6 @@
-<?php
-/**
- * Лицензия
- */
-
-/**
- * @author Craft-Soft Team
- * @package CS:Bans
- * @version 1.0 beta
- * @copyright (C)2013 Craft-Soft.ru.  Все права защищены.
- * @link http://craft-soft.ru/
- * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru  «Attribution-NonCommercial-ShareAlike»
- */
-
-$this->pageTitle=Yii::app()->name . ' - Лицензионное соглашение';
-$this->breadcrumbs=array(
-	'Лицензионное соглашение',
-);
-
-Yii::app()->clientScript->registerMetaTag('noindex,follow', 'robots');
-?>
-
+{{ title(App.name ~ ' :: Лицензионное соглашение') }}
+{{ breadcrumbs(['Лицензионное соглашение']) }}
+{{ void(App.clientScript.registerMetaTag('noindex,follow', 'robots')) }}
 <h2>Лицензионное соглашение</h2>
 
 <ol>
