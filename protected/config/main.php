@@ -32,24 +32,21 @@ $config = new conf;
 
 $basePath = dirname(dirname(__DIR__));
 
+$ds = DIRECTORY_SEPARATOR;
+
+if(YII_DEBUG) {
+    $fileName = 'db.config.inc.local.php';
+} else {
+    $fileName = 'db.config.inc.php';
+}
+
 // Подключаем конфиг старого AmxBans
-require_once $basePath . DIRECTORY_SEPARATOR . 'include' . DIRECTORY_SEPARATOR . 'db.config.inc.php';
+require_once "{$basePath}{$ds}include{$ds}{$fileName}";
 
 // Подключаем bootstrap
-Yii::setPathOfAlias(
-    'bootstrap',
-    realpath(
-        dirname(__FILE__)
-            . DIRECTORY_SEPARATOR
-            . '..'
-            . DIRECTORY_SEPARATOR
-            . 'extensions'
-            . DIRECTORY_SEPARATOR
-            . 'bootstrap'
-    )
-);
+Yii::setPathOfAlias('bootstrap', realpath(dirname(__FILE__) . "{$ds}..{$ds}extensions{$ds}bootstrap"));
 
-$dirs = scandir(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'modules');
+$dirs = scandir(dirname(__FILE__) . "{$ds}..{$ds}modules");
 
 $modules = array();
 foreach ($dirs as $name){
@@ -60,18 +57,17 @@ foreach ($dirs as $name){
 
 // Главные параметры приложения
 return array(
-	'basePath'=>$basePath . DIRECTORY_SEPARATOR . 'protected',
+	'basePath'=>$basePath . $ds . 'protected',
 	'name'=>'СS:Bans 1.4',
 	'sourceLanguage' => 'ru',
 	'language'=>'ru',
-    'version' => '1.4.0',
-
+    'timeZone' => 'Europe/Moscow',
 	// Предзагружаемые компоненты
 	'preload'=>array(
 		'log',
 		'DConfig',
 		'Ip2Country'
-		),
+    ),
 	// Автозагружаемые модели и компоненты
 	'import'=>array(
 		'application.models.*',
@@ -82,25 +78,7 @@ return array(
 	'modules'=>array_replace($modules, array(
 		
 	)),
-    
-    'onBeginRequest' => function() use ($basePath) {
-        if(!Yii::app()->db->username) {
-			Yii::app()->catchAllRequest = array('site/install');
-            return;
-		}
-        // Здаем главную страницу
-        try {
-            if (Yii::app()->config->start_page !== '/site/index') {
-                Yii::app()->homeUrl = array(Yii::app()->config->start_page);
-            }
-            if (is_dir($basePath . DIRECTORY_SEPARATOR . 'themes' . DIRECTORY_SEPARATOR . Yii::app()->config->design)) {
-                Yii::app()->setTheme(Yii::app()->config->design);
-            }
-        } catch(Exception $e) {
-            throw new CHttpException(500, 'Проблемы с базой данных. Похоже отсутствуют необходимые таблицы базы данных');
-        }
-        Yii::app()->db->autoConnect = true;
-    },  
+
 	// Компоненты приложения
 	'components'=>array(
         'prefs' => array(
@@ -110,11 +88,6 @@ return array(
 		'bootstrap'=>array(
 			'class'=>'bootstrap.components.Bootstrap',
 		),
-		// Компонент пользователей
-		'user'=>array(
-			// Аутентификация по куки
-			'allowAutoLogin'=>true,
-		),
 		// Конфиг (из таблицы {{webconfig}})
 		'config'=>array(
 			'class' => 'DConfig'
@@ -122,35 +95,10 @@ return array(
 		'IpToCountry'=>array(
 			'class' => 'Ip2Country'
 		),
-		// ЧПУ
-		'urlManager'=>array(
-			'urlFormat'=>'path',
-			'showScriptName'=>false,
-			'urlSuffix'=>'.html',
-			'rules'=>array(
-				'/'=>'site/index',
-				array(
-                    'bans/motd',
-                    'pattern' => 'motd',
-                    'urlSuffix' => '.php'
-                ),
-				'billing/unban/<id:\d+>' => 'billing/default/unban',
-				'billing/<controller:\w+>/<action:\w+>/<id:\d+>' => 'billing/<controller>/<action>',
-                'billing/<controller:\w+>/<action:\w+>' => 'billing/<controller>/<action>',
-				'billing/<action:\w+>' => 'billing/default/<action>',
-                'billing/<controller:\w+>' => 'billing/<controller>/buy',
-				
-				'<controller:\w+>/<id:\d+>'=>'<controller>/view',
-				'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
-				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
-			),
-		),
-		
 		'format'=>array(
 			'booleanFormat'=>array('Нет', 'Да'),
 			'datetimeFormat'=>'d.m.Y H:i',
 		),
-
 		// Подключение к БД
 		'db'=>array(
 			'connectionString' => 'mysql:host='.$config->db_host.';dbname='.$config->db_db,
@@ -164,10 +112,6 @@ return array(
 		),
 		'cache'=>array(
 			'class'=>'FileCache'
-		),
-		// Обработка ошибок
-		'errorHandler'=>array(
-			'errorAction'=>'site/error',
 		),
 		// Системный лог
 		'log'=>array(

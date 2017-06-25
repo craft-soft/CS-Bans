@@ -12,10 +12,15 @@
  * @license http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru  «Attribution-NonCommercial-ShareAlike»
  */
 
-date_default_timezone_set('Europe/Moscow');
+if(getenv('DEVEL')) {
+    define('YII_DEBUG',true);
+    define('YII_TRACE_LEVEL',3);
+} else {
+    $fileName = 'db.config.inc.php';
+}
 
 // Ядро
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
 // Создаем приложение
-Yii::createWebApplication(__DIR__ . DIRECTORY_SEPARATOR . 'protected' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'main.php')->run();
+Yii::createWebApplication(__DIR__ . DIRECTORY_SEPARATOR . 'protected' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'web.php')->run();
