@@ -37,7 +37,7 @@ class ServerinfoController extends Controller
 
 			$response = $server->RconCommand($_POST['command']);
 
-			if ($_POST['command'] == 'amx_reloadadmins' && $server->RconCommand('echo Hi') === 'Hi') {
+			if ($_POST['command'] == 'amx_reloadadmins') {
                 $response = 'Список админов обновлен';
             }
 
