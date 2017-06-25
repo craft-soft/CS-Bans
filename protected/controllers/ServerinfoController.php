@@ -64,8 +64,8 @@ class ServerinfoController extends Controller
 		if ($server === NULL) {
             Yii::app()->end();
         }
-
-        Yii::app()->end(json_encode($server->getInfo()));
+        
+        $this->jsonResponse($server->getInfo());
 	}
 
     /**
