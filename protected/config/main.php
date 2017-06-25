@@ -79,6 +79,10 @@ return array(
 		
 	)),
 
+    'aliases' => [
+        'vendor' => $basePath . $ds . 'vendor',
+    ],
+    
 	// Компоненты приложения
 	'components'=>array(
         'prefs' => array(
