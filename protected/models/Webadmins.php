@@ -59,42 +59,30 @@ class Webadmins extends CActiveRecord
 	 * @param type $username Ник админа в банах
 	 * @return boolean
 	 */
-	public static function checkAccess($access = NULL, $username = '') {
+	public static function checkAccess($access = null, $username = '') {
 
 		// Главному админу можно всё
-		if(Yii::app()->user->id == '1')
-			return TRUE;
+		if (Yii::app()->user->id == '1') {
+            return true;
+        }
 
-		if(Yii::app()->user->isGuest || !$access) {
-			return FALSE;
+        if(Yii::app()->user->isGuest || !$access) {
+			return false;
 		}
 
-		if(isset($this) && get_class($this) == 'Webadmins') {
-			$model = &$this;
-		}
-		else {
-			$model = Webadmins::model()->with('levels')->findByPk(Yii::app()->user->id);
-		}
+		$model = Webadmins::model()->with('levels')->findByPk(Yii::app()->user->id);
 
-		//exit($model->levels->$access);
-
-		if(
-			isset($model->levels->$access)
-				&&
-			(
-				$model->levels->$access === 'yes'
-					||
-				(
-					$model->levels->$access === 'own'
-						&&
-					strtolower($username) === strtolower(Yii::app()->user->name)
-				)
-			)
-		) {
-			return TRUE;
-		}
-
-		return FALSE;
+		return isset($model->levels->{$access})
+            &&
+        (
+            $model->levels->$access === 'yes'
+                ||
+            (
+                $model->levels->$access === 'own'
+                    &&
+                mb_strtolower($username) === mb_strtolower(Yii::app()->user->name)
+            )
+        );
 	}
 
 	/**
