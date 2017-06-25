@@ -82,12 +82,7 @@ class Usermenu extends CActiveRecord
 	public static function getMenu($install = false)
 	{
         if($install) {
-            return array(
-				array(
-					'label' => 'Главная',
-					'url' => Yii::app()->homeUrl,
-				)
-			);
+            return array();
         }
         
 		// Получаем модель
