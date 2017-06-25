@@ -295,7 +295,7 @@ class ServerinfoController extends Controller
 			$players .= "<td><b>Счёт</b></td>";
 			$players .= "<td><b>Время</b></td>";
 
-			foreach ($info['playersinfo'] as $player_key => $player) {
+			foreach ($info['playersinfo'] as $player) {
 				$players .= "<tr class=\"odd\">";
 				$players .= "<td width=\"70%\">" . CHtml::encode($player['name']) . "</td>";
 				$players .= "<td style=\"text-align:center\">" . intval($player['score'], ENT_QUOTES) . "</td>";
