@@ -94,7 +94,7 @@ class ServerinfoController extends Controller
 				break;
 			case 'message':
 				if (!preg_match('#^[\w ]+$#i', $_POST['reason'])) {
-                    Yii::app()->end("$('#loading').hide();alert('Только латинские символы и цифры');");
+                    Yii::app()->end('Ошибка! Только латинские символы и цифры');
                 }
                 $command = 'amx_psay "' . $_POST['player'] . '" "' . $_POST['reason'] . '"';
 				break;
@@ -104,12 +104,11 @@ class ServerinfoController extends Controller
 
 		$server = Serverinfo::model()->findByPk(intval($id));
 		if ($server->RconCommand($command)) {
-            $return = 'Команда отправлена успешно';
+            $response = 'Команда отправлена успешно';
         } else {
-            $return = 'Ошибка отправки команды';
+            $response = 'Ошибка отправки команды';
         }
-
-        Yii::app()->end("$('#loading').hide();alert('$return');");
+        Yii::app()->end($response);
 	}
 
 	/**
