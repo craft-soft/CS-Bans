@@ -39,4 +39,10 @@ class Controller extends CController
         }
         return true;
     }
+    
+    protected function jsonResponse($data)
+    {
+        header('Content-Type: application/json; charset=' . Yii::app()->charset);
+        Yii::app()->end(CJSON::encode($data));
+    }
 }
