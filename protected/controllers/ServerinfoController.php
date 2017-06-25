@@ -88,24 +88,19 @@ class ServerinfoController extends Controller
             throw new CHttpException(403, "У Вас недостаточно прав");
         }
 
-        // Проверочки
-		$action = CHtml::encode($_POST['action']);
-		$player = CHtml::encode($_POST['player']);
-		$reason = CHtml::encode($_POST['reason']);
-
-		switch($action)
+		switch($_POST['action'])
 		{
 			case 'ban':
-				$command = 'amx_ban '.  intval($_POST['time']).' '.$player.' ' . $reason;
+				$command = 'amx_ban '.  intval($_POST['time']).' '.$_POST['player'].' ' . $_POST['reason'];
 				break;
 			case 'kick':
-				$command = 'amx_kick '.$player;
+				$command = 'amx_kick '.$_POST['player'];
 				break;
 			case 'message':
-				if (!preg_match('#^[\w ]+$#i', $reason)) {
+				if (!preg_match('#^[\w ]+$#i', $_POST['reason'])) {
                     Yii::app()->end("$('#loading').hide();alert('Только латинские символы и цифры');");
                 }
-                $command = 'amx_psay "' . $player . '" "' . $reason . '"';
+                $command = 'amx_psay "' . $_POST['player'] . '" "' . $_POST['reason'] . '"';
 				break;
 		}
 
