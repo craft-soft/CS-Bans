@@ -27,25 +27,27 @@ class ServerinfoController extends Controller
 
 	public function actionSendcommand($id)
 	{
-		if(!Webadmins::checkAccess('servers_edit'))
-			throw new CHttpException(403, 'У Вас недостаточно прав');
+		if (!Webadmins::checkAccess('servers_edit')) {
+            throw new CHttpException(403, 'У Вас недостаточно прав');
+        }
 
-		if(isset($_POST['command']))
+        if(isset($_POST['command']))
 		{
 			$server = $this->loadModel($id);
 
 			$response = $server->RconCommand(CHtml::encode($_POST['command']));
 
-			if($_POST['command'] == 'amx_reloadadmins' && $server->RconCommand('echo Hi') === 'Hi')
-				$response = 'Список админов обновлен';
+			if ($_POST['command'] == 'amx_reloadadmins' && $server->RconCommand('echo Hi') === 'Hi') {
+                $response = 'Список админов обновлен';
+            }
 
-			if($response)
-				$return = CHtml::encode ($response);
+            if ($response) {
+                $return = CHtml::encode($response);
+            } else {
+                $return = 'Ошибка отправки команды';
+            }
 
-			else
-				$return = 'Ошибка отправки команды';
-
-			Yii::app()->end(CHtml::encode($return));
+            Yii::app()->end(CHtml::encode($return));
 		}
 	}
 
@@ -59,10 +61,11 @@ class ServerinfoController extends Controller
 		$id = filter_input(INPUT_POST, 'server');
 		$server = $this->loadModel($id);
 		
-		if($server === NULL)
-			Yii::app()->end();
+		if ($server === NULL) {
+            Yii::app()->end();
+        }
 
-		Yii::app()->end(json_encode($server->getInfo()));
+        Yii::app()->end(json_encode($server->getInfo()));
 	}
 
     /**
@@ -76,14 +79,16 @@ class ServerinfoController extends Controller
      */
 	public function actionContext($id)
 	{
-		if(!Webadmins::checkAccess('servers_edit'))
-			throw new CHttpException(403, 'У Вас недостаточно прав');
+		if (!Webadmins::checkAccess('servers_edit')) {
+            throw new CHttpException(403, 'У Вас недостаточно прав');
+        }
 
-		// Проверяем права
-		if(!Webadmins::checkAccess('bans_add'))
-			throw new CHttpException(403, "У Вас недостаточно прав");
+        // Проверяем права
+		if (!Webadmins::checkAccess('bans_add')) {
+            throw new CHttpException(403, "У Вас недостаточно прав");
+        }
 
-		// Проверочки
+        // Проверочки
 		$action = CHtml::encode($_POST['action']);
 		$player = CHtml::encode($_POST['player']);
 		$reason = CHtml::encode($_POST['reason']);
@@ -97,20 +102,21 @@ class ServerinfoController extends Controller
 				$command = 'amx_kick '.$player;
 				break;
 			case 'message':
-				if(!preg_match('#^[\w ]+$#i', $reason))
-					Yii::app()->end("$('#loading').hide();alert('Только латинские символы и цифры');");
-				$command = 'amx_psay "' . $player . '" "' . $reason . '"';
+				if (!preg_match('#^[\w ]+$#i', $reason)) {
+                    Yii::app()->end("$('#loading').hide();alert('Только латинские символы и цифры');");
+                }
+                $command = 'amx_psay "' . $player . '" "' . $reason . '"';
 				break;
 		}
 
 		$server = Serverinfo::model()->findByPk(intval($id));
-		if($server->RconCommand($command))
-			$return = 'Команда отправлена успешно';
+		if ($server->RconCommand($command)) {
+            $return = 'Команда отправлена успешно';
+        } else {
+            $return = 'Ошибка отправки команды';
+        }
 
-		else
-			$return = 'Ошибка отправки команды';
-
-		Yii::app()->end("$('#loading').hide();alert('$return');");
+        Yii::app()->end("$('#loading').hide();alert('$return');");
 	}
 
 	/**
@@ -120,10 +126,11 @@ class ServerinfoController extends Controller
 	public function actionView($id)
 	{
 		// Аякс запросы
-		if(Yii::app()->request->isAjaxRequest)
-			$this->layout = false;
+		if (Yii::app()->request->isAjaxRequest) {
+            $this->layout = false;
+        }
 
-		$this->render('view',array(
+        $this->render('view',array(
 			'server'=>$this->loadModel($id),
 		));
 	}
@@ -134,19 +141,21 @@ class ServerinfoController extends Controller
 	public function actionCreate()
 	{
 		// Проверка прав
-		if(!Webadmins::checkAccess('servers_edit'))
-			throw new CHttpException(403, "У Вас недостаточно прав");
+		if (!Webadmins::checkAccess('servers_edit')) {
+            throw new CHttpException(403, "У Вас недостаточно прав");
+        }
 
-		$model=new Serverinfo;
+        $model=new Serverinfo;
 
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Serverinfo']))
 		{
 			$model->attributes=$_POST['Serverinfo'];
-			if($model->save())
-				$this->redirect(array('admin'));
-		}
+			if ($model->save()) {
+                $this->redirect(array('admin'));
+            }
+        }
 
 		$this->render('create',array(
 			'model'=>$model,
@@ -160,10 +169,11 @@ class ServerinfoController extends Controller
 	public function actionUpdate($id)
 	{
 		// Проверка прав
-		if(!Webadmins::checkAccess('servers_edit'))
-			throw new CHttpException(403, "У Вас недостаточно прав");
+		if (!Webadmins::checkAccess('servers_edit')) {
+            throw new CHttpException(403, "У Вас недостаточно прав");
+        }
 
-		$this->layout = '//layouts/column2';
+        $this->layout = '//layouts/column2';
 		$model=$this->loadModel($id);
 
 		// $this->performAjaxValidation($model);
@@ -171,9 +181,10 @@ class ServerinfoController extends Controller
 		if(isset($_POST['Serverinfo']))
 		{
 			$model->attributes=$_POST['Serverinfo'];
-			if($model->save())
-				$this->redirect(array('admin'));
-		}
+			if ($model->save()) {
+                $this->redirect(array('admin'));
+            }
+        }
 
 		$this->render('update',array(
 			'model'=>$model,
@@ -188,14 +199,16 @@ class ServerinfoController extends Controller
 	public function actionDelete($id)
 	{
 		// Проверка прав
-		if(!Webadmins::checkAccess('servers_edit'))
-			throw new CHttpException(403, "У Вас недостаточно прав");
+		if (!Webadmins::checkAccess('servers_edit')) {
+            throw new CHttpException(403, "У Вас недостаточно прав");
+        }
 
-		$this->loadModel($id)->delete();
+        $this->loadModel($id)->delete();
 
-		if(!isset($_GET['ajax']))
-			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
-	}
+		if (!isset($_GET['ajax'])) {
+            $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+        }
+    }
 
 	/**
 	 *Главная страница серверов
@@ -205,10 +218,11 @@ class ServerinfoController extends Controller
 
 		$model=new Serverinfo('search');
 		$model->unsetAttributes();
-		if(isset($_GET['Serverinfo']))
-			$model->attributes=$_GET['Serverinfo'];
+		if (isset($_GET['Serverinfo'])) {
+            $model->attributes = $_GET['Serverinfo'];
+        }
 
-		$allbans = Bans::model()->cache(600)->count();
+        $allbans = Bans::model()->cache(600)->count();
 		$activebans = Bans::model()->cache(600)->count('((ban_created+(ban_length*60)) > :time OR ban_length = 0) AND `expired` = 0', array(':time' => time()));
 		$permbans = Bans::model()->cache(600)->count('ban_length = 0');
 
@@ -230,15 +244,17 @@ class ServerinfoController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		if(!Webadmins::checkAccess('servers_edit'))
-			throw new CHttpException(403, 'У Вас недостаточно прав');
+		if (!Webadmins::checkAccess('servers_edit')) {
+            throw new CHttpException(403, 'У Вас недостаточно прав');
+        }
 
-		$model=new Serverinfo('search');
+        $model=new Serverinfo('search');
 		$model->unsetAttributes();
-		if(isset($_GET['Serverinfo']))
-			$model->attributes=$_GET['Serverinfo'];
+		if (isset($_GET['Serverinfo'])) {
+            $model->attributes = $_GET['Serverinfo'];
+        }
 
-		$this->render('admin',array(
+        $this->render('admin',array(
 			'model'=>$model,
 		));
 	}
@@ -252,9 +268,10 @@ class ServerinfoController extends Controller
 	public function loadModel($id)
 	{
 		$model=Serverinfo::model()->findByPk($id);
-		if($model===null)
-			throw new CHttpException(404,'Запрошенная страница не существует.');
-		return $model;
+		if ($model === null) {
+            throw new CHttpException(404, 'Запрошенная страница не существует.');
+        }
+        return $model;
 	}
 
 	/**
