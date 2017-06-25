@@ -102,6 +102,8 @@ class ServerinfoController extends Controller
                 }
                 $command = 'amx_psay "' . $_POST['player'] . '" "' . $_POST['reason'] . '"';
 				break;
+            default:
+                throw new CHttpException(400, 'Неверный параметр запроса "action"');
 		}
 
 		$server = Serverinfo::model()->findByPk(intval($id));
