@@ -3,6 +3,10 @@ php_flag session.cookie_httponly On
 AddDefaultCharset UTF-8
 Options -Indexes +FollowSymLinks
 
+<FilesMatch "composer\..*$">
+    Deny from all
+</FilesMatch>
+
 RewriteEngine on
 
 # if a directory or a file exists, use it directly
