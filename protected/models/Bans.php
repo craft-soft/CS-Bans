@@ -38,13 +38,6 @@
  */
 class Bans extends CActiveRecord
 {
-	/**
-	 * Флаг страны
-	 * @var string
-	 */
-	public $country = null;
-	//public $expiredTime = null;
-
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -146,15 +139,15 @@ class Bans extends CActiveRecord
 		return $this->ban_length == '-1' || $this->expired == 1 || ($this->ban_length && ($this->ban_created + ($this->ban_length * 60)) < time());
 	}
 	
-	protected function afterFind() {
-		$country = strtolower(Yii::app()->IpToCountry->lookup($this->player_ip));
-		$this->country = CHtml::image(
+    public function getCountry()
+    {
+        $country = strtolower(Yii::app()->IpToCountry->lookup($this->player_ip));
+        return CHtml::image(
             Yii::app()->urlManager->baseUrl 
             . '/images/country/' 
             . ($country != 'zz' ? $country : 'clear') . '.png'
         );
-        return parent::afterFind();
-	}
+    }
 
 	protected function beforeSave() {
 		if($this->isNewRecord) {
