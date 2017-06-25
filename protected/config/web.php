@@ -68,7 +68,9 @@ $webConfig = [
             'filters' => array(
                 'jencode' => 'CJSON::encode',
                 'encode' => 'CHtml::encode',
+                'intval' => 'intval',
                 'printr' => 'print_r',
+                'date2word' => 'Prefs::date2word',
             ),
         ),
     ],
