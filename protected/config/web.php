@@ -50,6 +50,27 @@ $webConfig = [
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 			),
 		),
+        'viewRenderer' => array(
+            'class' => 'vendor.yiiext.twig-renderer.ETwigViewRenderer',
+            'twigPathAlias' => 'vendor.twig.twig.lib.Twig',
+
+            // All parameters below are optional, change them to your needs
+            'fileExtension' => '.twig',
+            'globals' => array(
+                'html' => 'CHtml'
+            ),
+            'functions' => array(
+                'rot13' => 'str_rot13',
+                'printr' => 'print_r',
+                'title' => 'TwigHelper::setTitle',
+                'breadcrumbs' => 'TwigHelper::setBreadcrumbs',
+            ),
+            'filters' => array(
+                'jencode' => 'CJSON::encode',
+                'encode' => 'CHtml::encode',
+                'printr' => 'print_r',
+            ),
+        ),
     ],
 
 	// Тема (темы лежат в themes)
