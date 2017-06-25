@@ -1,0 +1,129 @@
+{{ title(App.name ~ ' :: Сервер ' ~ info.name) }}
+{{ breadcrumbs([
+    {
+        route: 'index',
+        label: 'Серверы'
+    },
+    info.name
+]) }}
+{% if not App.request.isAjaxRequest and not App.user.isGuest %}
+    {% set clientScript = App.clientScript %}
+    {{ void(clientScript.registerScriptFile(App.theme.baseUrl ~ '/js/jquery.contextmenu.js', constant('CClientScript::POS_END'))) }}
+    {{ void(clientScript.registerScriptFile(App.theme.baseUrl ~ '/js/servers.js', constant('CClientScript::POS_END'))) }}
+    {{ void(clientScript.registerCssFile(App.theme.baseUrl ~ '/css/jquery.contextmenu.css')) }}
+    {{ void(clientScript.registerMetaTag(this.createUrl('/serverinfo/context', {'id': server.id}), 'contextUrl')) }}
+{% endif %}
+<div id="container">
+    {% if info %}
+        <h2>Детали сервера "{{ info.name|encode }}"</h2>
+        {% if not App.user.isGuest %}
+            <p class="text-success">
+                <i class="icon-exclamation-sign"></i>
+                <i>Нажмите правой кнопкой на игроке для вызова меню</i>
+            </p>
+        {% endif %}
+
+        <div class="row-fluid">
+            <div class="span7">
+                {% if info.playersinfo %}
+                    <h5 class="text-center">Игроки</h5>
+                    <table class="table table-bordered" id="players">
+                        <thead>
+                            <th>
+                                Ник
+                            </th>
+                            <th style="text-align: center">
+                                Счет
+                            </th>
+                            <th style="text-align: center">
+                                Время
+                            </th>
+                        </thead>
+                        <tbody>
+                            {% for player in info.playersinfo %}
+                                <tr class="context-menu-one" id="{{ player.name|encode }}">
+                                    <td>{{ player.name|encode }}</td>
+                                    <td class="text-center">{{ player.score|intval }}</td>
+                                    <td class="text-center">
+                                        {{ player.time|date2word(false, true) }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="alert alert-error">Нет игроков</div>
+                {% endif %}
+            </div>
+            <div class="span5">
+                <h5 class="text-center">Информация</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <td style="text-align: center" colspan="2">
+                            {{ info.mapimg }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bold">
+                            Адрес:
+                        </td>
+                        <td>
+                            <a href="steam://connect/{{ server.address }}">{{ server.address }}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bold">
+                            Карта:
+                        </td>
+                        <td>
+                            {{ info.map|encode }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bold">
+                            Игроки:
+                        </td>
+                        <td>
+                            {{ info.players|intval }}/{{ info.playersmax|intval }}
+                        </td>
+                    </tr>
+                    {% if info.nextmap %}
+                        <tr>
+                            <td class="bold">
+                                Следующая карта:
+                            </td>
+                            <td>
+                                {{ info.nextmap|encode }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                    {% if info.timeleft %}
+                        <tr>
+                            <td class="bold">
+                                До смены карты:
+                            </td>
+                            <td>
+                                {{ info.timeleft|encode }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                    {% if info.contact %}
+                        <tr>
+                            <td class="bold">
+                                Контакты:
+                            </td>
+                            <td>
+                                {{ info.contact|encode }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+	{% else %}
+        <h2>Детали сервера "{{ server.hostname|encode }}"</h2>
+        <div class="alert alert-error">
+            Сервер не отвечает. Возможно сервер выключен или сменяет карту
+        </div>
+    {% endif %}
+</div>

@@ -121,9 +121,10 @@ class ServerinfoController extends Controller
 		if (Yii::app()->request->isAjaxRequest) {
             $this->layout = false;
         }
-
-        $this->render('view',array(
-			'server'=>$this->loadModel($id),
+        $server = $this->loadModel($id);
+        $this->render('view', array(
+			'server'=>$server,
+            'info' => $server->getInfo()
 		));
 	}
 
