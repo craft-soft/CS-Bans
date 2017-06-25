@@ -23,7 +23,6 @@ class DConfig extends CApplicationComponent
 
     public function get($key)
     {
-		$key = CHtml::encode($key);
 		if (isset($this->data[$key])){
 			return $this->data[$key];
         } else {
@@ -35,5 +34,3 @@ class DConfig extends CApplicationComponent
 		return $this->get($name);
 	}
 }
-
-?>
