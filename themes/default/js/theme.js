@@ -1,4 +1,4 @@
-$(function () {
+(function ($, window) {
 	var html = '',
         cloned = $('.main-nav > li').clone (),
         container = $('<div>', { id: 'responsive-nav' }),
@@ -32,4 +32,4 @@ $(function () {
     window.getCsrfToken = function() {
         return $('meta[name=csrf-token]').attr('content');
     };
-});
+})(jQuery, this);
