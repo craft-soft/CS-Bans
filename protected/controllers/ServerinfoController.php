@@ -42,7 +42,7 @@ class ServerinfoController extends Controller
             }
 
             if ($response) {
-                $return = CHtml::encode($response);
+                $return = $response;
             } else {
                 $return = 'Ошибка отправки команды';
             }
