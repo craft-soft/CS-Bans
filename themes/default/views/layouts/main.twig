@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ this.pageTitle|encode }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="csrf-param" content="{{ App.request.csrfTokenName }}">
+    <meta name="csrf-token" content="{{ App.request.csrfToken }}">
+    <link href="{{ App.theme.baseUrl }}/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ App.theme.baseUrl }}/css/bootstrap-responsive.min.css" rel="stylesheet">
+
+    <link href="{{ App.theme.baseUrl }}/css/font-awesome.min.css" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,800italic,400,600,800&subset=latin,cyrillic" rel="stylesheet">
+
+    <link href="{{ App.theme.baseUrl }}/css/style.css" rel="stylesheet">
+    <link href="{{ App.theme.baseUrl }}/css/style-responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+<body>
+    <div id="wrapper" class="clearfix">
+        <div id="header">
+            <div class="container">
+                <h1>
+                    <a href="{{ this.createUrl('/site/index') }}">{{ App.name|encode }}</a>
+                </h1>
+            </div>
+        </div>
+        <div id="nav" class="clearfix">
+            <div class="container">
+                <ul class="main-nav">
+                    {% for item in this.menuLinks %}
+                    <li>
+                        <a href="{{ item.url }}">{{ item.label|encode }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <ul class="main-nav pull-right">
+                    <li class="dropdown">
+                        {% if App.user.isguest %}
+                        <a href="javascript:;" data-toggle="dropdown">
+                            Войти
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <p>
+                                    <form method="post" action="{{ this.createUrl('/site/login') }}" accept-charset="UTF-8">
+                                        <input
+                                            style="margin-bottom: 15px;"
+                                            type="text"
+                                            placeholder="Логин"
+                                            id="LoginForm_username"
+                                            name="LoginForm[username]">
+                                        <input
+                                            style="margin-bottom: 15px;"
+                                            type="password"
+                                            placeholder="Пароль"
+                                            id="LoginForm_password"
+                                            name="LoginForm[password]">
+                                        <input type="hidden" value="{{ App.request.csrfToken }}" name="{{ App.request.csrfTokenName }}" />
+                                        <input class="btn btn-primary btn-block" name="yt0" type="submit" value="Войти">
+                                    </form>
+                                </p>
+                            </li>
+                        </ul>
+                        {% else %}
+                        <a href="javascript:;" data-toggle="dropdown">
+                            {{ App.user.name|encode }}
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="{{ this.createUrl('/admin/index') }}"><i class="icon-globe"></i> Админцентр</a>
+                            </li>
+                            <li>
+                                <hr />
+                            </li>
+                            <li>
+                                <a href="{{ this.createUrl('/site/logout') }}"><i class="icon-off"></i> Выйти</a>
+                            </li>
+                        </ul>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div id="wrap">
+            <div class="container" id="page">
+                {% if this.breadcrumbs %}
+                    {{ void(this.widget('bootstrap.widgets.TbBreadcrumbs', {
+                        'links': this.breadcrumbs,
+                        'htmlOptions': {
+                            'class': 'page-title'
+                        }
+                    })) }}
+                {% endif %}
+                {{ content }}
+                <div class="clear"></div>
+                <div id="push"></div>
+            </div>
+        </div>
+        <br />
+        <div id="copyright">
+            <div class="container">
+                <div class="row">
+                    <div id="rights" class="grid-6">
+                        <b>{{ App.name|encode }}</b>
+                    </div>
+                    <div id="totop" class="grid-6">
+                        © 2013-{{ "now"|date("Y") }}
+                        <a href="http://craft-soft.ru" target="_blank">Craft-Soft Team</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="loading">
+        <h1>Загрузка</h1>
+        <div class="circle"></div>
+        <div class="circle1"></div>
+    </div>
+	{{ void(App.clientScript.registerCoreScript('jquery')) }}
+    <script src="{{ App.theme.baseUrl }}/js/bootstrap.min.js"></script>
+    <script src="{{ App.theme.baseUrl }}/js/theme.js"></script>
+</body>
+</html>

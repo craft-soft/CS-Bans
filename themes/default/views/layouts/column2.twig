@@ -1,0 +1,29 @@
+{{ void(this.beginContent('//layouts/main')) }}
+<div class="row-fluid">
+    <div class="span9">
+        <div id="content">
+            {{ content }}
+        </div>
+    </div>
+    <div class="span3">
+        {% if this.menu %}
+        <div id="sidebar">
+            <div class="portlet">
+                <div class="portlet-decoration">
+                    <div class="portlet-title">Меню</div>
+                </div>
+                <div class="portlet-content">
+                    <ul class="operations nav">
+                        {% for link in this.menu %}
+                        <li>
+                            <a href="{{ html.normalizeUrl(link.url) }}">{{ link.label|encode }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{{ void(this.endContent()) }}
