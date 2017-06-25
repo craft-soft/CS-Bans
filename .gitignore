@@ -2,7 +2,7 @@
 /nbproject
 /include/files/*
 /assets/*
-!/assets/.gitkeep
+!/assets/.index.html
 /protected/runtime/*
 !/protected/runtime/.gitkeep
 /include/db.config.inc.local.php
