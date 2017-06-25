@@ -125,11 +125,6 @@ return array(
 		),
 	),
 
-	// Тема (темы лежат в themes)
-	'theme'=>'default',
-
-	'homeUrl' => array('/site/index'),
-
 	// Дополнительные параметры (вызываются так: Yii::app()->params['adminEmail'])
 	'params'=>array(
 		'adminEmail'=>'webmaster@example.com',

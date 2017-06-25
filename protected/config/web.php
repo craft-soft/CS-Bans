@@ -50,7 +50,12 @@ $webConfig = [
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 			),
 		),
-    ]
+    ],
+
+	// Тема (темы лежат в themes)
+	'theme'=>'default',
+
+	'homeUrl' => array('/site/index'),
 ];
 
 if(!YII_DEBUG) {
