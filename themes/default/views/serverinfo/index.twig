@@ -1,0 +1,154 @@
+{{ title(App.name ~ ' :: Список серверов') }}
+{{ breadcrumbs(['Серверы']) }}
+{{ void(App.clientScript.registerScriptFile(App.theme.baseUrl ~ '/js/serverinfo/index.js', constant('CClientScript::POS_END'))) }}
+<h2>Серверы</h2>
+
+<div class="container">
+	<div class="row-fluid">
+		<div class="span9">
+			<table
+                id="servers"
+                class="table table-bordered table-condensed table-striped"
+                data-info-url="{{ this.createUrl('/serverinfo/getinfo') }}"
+                data-modal-url="{{ this.createUrl('/serverinfo/serverdetail') }}">
+                <col style="width: 40px">
+                <col style="width: 40px">
+                <col style="width: 40px">
+                <col>
+                <col>
+                <col>
+                <col style="width: 10px">
+				<thead>
+					<tr>
+						<th class="text-center">Мод</th>
+						<th class="text-center">OS</th>
+						<th class="text-center">VAC</th>
+						<th>Имя</th>
+						<th>Игроки</th>
+						<th>Карта</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+                    {% for server in servers %}
+					<tr
+                        class="warning"
+                        data-server-id="{{ server.id|intval }}"
+                        data-server-hostname="{{ server.hostname|encode }}">
+						<td class="mod text-center"></td>
+                        <td class="os text-center"></td>
+                        <td class="vac text-center"></td>
+                        <td class="hostname">
+                            {{ server.hostname|encode }}
+                            <img src="{{ App.baseUrl }}/images/loading.gif" alt="Loading...">
+                        </td>
+                        <td class="players"></td>
+                        <td class="map"></td>
+                        <td class="action">
+                            <a href="{{ this.createUrl('/serverinfo/view', {id: server.id}) }}"><i class="icon-eye-open"></i></a>
+                        </td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="span3">
+			<table class="items table table-bordered table-condensed">
+				<thead>
+					<tr>
+						<th>Статистика</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="odd">
+						<td>
+							<div class="row-fluid">
+								<div class="span8 muted">
+									<b>Всего банов:</b>
+								</div>
+								<div class="span4">
+									{{ info.bancount|intval }}
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr class="odd">
+						<td>
+							<div class="row-fluid">
+								<div class="span8 muted">
+									<b>Активные:</b>
+								</div>
+								<div class="span4">
+                                    {{ info.actbans|intval }}
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr class="odd">
+						<td>
+							<div class="row-fluid">
+								<div class="span8 muted">
+									<b>Перманентные:</b>
+								</div>
+								<div class="span4">
+                                    {{ info.permbans|intval }}
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr class="odd">
+						<td>
+							<div class="row-fluid">
+								<div class="span8 muted">
+									<b>Временные:</b>
+								</div>
+								<div class="span4">
+                                    {{ info.tempbans|intval }}
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr class="odd">
+						<td>
+							<br />
+						</td>
+					</tr>
+					<tr class="odd">
+						<td>
+							<div class="row-fluid">
+								<div class="span8 muted">
+									<b>Админов:</b>
+								</div>
+								<div class="span4">
+                                    {{ info.admins|intval }}
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr class="odd">
+						<td>
+							<div class="row-fluid">
+								<div class="span8 muted">
+									<b>Серверов:</b>
+								</div>
+								<div class="span4">
+                                    {{ info.serversCount|intval }}
+								</div>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<div class="modal hide fade" id="ServerDetail" style="width: 600px; margin-left: -300px">
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal"  data-placement="bottom">&times;</a>
+        <h4>Детали сервера <a id="serverlink" rel="tooltip" data-placement="bottom" data-title="Показать подробности"></a></h4>
+    </div>
+    <div class="modal-body"></div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Закрыть</a>
+    </div>
+</div>

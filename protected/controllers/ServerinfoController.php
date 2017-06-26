@@ -277,40 +277,43 @@ class ServerinfoController extends Controller
 		
 		$info = $model->getInfo();
 
-		$players = "";
-		if (empty($info['playersinfo']) || !is_array($info['playersinfo'])) {
-			$players .= "<table class=\"items table table-bordered table-condensed\">";
-			$players .= "<tr class=\"odd\"><td width=\"100%\" style=\"text-align:center\">Нет игроков</td></tr></table>";
-		} else {
-			$players .= "<table class=\"items table table-bordered table-condensed\">";
-			$players .= "<tr class=\"odd\">";
-			$players .= "<td width=\"70%\"><b>Ник</b></td>";
-			$players .= "<td><b>Счёт</b></td>";
-			$players .= "<td><b>Время</b></td>";
+//		$players = "";
+//		if (empty($info['playersinfo']) || !is_array($info['playersinfo'])) {
+//			$players .= "<table class=\"items table table-bordered table-condensed\">";
+//			$players .= "<tr class=\"odd\"><td width=\"100%\" style=\"text-align:center\">Нет игроков</td></tr></table>";
+//		} else {
+//			$players .= "<table class=\"items table table-bordered table-condensed\">";
+//			$players .= "<tr class=\"odd\">";
+//			$players .= "<td width=\"70%\"><b>Ник</b></td>";
+//			$players .= "<td><b>Счёт</b></td>";
+//			$players .= "<td><b>Время</b></td>";
+//
+//			foreach ($info['playersinfo'] as $player) {
+//				$players .= "<tr class=\"odd\">";
+//				$players .= "<td width=\"70%\">" . CHtml::encode($player['name']) . "</td>";
+//				$players .= "<td style=\"text-align:center\">" . intval($player['score'], ENT_QUOTES) . "</td>";
+//				$players .= "<td>" . (function_exists('query_live') ? $player['time'] : Prefs::date2word(intval($player['time']), FALSE, TRUE)) . "</td>";
+//				$players .= "</tr>";
+//			}
+//			$players .= "</table>";
+//		}
+//
+//		$js = "$('#server-name').html('" . CJavaScript::quote($info['name']) . "');";
+//		$js .= "$('#serverlink').html('" . CJavaScript::quote($info['name']) . "').attr({'href': '".Yii::app()->createUrl('serverinfo/view', array('id'=>$model->id))."'});";
+//		$js .= "$('#server-address').html('" . CJavaScript::quote($model->address) . "');";
+//		$js .= "$('#steam-connect').attr({'href': 'steam://connect/" . CJavaScript::quote($model->address) . "'});";
+//		$js .= "$('#hlws-add').attr({'href': 'hlsw://" . CJavaScript::quote($model->address) . "'});";
+//		$js .= "$('#server-map').html('" . CJavaScript::quote($info['map']) . "');";
+//		$js .= "$('#server-players').html('" . $info['players'] . '/' . $info['playersmax'] . "');";
+//		$js .= "$('#serverinfo-players').html('" . CJavaScript::quote($players) . "');";
+//		$js .= "$('#server-mapimage').html('" . CJavaScript::quote($info['mapimg']) . "');";
+//		$js .= "$('#loading').hide();";
+//		$js .= "$('#ServerDetail').modal('show');";
 
-			foreach ($info['playersinfo'] as $player) {
-				$players .= "<tr class=\"odd\">";
-				$players .= "<td width=\"70%\">" . CHtml::encode($player['name']) . "</td>";
-				$players .= "<td style=\"text-align:center\">" . intval($player['score'], ENT_QUOTES) . "</td>";
-				$players .= "<td>" . (function_exists('query_live') ? $player['time'] : Prefs::date2word(intval($player['time']), FALSE, TRUE)) . "</td>";
-				$players .= "</tr>";
-			}
-			$players .= "</table>";
-		}
-
-		$js = "$('#server-name').html('" . CJavaScript::quote($info['name']) . "');";
-		$js .= "$('#serverlink').html('" . CJavaScript::quote($info['name']) . "').attr({'href': '".Yii::app()->createUrl('serverinfo/view', array('id'=>$model->id))."'});";
-		$js .= "$('#server-address').html('" . CJavaScript::quote($model->address) . "');";
-		$js .= "$('#steam-connect').attr({'href': 'steam://connect/" . CJavaScript::quote($model->address) . "'});";
-		$js .= "$('#hlws-add').attr({'href': 'hlsw://" . CJavaScript::quote($model->address) . "'});";
-		$js .= "$('#server-map').html('" . CJavaScript::quote($info['map']) . "');";
-		$js .= "$('#server-players').html('" . $info['players'] . '/' . $info['playersmax'] . "');";
-		$js .= "$('#serverinfo-players').html('" . CJavaScript::quote($players) . "');";
-		$js .= "$('#server-mapimage').html('" . CJavaScript::quote($info['mapimg']) . "');";
-		$js .= "$('#loading').hide();";
-		$js .= "$('#ServerDetail').modal('show');";
-
-		Yii::app()->end($js);
+		Yii::app()->end($this->renderPartial('_modal', [
+            'server' => $model,
+            'info' => $info
+        ]));
 	}
 
 

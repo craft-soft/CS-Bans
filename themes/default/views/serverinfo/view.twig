@@ -9,7 +9,7 @@
 {% if not App.request.isAjaxRequest and not App.user.isGuest %}
     {% set clientScript = App.clientScript %}
     {{ void(clientScript.registerScriptFile(App.theme.baseUrl ~ '/js/jquery.contextmenu.js', constant('CClientScript::POS_END'))) }}
-    {{ void(clientScript.registerScriptFile(App.theme.baseUrl ~ '/js/servers.js', constant('CClientScript::POS_END'))) }}
+    {{ void(clientScript.registerScriptFile(App.theme.baseUrl ~ '/js/serverinfo/view.js', constant('CClientScript::POS_END'))) }}
     {{ void(clientScript.registerCssFile(App.theme.baseUrl ~ '/css/jquery.contextmenu.css')) }}
     {{ void(clientScript.registerMetaTag(this.createUrl('/serverinfo/context', {'id': server.id}), 'contextUrl')) }}
 {% endif %}

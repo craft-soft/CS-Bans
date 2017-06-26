@@ -1,0 +1,61 @@
+<div class="row-fluid">
+    <div class="span6">
+        <b>Название: </b>
+        <span>{{ info.name|encode }}</span>
+        <hr>
+        <b>Адрес: </b>
+        <span>{{ server.address|encode }}</span>
+        <hr>
+        <b>Карта: </b>
+        <span>{{ info.map|encode }}</span>
+        <hr>
+        <b>Игроки: </b>
+        <span>{{ info.players|intval }}/{{ info.playersmax|intval }}</span>
+    </div>
+    <div class="span6">
+        <div id="server-mapimage" class="text-center">
+            <img src="{{ info.mapimage|encode }}" alt="{{ info.map|encode }}">
+        </div>
+        <hr>
+        <div id="server-links" class="text-center">
+            <a href="steam://cnnect/{{ server.address }}" title="Подключиться">
+                <img src="{{ App.baseUrl }}/images/steam-connect.png" alt="Подключиться">
+            </a>
+            &nbsp;
+            <a href="hlsw://{{ server.address }}">
+                <img src="{{ App.baseUrl }}/images/hlsw-add.png" alt="HLSV">
+            </a>
+        </div>
+    </div>
+</div>
+<hr>
+<p class="text-success">
+    <i class="icon-user"></i>
+    Игроки
+</p>
+<div id="serverinfo-players">
+    {% if not info.playersinfo %}
+        <table class="items table table-bordered table-condensed">
+            <tr class="odd"><td width="100%" style="text-align:center">Нет игроков</td></tr>
+        </table>
+    {% else %}
+        <table class="items table table-bordered table-condensed">
+            <thead>
+                <tr>
+                    <th>Ник</th>
+                    <th>Счет</th>
+                    <th>Время</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in info.playersinfo %}
+                    <tr>
+                        <td>{{ player.name|encode }}</td>
+                        <td>{{ player.score|intval }}</td>
+                        <td>{{ player.time|date2word(false, true) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
