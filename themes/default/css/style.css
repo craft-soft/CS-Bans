@@ -40,6 +40,10 @@ input {
 	font: 13px/1.7em 'Open Sans', arial, sans-serif;
 }
 
+.text-center {
+    text-align: center !important;
+}
+
 #wrapper {
 	width: 880px;
 	padding: 0 50px;
