@@ -1,4 +1,3 @@
-php_flag display_errors Off
 php_flag session.cookie_httponly On
 AddDefaultCharset UTF-8
 Options -Indexes +FollowSymLinks
