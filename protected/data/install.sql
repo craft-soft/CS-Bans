@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `%prefix%_admins_servers` (
-  `admin_id` int(11) DEFAULT NULL,
-  `server_id` int(11) DEFAULT NULL,
+  `admin_id` int(11),
+  `server_id` int(11),
   `custom_flags` varchar(32) NOT NULL,
   `use_static_bantime` enum('yes','no') NOT NULL DEFAULT 'yes',
   PRIMARY KEY (`admin_id`,`server_id`)

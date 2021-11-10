@@ -166,12 +166,11 @@ class SiteController extends Controller
 				$error[] = "Недоступно расширение {$ext}";
 			}
 		}
-
-		if(!is_writable($confFile)) {
-			if(!chmod($confFile, 0666)) {
-				$error[] = 'Недостаточно прав для записи в конфиг';
-			}
+        touch($confFile);
+		if(!file_exists($confFile)) {
+            $error[] = 'Недостаточно прав для записи в конфиг';
 		}
+        @unlink($confFile);
 		if(!is_writable($assetDir)) {
 			if(!chmod($assetDir, 0777)) {
 				exit('Недостаточно прав для записи в папку /assets');

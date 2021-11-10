@@ -31,7 +31,7 @@ class AdminsServers extends CActiveRecord
 		return '{{admins_servers}}';
 	}
 
-	public static function getFlags() {
+	public function getFlags() {
 
 		return str_split($this->custom_flags);
 	}
@@ -42,7 +42,7 @@ class AdminsServers extends CActiveRecord
 	}
 
 	/**
-	 * @return правила проверки для полей
+	 * @return array Правила проверки для полей
 	 */
 	public function rules()
 	{

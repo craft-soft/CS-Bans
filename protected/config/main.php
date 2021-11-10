@@ -31,7 +31,9 @@ class conf
 $config = new conf;
 
 // Подключаем конфиг старого AmxBans
-require_once ROOTPATH . '/include/db.config.inc.php';
+if (file_exists(ROOTPATH . '/include/db.config.inc.php')) {
+    require_once ROOTPATH . '/include/db.config.inc.php';
+}
 
 // Подключаем bootstrap
 Yii::setPathOfAlias('bootstrap', dirname(__FILE__).'/../extensions/bootstrap');
@@ -69,9 +71,9 @@ return array(
 		'application.components.gameq.filters.*',
 		'ext.editable.*'
 	),
-	
+
 	'modules'=>array_replace($modules, array(
-		
+
 	)),
 
 	// Компоненты приложения
@@ -99,19 +101,19 @@ return array(
 			'urlSuffix'=>'.html',
 			'rules'=>array(
 				'/'=>'site/index',
-				
+
 				'billing/unban/<id:\d+>' => 'billing/default/unban',
 				'billing/<controller:\w+>/<action:\w+>/<id:\d+>' => 'billing/<controller>/<action>',
                 'billing/<controller:\w+>/<action:\w+>' => 'billing/<controller>/<action>',
 				'billing/<action:\w+>' => 'billing/default/<action>',
                 'billing/<controller:\w+>' => 'billing/<controller>/buy',
-				
+
 				'<controller:\w+>/<id:\d+>'=>'<controller>/view',
 				'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 			),
 		),
-		
+
 		'format'=>array(
 			'booleanFormat'=>array('Нет', 'Да'),
 			'datetimeFormat'=>'d.m.Y H:i',
