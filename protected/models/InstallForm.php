@@ -69,7 +69,10 @@ class InstallForm extends CFormModel
 	 */
 	public $license;
 
-	protected $conn = NULL;
+    /**
+     * @var CDbConnection|null
+     */
+	protected $conn;
 
 	public function rules()
 	{
@@ -175,37 +178,61 @@ class InstallForm extends CFormModel
 		catch(Exception $e) {
 			return $e->getMessage();
 		}
-
+/** @var StdClass $cfg */
 		// Сохраняем конфиг
-		$cfg = '<?php' . PHP_EOL;
-		$cfg .= '/**' . PHP_EOL;
-		$cfg .= ' * Конфигурационные данные системы' . PHP_EOL;
-		$cfg .= ' *' . PHP_EOL;
-		$cfg .= ' * @author Craft-Soft Team' . PHP_EOL;
-		$cfg .= ' * @version 1.0 beta' . PHP_EOL;
-		$cfg .= ' * @copyright (C)2013 Craft-Soft.ru.  Все права защищены.' . PHP_EOL;
-		$cfg .= ' * @package CS:Bans' . PHP_EOL;
-		$cfg .= ' * @link http://craft-soft.ru/' . PHP_EOL;
-		$cfg .= '*/' . PHP_EOL;
-		$cfg .= PHP_EOL;
-		$cfg .= "\$config->db_host	= '{$this->db_host}';" . PHP_EOL;
-		$cfg .= "\$config->db_user	= '{$this->db_user}';" . PHP_EOL;
-		$cfg .= "\$config->db_pass	= '{$this->db_pass}';" . PHP_EOL;
-		$cfg .= "\$config->db_db	= '{$this->db_db}';" . PHP_EOL;
-		$cfg .= "\$config->db_prefix	= '{$this->db_prefix}';" . PHP_EOL;
+        $cfg = '<?php' . PHP_EOL;
+        $cfg .= <<<EOL
+
+/** @var conf \$config */
+
+/**
+ * Конфигурационные данные системы
+ *
+ * @author Craft-Soft Team
+ * @version 1.0 beta
+ * @copyright (C)2013 Craft-Soft.ru.  Все права защищены.
+ * @package CS:Bans
+ * @link http://craft-soft.ru/
+*/
+
+\$config->db_host	= '$this->db_host';
+\$config->db_user	= '$this->db_user';
+\$config->db_pass	= '$this->db_pass';
+\$config->db_db	= '$this->db_db';
+\$config->db_prefix	= '$this->db_prefix';
+
+EOL;
 
 		$cfgFile = __DIR__ . '/../../include/db.config.inc.php';
 
-		if(
-			!is_writable($cfgFile)
-				||
-			!file_put_contents($cfgFile, $cfg)
-		) {
+		if(!@file_put_contents($cfgFile, $cfg)) {
+            $this->rollback();
 			return 'Не удалось сохранить конфиг.';
 		}
 
 		return TRUE;
 	}
+
+    private function rollback()
+    {
+        if ($this->conn) {
+            $sql = <<<SQL
+SET FOREIGN_KEY_CHECKS = 0; 
+SET @tables = NULL;
+SELECT GROUP_CONCAT(table_schema, '.', table_name) INTO @tables
+  FROM information_schema.tables 
+  WHERE table_schema = '$this->db_db'; -- specify DB name here.
+
+SET @tables = CONCAT('DROP TABLE IF EXISTS ', @tables);
+PREPARE stmt FROM @tables;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+SET FOREIGN_KEY_CHECKS = 1; 
+SQL;
+
+            $r = $this->conn->createCommand($sql)->execute();
+        }
+    }
 
 	protected function afterValidate() {
 
@@ -217,6 +244,6 @@ class InstallForm extends CFormModel
 			$this->addError('license', 'Вы не приняли условия лицензионного соглашения');
 		}
 
-		return parent::afterValidate();
+		parent::afterValidate();
 	}
 }
