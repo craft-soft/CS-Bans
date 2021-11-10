@@ -204,7 +204,7 @@ class Amxadmins extends CActiveRecord
         if($removePwd) {
             $this->password = '';
         }
-        
+
 		if($this->isNewRecord) {
 			$this->created = time();
             if($this->password && $this->scenario != 'buy') {
@@ -226,7 +226,7 @@ class Amxadmins extends CActiveRecord
                 }
             }
 
-            if($this->expired == 0) {
+            if($this->expired < time()) {
 				$this->expired = time();
 			}
 
@@ -236,7 +236,7 @@ class Amxadmins extends CActiveRecord
 					$this->days = $this->days - $this->change;
 					break;
 				case '0':
-					$this->expired = $this->expired + ($this->change *86400);
+                    $this->expired = (int)$this->expired + ($this->change *86400);
 					$this->days = $this->days + $this->change;
 					break;
 				default:
@@ -248,7 +248,7 @@ class Amxadmins extends CActiveRecord
 	}
 
 	protected function afterValidate() {
-		
+
 		if ($this->scenario == 'buy') {
             return true;
         }
@@ -260,7 +260,7 @@ class Amxadmins extends CActiveRecord
         if($this->isNewRecord && $this->flags === 'a' && !$this->password) {
             $this->addError('password', 'Для админки по нику нужно обязательно указывать пароль');
         }
-        
+
 		if ($this->flags === 'd' && !filter_var($this->steamid, FILTER_VALIDATE_IP, array('flags' => FILTER_FLAG_IPV4))) {
             $this->addError('steamid', 'Неверно введен IP');
         }
@@ -272,7 +272,7 @@ class Amxadmins extends CActiveRecord
         if ($this->password && !preg_match('#^([a-z0-9]+)$#i', $this->password)) {
 			$this->addError ('password', 'Пароль может содержать только буквы латинского алфавита и цифры');
 		}
-        
+
         if(!$this->isNewRecord && $this->days < $this->change && $this->addtake === '1')
 		{
 			$this->addError ('', 'Ошибка! Нельзя забрать дней больше, чем у него уже есть');
@@ -281,11 +281,11 @@ class Amxadmins extends CActiveRecord
         if(empty($this->servers)) {
             $this->addError ('servers', 'Выберите хотябы один сервер');
         }
-        
+
         if($this->hasErrors()) {
             return $this->getErrors();
         }
-        
+
 		return parent::afterValidate();
 	}
 
