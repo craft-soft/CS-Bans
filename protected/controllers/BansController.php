@@ -73,23 +73,30 @@ class BansController extends Controller
 		// Проверка прав на просмотр IP
 		$ipaccess = Webadmins::checkAccess('ip_view');
 		if($ipaccess) {
-            $geo = array(
-                'city' => 'Н/А',
-                'region' => 'Не определен',
-                'country' => 'Не определен',
-                'lat' => 0,
-                'lng' => 0,
-            );
-			$get = @file_get_contents('http://ipgeobase.ru:7020/geo?ip=' . $model->player_ip);
-            if($get) {
-                $xml = @simplexml_load_string($get);
-                if(!empty($xml->ip)) {
-                    $geo['city'] = $xml->ip->city;
-                    $geo['region'] = $xml->ip->region;
-                    $geo['country'] = $xml->ip->country;
-                    $geo['lat'] = $xml->ip->lat;
-                    $geo['lng'] = $xml->ip->lng;
+            $cacheKey = "PLAYER_IP_{$model->player_ip}_";
+            $geo = Yii::app()->cache->get($cacheKey);
+            if (!$geo) {
+                $geo = array(
+                    'city' => 'Н/А',
+                    'region' => 'Не определен',
+                    'country' => 'Не определен',
+                    'lat' => 0,
+                    'lng' => 0,
+                );
+                $get = @file_get_contents("http://ip-api.com/json/$model->player_ip?lang=ru&fields=status,message,country,regionName,city,district,lat,lon,query");
+                if($get) {
+                    $json = json_decode($get, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $geo = array(
+                            'city' => $json['city'],
+                            'region' => $json['regionName'],
+                            'country' => $json['country'],
+                            'lat' => $json['lat'],
+                            'lng' => $json['lon'],
+                        );
+                    }
                 }
+                Yii::app()->cache->set($cacheKey, $geo, 86400);
             }
 		}
 
@@ -131,7 +138,7 @@ class BansController extends Controller
 				),
 			),
 		));
-		
+
 		// История банов
 		$history = new CActiveDataProvider('Bans', array(
 			'criteria' => array(
@@ -358,7 +365,7 @@ class BansController extends Controller
 	{
 		$this->layout = FALSE;
 
-		$sid = (int)SubStr( $sid, 1 );
+		$sid = (int)substr( $sid, 1 );
 
 		$model = Bans::model()->findByPk($sid);
 		if ($model === null) {
