@@ -68,7 +68,7 @@ class Prefs extends CApplicationComponent {
 	*/
 	public static function steam_convert($id, $url = false, $xml = false) {
 
-		$RightSteam = "/^(STEAM_[0-9])\:([0-9])\:([0-9]{4,8})$/";
+		$RightSteam = "/^(STEAM_[0-9]):([0-9]):([0-9]{4,8})$/";
 		$RightNumber = "/^(7656119)([0-9]{10})$/";
 
 		if (!$id) { return false; }
@@ -192,7 +192,7 @@ class Prefs extends CApplicationComponent {
 
 			return $s;
 		} else {
-			return;
+			return null;
 		}
 	}
 
@@ -260,7 +260,6 @@ class Prefs extends CApplicationComponent {
 			default:
 				return false;
 		}
-		return false;
 	}
 
 	/**
@@ -280,7 +279,7 @@ class Prefs extends CApplicationComponent {
 
     /**
 	 * Получение информации о сервере/сайте
-	 * @return string
+	 * @return array
 	 */
 	public static function sysprefs()
 	{
@@ -316,18 +315,38 @@ class Prefs extends CApplicationComponent {
 	public static function getVersion() {
 		$current = Yii::app()->params['Version'];
 		if( ($last = Yii::app()->cache->get('getVersion')) === false ) {
-			$last = @file_get_contents('http://craft-soft.ru/goods/version.html?id=csbans');
+            $ch = curl_init('https://api.github.com/repos/craft-soft/CS-Bans/tags');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:17.0) Gecko/20100101 Firefox/17.0');
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Accept: application/vnd.github.v3+json'
+            ]);
+            $lastAll = curl_exec($ch);
+            curl_close($ch);
+            if ($lastAll) {
+                $all = json_decode($lastAll, true);
+                if (
+                    json_last_error() === JSON_ERROR_NONE
+                    &&
+                    isset($all[0]['name'])
+                    &&
+                    preg_match('([\d.]+)', $all[0]['name'], $match)
+                ) {
+                    $last = $match[0];
+                }
+            }
 		}
 		if(!$last) {
-			return "{$current} <span class='text-warning'>(не удалось проверить версию)</span>";
+			return "{$current} <span class='text-warning'>не удалось проверить версию</span>";
 		}
 		Yii::app()->cache->set('getVersion', $last, 21600);
 		if(version_compare($current, $last, '<')) {
-			return "{$current} <span class='text-error'>(доступна новая версия)</span>";
+			return "{$current} <span class='text-error'>доступна новая версия <strong>($last)</strong></span>";
 		}
-		return "{$current} <span class='text-success'>(вы используете последнюю версию)</span>";
+		return "{$current} <span class='text-success'>вы используете последнюю версию</span>";
 	}
-    
+
     public static function getRealIp() {
 		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
 			$ip = $_SERVER['HTTP_CLIENT_IP'];
