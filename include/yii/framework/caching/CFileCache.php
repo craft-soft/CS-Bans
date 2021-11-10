@@ -7,6 +7,7 @@
  * @copyright 2008-2013 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
+
 /**
  * CFileCache provides a file-based caching mechanism.
  *
@@ -63,8 +64,10 @@ class CFileCache extends CCache
 	 * @since 1.1.14
 	 */
 	public $embedExpiry=false;
+
 	private $_gcProbability=100;
 	private $_gced=false;
+
 	/**
 	 * Initializes this application component.
 	 * This method is required by the {@link IApplicationComponent} interface.
@@ -80,6 +83,7 @@ class CFileCache extends CCache
 			chmod($this->cachePath,$this->cachePathMode);
 		}
 	}
+
 	/**
 	 * @return integer the probability (parts per million) that garbage collection (GC) should be performed
 	 * when storing a piece of data in the cache. Defaults to 100, meaning 0.01% chance.
@@ -88,6 +92,7 @@ class CFileCache extends CCache
 	{
 		return $this->_gcProbability;
 	}
+
 	/**
 	 * @param integer $value the probability (parts per million) that garbage collection (GC) should be performed
 	 * when storing a piece of data in the cache. Defaults to 100, meaning 0.01% chance.
@@ -102,6 +107,7 @@ class CFileCache extends CCache
 			$value=1000000;
 		$this->_gcProbability=$value;
 	}
+
 	/**
 	 * Deletes all values from cache.
 	 * This is the implementation of the method declared in the parent class.
@@ -113,6 +119,7 @@ class CFileCache extends CCache
 		$this->gc(false);
 		return true;
 	}
+
 	/**
 	 * Retrieves a value from cache with a specified key.
 	 * This is the implementation of the method declared in the parent class.
@@ -128,6 +135,7 @@ class CFileCache extends CCache
 			@unlink($cacheFile);
 		return false;
 	}
+
 	/**
 	 * Stores a value identified by a key in cache.
 	 * This is the implementation of the method declared in the parent class.
@@ -144,9 +152,11 @@ class CFileCache extends CCache
 			$this->gc();
 			$this->_gced=true;
 		}
+
 		if($expire<=0)
 			$expire=31536000; // 1 year
 		$expire+=time();
+
 		$cacheFile=$this->getCacheFile($key);
 		if($this->directoryLevel>0)
 		{
@@ -162,6 +172,7 @@ class CFileCache extends CCache
 		else
 			return false;
 	}
+
 	/**
 	 * Stores a value identified by a key into cache if the cache does not contain this key.
 	 * This is the implementation of the method declared in the parent class.
@@ -178,6 +189,7 @@ class CFileCache extends CCache
 			return false;
 		return $this->setValue($key,$value,$expire);
 	}
+
 	/**
 	 * Deletes a value with the specified key from cache
 	 * This is the implementation of the method declared in the parent class.
@@ -189,6 +201,7 @@ class CFileCache extends CCache
 		$cacheFile=$this->getCacheFile($key);
 		return @unlink($cacheFile);
 	}
+
 	/**
 	 * Returns the cache file path given the cache key.
 	 * @param string $key cache key
@@ -209,6 +222,7 @@ class CFileCache extends CCache
 		else
 			return $this->cachePath.DIRECTORY_SEPARATOR.$key.$this->cacheFileSuffix;
 	}
+
 	/**
 	 * Removes expired cache files.
 	 * @param boolean $expiredOnly whether only expired cache files should be removed.
@@ -233,6 +247,7 @@ class CFileCache extends CCache
 		}
 		closedir($handle);
 	}
+
 	/**
 	 * Returns cache file modification time. {@link $embedExpiry} aware.
 	 * @param string $path to the file, modification time to be retrieved from.

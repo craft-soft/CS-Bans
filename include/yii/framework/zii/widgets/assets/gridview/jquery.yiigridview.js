@@ -54,6 +54,8 @@
 					ajaxUpdate: [],
 					ajaxVar: 'ajax',
 					ajaxType: 'GET',
+					csrfTokenName: null,
+					csrfToken: null,
 					pagerClass: 'pager',
 					loadingClass: 'loading',
 					filterClass: 'filters',
@@ -70,6 +72,7 @@
 
 			return this.each(function () {
 				var eventType,
+					eventTarget,
 					$grid = $(this),
 					id = $grid.attr('id'),
 					pagerSelector = '#' + id + ' .' + settings.pagerClass.replace(/\s+/g, '.') + ' a',
@@ -89,11 +92,16 @@
 						// Check to see if History.js is enabled for our Browser
 						if (settings.enableHistory && window.History.enabled) {
 							// Ajaxify this link
-							var url = $(this).attr('href').split('?'),
-								params = $.deparam.querystring('?'+ (url[1] || ''));
+							var href = $(this).attr('href');
+							if(href){
+								var url = href.split('?'),
+									params = $.deparam.querystring('?'+ (url[1] || ''));
 
-							delete params[settings.ajaxVar];
-							window.History.pushState(null, document.title, decodeURIComponent($.param.querystring(url[0], params)));
+								delete params[settings.ajaxVar];
+
+								var updateUrl = $.param.querystring(url[0], params);
+								window.History.pushState({url: updateUrl}, document.title, updateUrl);
+							}
 						} else {
 							$('#' + id).yiiGridView('update', {url: $(this).attr('href')});
 						}
@@ -107,11 +115,13 @@
 							return; // only react to enter key
 						} else {
 							eventType = 'keydown';
+							eventTarget = event.target;
 						}
 					} else {
-						// prevent processing for both keydown and change events
-						if (eventType === 'keydown') {
+						// prevent processing for both keydown and change events on the same element
+						if (eventType === 'keydown' && eventTarget === event.target) {
 							eventType = '';
+							eventTarget = null;
 							return;
 						}
 					}
@@ -125,7 +135,9 @@
 							params = $.deparam.querystring($.param.querystring(url, data));
 
 						delete params[settings.ajaxVar];
-						window.History.pushState(null, document.title, decodeURIComponent($.param.querystring(url.substr(0, url.indexOf('?')), params)));
+
+						var updateUrl = $.param.querystring(url.substr(0, url.indexOf('?')), params);
+						window.History.pushState({url: updateUrl}, document.title, updateUrl);
 					} else {
 						$('#' + id).yiiGridView('update', {data: data});
 					}
@@ -135,7 +147,10 @@
 				if (settings.enableHistory && settings.ajaxUpdate !== false && window.History.enabled) {
 					$(window).bind('statechange', function() { // Note: We are using statechange instead of popstate
 						var State = window.History.getState(); // Note: We are using History.getState() instead of event.state
-						$('#' + id).yiiGridView('update', {url: State.url});
+						if (State.data.url === undefined) {
+							State.data.url = State.url;
+						}
+						$('#' + id).yiiGridView('update', State.data);
 					});
 				}
 
@@ -156,9 +171,9 @@
 
 						if (settings.selectableRows === 1) {
 							$row.siblings().removeClass('selected');
-							$checks.prop('checked', false);
+							$checks.prop('checked', false).trigger("change");
 						}
-						$('input.select-on-check', $row).prop('checked', isRowSelected);
+						$('input.select-on-check', $row).prop('checked', isRowSelected).trigger("change");
 						$("input.select-on-check-all", $currentGrid).prop('checked', $checks.length === $checks.filter(':checked').length);
 
 						if (settings.selectionChanged !== undefined) {
@@ -173,11 +188,11 @@
 								$rows = $currentGrid.find('.' + settings.tableClass).children('tbody').children();
 							if (this.checked) {
 								$rows.addClass('selected');
-								$checks.prop('checked', true);
+								$checks.prop('checked', true).trigger("change");
 								$checksAll.prop('checked', true);
 							} else {
 								$rows.removeClass('selected');
-								$checks.prop('checked', false);
+								$checks.prop('checked', false).trigger("change");
 								$checksAll.prop('checked', false);
 							}
 							if (settings.selectionChanged !== undefined) {
@@ -299,7 +314,7 @@
 						}
 
 						if (settings.ajaxUpdateError !== undefined) {
-							settings.ajaxUpdateError(XHR, textStatus, errorThrown, err);
+							settings.ajaxUpdateError(XHR, textStatus, errorThrown, err, id);
 						} else if (err) {
 							alert(err);
 						}
@@ -312,8 +327,17 @@
 					}
 				} else {
 					if (options.data === undefined) {
-						options.data = $(settings.filterSelector).serialize();
+						options.data = {};
+						$.each($(settings.filterSelector).serializeArray(), function () {
+							options.data[this.name] = this.value;
+						});
 					}
+				}
+				if (settings.csrfTokenName && settings.csrfToken) {
+					if (typeof options.data=='string')
+						options.data+='&'+settings.csrfTokenName+'='+settings.csrfToken;
+					else
+						options.data[settings.csrfTokenName] = settings.csrfToken;
 				}
 				if(yiiXHR[id] != null){
 					yiiXHR[id].abort();

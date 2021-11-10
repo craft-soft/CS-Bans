@@ -39,9 +39,15 @@ class CDataColumn extends CGridColumn
 	 * In this expression, you can use the following variables:
 	 * <ul>
 	 *   <li><code>$row</code> the row number (zero-based).</li>
-	 *   <li><code>$data</code> the data model for the row.</li>
+	 *   <li><code>$data</code> the value provided by grid view object for the row.</li>
 	 * 	 <li><code>$this</code> the column object.</li>
 	 * </ul>
+	 * Type of the <code>$data</code> depends on {@link IDataProvider data provider} which is passed to the 
+	 * {@link CGridView grid view object}. In case of {@link CActiveDataProvider}, <code>$data</code> will have
+	 * object type and its values are accessed like <code>$data->property</code>. In case of 
+	 * {@link CArrayDataProvider} or {@link CSqlDataProvider}, it will have array type and its values must be
+	 * accessed like <code>$data['property']</code>.
+	 * 
 	 * A PHP expression can be any PHP code that has a value. To learn more about what an expression is,
 	 * please refer to the {@link http://www.php.net/manual/en/language.expressions.php php manual}.
 	 */
@@ -85,58 +91,63 @@ class CDataColumn extends CGridColumn
 	}
 
 	/**
-	 * Renders the filter cell content.
-	 * This method will render the {@link filter} as is if it is a string.
+	 * Returns the filter cell content.
+	 * This method will return the {@link filter} as is if it is a string.
 	 * If {@link filter} is an array, it is assumed to be a list of options, and a dropdown selector will be rendered.
 	 * Otherwise if {@link filter} is not false, a text field is rendered.
-	 * @since 1.1.1
+	 * @return string the filter cell content
+	 * @since 1.1.16
 	 */
-	protected function renderFilterCellContent()
+	public function getFilterCellContent()
 	{
 		if(is_string($this->filter))
-			echo $this->filter;
+			return $this->filter;
 		elseif($this->filter!==false && $this->grid->filter!==null && $this->name!==null && strpos($this->name,'.')===false)
 		{
 			if(is_array($this->filter))
-				echo CHtml::activeDropDownList($this->grid->filter, $this->name, $this->filter, array('id'=>false,'prompt'=>''));
+				return CHtml::activeDropDownList($this->grid->filter, $this->name, $this->filter, array('id'=>false,'prompt'=>''));
 			elseif($this->filter===null)
-				echo CHtml::activeTextField($this->grid->filter, $this->name, array('id'=>false));
+				return CHtml::activeTextField($this->grid->filter, $this->name, array('id'=>false));
 		}
 		else
-			parent::renderFilterCellContent();
+			return parent::getFilterCellContent();
 	}
 
 	/**
-	 * Renders the header cell content.
+	 * Returns the header cell content.
 	 * This method will render a link that can trigger the sorting if the column is sortable.
+	 * @return string the header cell content.
+	 * @since 1.1.16
 	 */
-	protected function renderHeaderCellContent()
+	public function getHeaderCellContent()
 	{
 		if($this->grid->enableSorting && $this->sortable && $this->name!==null)
-			echo $this->grid->dataProvider->getSort()->link($this->name,$this->header,array('class'=>'sort-link'));
+			return $this->grid->dataProvider->getSort()->link($this->name,$this->header,array('class'=>'sort-link'));
 		elseif($this->name!==null && $this->header===null)
 		{
 			if($this->grid->dataProvider instanceof CActiveDataProvider)
-				echo CHtml::encode($this->grid->dataProvider->model->getAttributeLabel($this->name));
+				return CHtml::encode($this->grid->dataProvider->model->getAttributeLabel($this->name));
 			else
-				echo CHtml::encode($this->name);
+				return CHtml::encode($this->name);
 		}
 		else
-			parent::renderHeaderCellContent();
+			return parent::getHeaderCellContent();
 	}
 
 	/**
-	 * Renders the data cell content.
+	 * Returns the data cell content.
 	 * This method evaluates {@link value} or {@link name} and renders the result.
 	 * @param integer $row the row number (zero-based)
-	 * @param mixed $data the data associated with the row
+	 * @return string the data cell content.
+	 * @since 1.1.16
 	 */
-	protected function renderDataCellContent($row,$data)
+	public function getDataCellContent($row)
 	{
+		$data=$this->grid->dataProvider->data[$row];
 		if($this->value!==null)
 			$value=$this->evaluateExpression($this->value,array('data'=>$data,'row'=>$row));
 		elseif($this->name!==null)
 			$value=CHtml::value($data,$this->name);
-		echo $value===null ? $this->grid->nullDisplay : $this->grid->getFormatter()->format($value,$this->type);
+		return $value===null ? $this->grid->nullDisplay : $this->grid->getFormatter()->format($value,$this->type);
 	}
 }
