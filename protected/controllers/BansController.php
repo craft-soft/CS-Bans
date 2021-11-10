@@ -83,7 +83,17 @@ class BansController extends Controller
                     'lat' => 0,
                     'lng' => 0,
                 );
-                $get = @file_get_contents("http://ip-api.com/json/$model->player_ip?lang=ru&fields=status,message,country,regionName,city,district,lat,lon,query");
+
+                // Контекст с таймаутом на 3 секунды, чтобы страница не зависала наглухо
+                $context = stream_context_create(array(
+                    'http' =>
+                        array(
+                            'timeout' => 3,
+                        )
+                ));
+
+                $get = @file_get_contents("http://ip-api.com/json/$model->player_ip?lang=ru&fields=status,message,country,regionName,city,district,lat,lon,query",
+                    false, $context);
                 if($get) {
                     $json = json_decode($get, true);
                     if (json_last_error() === JSON_ERROR_NONE) {
