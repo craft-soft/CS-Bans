@@ -35,9 +35,15 @@ class CLinkColumn extends CGridColumn
 	 * In this expression, you can use the following variables:
 	 * <ul>
 	 *   <li><code>$row</code> the row number (zero-based).</li>
-	 *   <li><code>$data</code> the data model for the row.</li>
+	 *   <li><code>$data</code> the value provided by grid view object for the row.</li>
 	 * 	 <li><code>$this</code> the column object.</li>
 	 * </ul>
+	 * Type of the <code>$data</code> depends on {@link IDataProvider data provider} which is passed to the 
+	 * {@link CGridView grid view object}. In case of {@link CActiveDataProvider}, <code>$data</code> will have
+	 * object type and its values are accessed like <code>$data->property</code>. In case of 
+	 * {@link CArrayDataProvider} or {@link CSqlDataProvider}, it will have array type and its values must be
+	 * accessed like <code>$data['property']</code>.
+	 *
 	 * The PHP expression will be evaluated using {@link evaluateExpression}.
 	 *
 	 * A PHP expression can be any PHP code that has a value. To learn more about what an expression is,
@@ -60,9 +66,15 @@ class CLinkColumn extends CGridColumn
 	 * In this expression, you can use the following variables:
 	 * <ul>
 	 *   <li><code>$row</code> the row number (zero-based).</li>
-	 *   <li><code>$data</code> the data model for the row.</li>
+	 *   <li><code>$data</code> the value provided by grid view object for the row.</li>
 	 * 	 <li><code>$this</code> the column object.</li>
 	 * </ul>
+	 * Type of the <code>$data</code> depends on {@link IDataProvider data provider} which is passed to the 
+	 * {@link CGridView grid view object}. In case of {@link CActiveDataProvider}, <code>$data</code> will have
+	 * object type and its values are accessed like <code>$data->property</code>. In case of 
+	 * {@link CArrayDataProvider} or {@link CSqlDataProvider}, it will have array type and its values must be
+	 * accessed like <code>$data['property']</code>.
+	 *
 	 * The PHP expression will be evaluated using {@link evaluateExpression}.
 	 *
 	 * A PHP expression can be any PHP code that has a value. To learn more about what an expression is,
@@ -87,13 +99,15 @@ class CLinkColumn extends CGridColumn
 	public $linkHtmlOptions=array();
 
 	/**
-	 * Renders the data cell content.
+	 * Returns the data cell content.
 	 * This method renders a hyperlink in the data cell.
 	 * @param integer $row the row number (zero-based)
-	 * @param mixed $data the data associated with the row
+	 * @return string the data cell content.
+	 * @since 1.1.16
 	 */
-	protected function renderDataCellContent($row,$data)
+	public function getDataCellContent($row)
 	{
+		$data=$this->grid->dataProvider->data[$row];
 		if($this->urlExpression!==null)
 			$url=$this->evaluateExpression($this->urlExpression,array('data'=>$data,'row'=>$row));
 		else
@@ -104,8 +118,8 @@ class CLinkColumn extends CGridColumn
 			$label=$this->label;
 		$options=$this->linkHtmlOptions;
 		if(is_string($this->imageUrl))
-			echo CHtml::link(CHtml::image($this->imageUrl,$label),$url,$options);
+			return CHtml::link(CHtml::image($this->imageUrl,$label),$url,$options);
 		else
-			echo CHtml::link($label,$url,$options);
+			return CHtml::link($label,$url,$options);
 	}
 }

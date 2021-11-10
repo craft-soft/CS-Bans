@@ -261,7 +261,7 @@ class CComponent
 					return call_user_func_array(array($object,$name),$parameters);
 			}
 		}
-		if(class_exists('Closure', false) && $this->canGetProperty($name) && $this->$name instanceof Closure)
+		if(class_exists('Closure', false) && ($this->canGetProperty($name) || property_exists($this, $name)) && $this->$name instanceof Closure)
 			return call_user_func_array($this->$name, $parameters);
 		throw new CException(Yii::t('yii','{class} and its behaviors do not have a method or closure named "{name}".',
 			array('{class}'=>get_class($this), '{name}'=>$name)));
@@ -499,7 +499,7 @@ class CComponent
 	 * $component->getEventHandlers($eventName)->add($eventHandler);
 	 * </pre>
 	 *
-	 * Using {@link getEventHandlers}, one can also specify the excution order
+	 * Using {@link getEventHandlers}, one can also specify the execution order
 	 * of multiple handlers attaching to the same event. For example:
 	 * <pre>
 	 * $component->getEventHandlers($eventName)->insertAt(0,$eventHandler);
@@ -507,7 +507,7 @@ class CComponent
 	 * makes the handler to be invoked first.
 	 *
 	 * @param string $name the event name
-	 * @param callback $handler the event handler
+	 * @param callable $handler the event handler
 	 * @throws CException if the event is not defined
 	 * @see detachEventHandler
 	 */
@@ -520,7 +520,7 @@ class CComponent
 	 * Detaches an existing event handler.
 	 * This method is the opposite of {@link attachEventHandler}.
 	 * @param string $name event name
-	 * @param callback $handler the event handler to be removed
+	 * @param callable $handler the event handler to be removed
 	 * @return boolean if the detachment process is successful
 	 * @see attachEventHandler
 	 */
@@ -609,12 +609,19 @@ class CComponent
 		if(is_string($_expression_))
 		{
 			extract($_data_);
-			return eval('return '.$_expression_.';');
+			try
+			{
+				return eval('return ' . $_expression_ . ';');
+			}
+			catch (ParseError $e)
+			{
+				return false;
+			}
 		}
 		else
 		{
 			$_data_[]=$this;
-			return call_user_func_array($_expression_, $_data_);
+			return call_user_func_array($_expression_, array_values($_data_));
 		}
 	}
 }

@@ -41,10 +41,16 @@ class CCheckBoxColumn extends CGridColumn
 	 * @var string a PHP expression that will be evaluated for every data cell and whose result will be rendered
 	 * in each data cell as the checkbox value. In this expression, you can use the following variables:
 	 * <ul>
-	 *   <li><code>$row</code> the row number (zero-based)</li>
-	 *   <li><code>$data</code> the data model for the row</li>
-	 *   <li><code>$this</code> the column object</li>
+	 *   <li><code>$row</code> the row number (zero-based).</li>
+	 *   <li><code>$data</code> the value provided by grid view object for the row.</li>
+	 *   <li><code>$this</code> the column object.</li>
 	 * </ul>
+	 * Type of the <code>$data</code> depends on {@link IDataProvider data provider} which is passed to the 
+	 * {@link CGridView grid view object}. In case of {@link CActiveDataProvider}, <code>$data</code> will have
+	 * object type and its values are accessed like <code>$data->property</code>. In case of 
+	 * {@link CArrayDataProvider} or {@link CSqlDataProvider}, it will have array type and its values must be
+	 * accessed like <code>$data['property']</code>.
+	 *
 	 * The PHP expression will be evaluated using {@link evaluateExpression}.
 	 *
 	 * A PHP expression can be any PHP code that has a value. To learn more about what an expression is,
@@ -55,10 +61,16 @@ class CCheckBoxColumn extends CGridColumn
 	 * @var string a PHP expression that will be evaluated for every data cell and whose result will
 	 * determine if checkbox for each data cell is checked. In this expression, you can use the following variables:
 	 * <ul>
-	 *   <li><code>$row</code> the row number (zero-based)</li>
-	 *   <li><code>$data</code> the data model for the row</li>
-	 *   <li><code>$this</code> the column object</li>
+	 *   <li><code>$row</code> the row number (zero-based).</li>
+	 *   <li><code>$data</code> the value provided by grid view object for the row.</li>
+	 *   <li><code>$this</code> the column object.</li>
 	 * </ul>
+	 * Type of the <code>$data</code> depends on {@link IDataProvider data provider} which is passed to the 
+	 * {@link CGridView grid view object}. In case of {@link CActiveDataProvider}, <code>$data</code> will have
+	 * object type and its values are accessed like <code>$data->property</code>. In case of 
+	 * {@link CArrayDataProvider} or {@link CSqlDataProvider}, it will have array type and its values must be
+	 * accessed like <code>$data['property']</code>.
+	 *
 	 * The PHP expression will be evaluated using {@link evaluateExpression}.
 	 *
 	 * A PHP expression can be any PHP code that has a value. To learn more about what an expression is,
@@ -70,10 +82,16 @@ class CCheckBoxColumn extends CGridColumn
 	 * @var string a PHP expression that will be evaluated for every data cell and whose result will
 	 * determine if checkbox for each data cell is disabled. In this expression, you can use the following variables:
 	 * <ul>
-	 *   <li><code>$row</code> the row number (zero-based)</li>
-	 *   <li><code>$data</code> the data model for the row</li>
-	 *   <li><code>$this</code> the column object</li>
+	 *   <li><code>$row</code> the row number (zero-based).</li>
+	 *   <li><code>$data</code> the value provided by grid view object for the row.</li>
+	 *   <li><code>$this</code> the column object.</li>
 	 * </ul>
+	 * Type of the <code>$data</code> depends on {@link IDataProvider data provider} which is passed to the 
+	 * {@link CGridView grid view object}. In case of {@link CActiveDataProvider}, <code>$data</code> will have
+	 * object type and its values are accessed like <code>$data->property</code>. In case of 
+	 * {@link CArrayDataProvider} or {@link CSqlDataProvider}, it will have array type and its values must be
+	 * accessed like <code>$data['property']</code>.
+	 *
 	 * The PHP expression will be evaluated using {@link evaluateExpression}.
 	 *
 	 * A PHP expression can be any PHP code that has a value. To learn more about what an expression is,
@@ -187,43 +205,39 @@ EOD;
 	}
 
 	/**
-	 * Renders the header cell content.
+	 * Returns the header cell content.
 	 * This method will render a checkbox in the header when {@link selectableRows} is greater than 1
 	 * or in case {@link selectableRows} is null when {@link CGridView::selectableRows} is greater than 1.
+	 * @return string the header cell content.
+	 * @since 1.1.16
 	 */
-	protected function renderHeaderCellContent()
+	public function getHeaderCellContent()
 	{
 		if(trim($this->headerTemplate)==='')
-		{
-			echo $this->grid->blankDisplay;
-			return;
-		}
+			return $this->grid->blankDisplay;
 
-		$item = '';
 		if($this->selectableRows===null && $this->grid->selectableRows>1)
-			$item = CHtml::checkBox($this->id.'_all',false,array('class'=>'select-on-check-all'));
+			$item=CHtml::checkBox($this->id.'_all',false,array('class'=>'select-on-check-all'));
 		elseif($this->selectableRows>1)
-			$item = CHtml::checkBox($this->id.'_all',false);
+			$item=CHtml::checkBox($this->id.'_all',false);
 		else
-		{
-			ob_start();
-			parent::renderHeaderCellContent();
-			$item = ob_get_clean();
-		}
+			$item=parent::getHeaderCellContent();
 
-		echo strtr($this->headerTemplate,array(
+		return strtr($this->headerTemplate,array(
 			'{item}'=>$item,
 		));
 	}
 
 	/**
-	 * Renders the data cell content.
+	 * Returns the data cell content.
 	 * This method renders a checkbox in the data cell.
 	 * @param integer $row the row number (zero-based)
-	 * @param mixed $data the data associated with the row
+	 * @return string the data cell content.
+	 * @since 1.1.16
 	 */
-	protected function renderDataCellContent($row,$data)
+	public function getDataCellContent($row)
 	{
+		$data=$this->grid->dataProvider->data[$row];
 		if($this->value!==null)
 			$value=$this->evaluateExpression($this->value,array('data'=>$data,'row'=>$row));
 		elseif($this->name!==null)
@@ -243,6 +257,6 @@ EOD;
 		unset($options['name']);
 		$options['value']=$value;
 		$options['id']=$this->id.'_'.$row;
-		echo CHtml::checkBox($name,$checked,$options);
+		return CHtml::checkBox($name,$checked,$options);
 	}
 }

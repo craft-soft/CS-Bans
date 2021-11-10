@@ -330,6 +330,7 @@ class CController extends CBaseController
 	 * The default implementation will throw a 400 HTTP exception.
 	 * @param CAction $action the action being executed
 	 * @since 1.1.7
+	 * @throws CHttpException
 	 */
 	public function invalidActionParams($action)
 	{
@@ -405,6 +406,7 @@ class CController extends CBaseController
 	 * @param string $actionID ID of the action. If empty, the {@link defaultAction default action} will be used.
 	 * @return CAction the action instance, null if the action does not exist.
 	 * @see actions
+	 * @throws CException
 	 */
 	public function createAction($actionID)
 	{
@@ -431,6 +433,7 @@ class CController extends CBaseController
 	 * @param string $requestActionID the originally requested action ID
 	 * @param array $config the action configuration that should be applied on top of the configuration specified in the map
 	 * @return CAction the action instance, null if the action does not exist.
+	 * @throws CException
 	 */
 	protected function createActionFromMap($actionMap,$actionID,$requestActionID,$config=array())
 	{
@@ -915,14 +918,14 @@ class CController extends CBaseController
 	 * Note, the callback and its parameter values will be serialized and saved in cache.
 	 * Make sure they are serializable.
 	 *
-	 * @param callback $callback a PHP callback which returns the needed dynamic content.
+	 * @param callable $callback a PHP callback which returns the needed dynamic content.
 	 * When the callback is specified as a string, it will be first assumed to be a method of the current
 	 * controller class. If the method does not exist, it is assumed to be a global PHP function.
 	 * Note, the callback should return the dynamic content instead of echoing it.
 	 */
 	public function renderDynamic($callback)
 	{
-		$n=count($this->_dynamicOutput);
+		$n=($this->_dynamicOutput === null ? 0 : count($this->_dynamicOutput));
 		echo "<###dynamic-$n###>";
 		$params=func_get_args();
 		array_shift($params);
@@ -931,7 +934,7 @@ class CController extends CBaseController
 
 	/**
 	 * This method is internally used.
-	 * @param callback $callback a PHP callback which returns the needed dynamic content.
+	 * @param callable $callback a PHP callback which returns the needed dynamic content.
 	 * @param array $params parameters passed to the PHP callback
 	 * @see renderDynamic
 	 */
