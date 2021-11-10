@@ -63,7 +63,7 @@ class Serverinfo extends CActiveRecord
             ),
         );
     }
-	
+
 	public function rules()
 	{
 		return array(
@@ -123,25 +123,25 @@ class Serverinfo extends CActiveRecord
 
 	public function getInfo() {
 		$sip = explode(':',  $this->address);
-		
+
 		//include ROOTPATH . '/include/GameQ.php';
-		
+
 		$server = new GameQ;
-		
+
 		$server->addServer(array(
 			'id' => $this->id,
 			'type' => $this->gametype,
 			'host' => $this->address
 		));
-		
+
 		$server->setOption('timeout', 1);
-		
+
 		$s = $server->requestData();
 		$s = $s[$this->id];
 
 		$rules = array();
 		$info['online'] = $s['gq_online'] == 1;
-		
+
 		if($info['online'])
 		{
 			$info['players'] = $s['num_players'];
@@ -150,9 +150,14 @@ class Serverinfo extends CActiveRecord
 			$info['map'] = $s['map'];
 			$info['game'] = $s['game_dir'];
 			$info['os'] = $s['os'] == 'l' ? 'Linux' : 'Windows';
-			$info['secure'] = $s['secure'] == 0 ? FALSE : TRUE;
+			$info['secure'] = !($s['secure'] == 0);
 			$info['playersinfo'] = isset($s['players']) && is_array($s['players']) ? $s['players'] : array();
-			$info['timeleft'] = isset($s['mp_timeleft']) ? $s['mp_timeleft'] : isset($s['amx_timeleft'])?$s['amx_timeleft']:false;
+            if (isset($s["mp_timeleft"]) && $s["mp_timeleft"] != "0")
+                $info["timeleft"] = $s["mp_timeleft"];
+            else if (isset($s["amx_timeleft"]))
+                $info["timeleft"] = $s["amx_timeleft"];
+            else
+                $info["timeleft"] = "0";
 			$info['nextmap'] = isset($s['amx_nextmap'])?$s['amx_nextmap']:FALSE;
 			$info['contact'] = isset($s['sv_contact'])?$s['sv_contact']:FALSE;
 			$game = $this->gametype ? $this->gametype : $info['game'];
@@ -196,7 +201,7 @@ class Serverinfo extends CActiveRecord
 		}
 		return FALSE;
 	}
-	
+
 	public function rconCommand($command)
 	{
 		$addr = explode(':', $this->address);
