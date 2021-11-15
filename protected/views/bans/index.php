@@ -20,7 +20,7 @@ $this->breadcrumbs=array(
 );
 
 Yii::app()->clientScript->registerScript('banlist', "
-$('.bantr').live('click', function(){
+$('.bantr').bind('click', function(){
 	$('#loading').show();
 	var bid = this.id.substr(4);
 	$.post('".Yii::app()->createUrl('bans/bandetail/')."', {'bid': bid}, function(data){

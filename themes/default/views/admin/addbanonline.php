@@ -22,7 +22,7 @@ $this->breadcrumbs=array(
 
 Yii::app()->clientScript->registerScript('', '
 
-$(".servtr").live("click", function(){
+$(".servtr").bind("click", function(){
 	$("#loading").show();
 	var sid = this.id.substr(6);
 	$.post(

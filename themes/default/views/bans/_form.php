@@ -16,12 +16,12 @@ Yii::app()->clientScript->registerScript('addban', '
 $("#Bans_ban_reason").change(function(){
 	if(this.value == "selfreason")
 	{
-		//$(this).attr("disabled", "disabled");
-		$("#selfreasoncheckbox").attr("checked", true);
+		//$(this).prop("disabled", true);
+		$("#selfreasoncheckbox").prop("checked", true);
 		$(".selfreason").show();
 	}
 	else{
-		$("#selfreasoncheckbox").removeAttr("checked");
+		$("#selfreasoncheckbox").prop("checked", false);
 		//$("#self_ban_reason").val("");
 		$(".selfreason").hide();
 	}
