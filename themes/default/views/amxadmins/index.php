@@ -21,7 +21,7 @@ $this->widget('bootstrap.widgets.TbBreadcrumbs', array(
 ));
 
 Yii::app()->clientScript->registerScript('viewdetail', "
-$('.admintr').live('click', function(){
+$('.admintr').bind('click', function(){
 	$('#loading').show();
 	var aid = this.id.substr(6);
 	$.post('".Yii::app()->urlManager->baseUrl."/amxadmins/view/', {'aid': aid}, function(data){

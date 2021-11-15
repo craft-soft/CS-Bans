@@ -24,7 +24,7 @@ $this->renderPartial('/admin/mainmenu', array('active' =>'server', 'activebtn' =
 <?php
 
 Yii::app()->clientScript->registerScript('serverview', '
-$(".servtr").css("cursor", "pointer").live("click", function(){
+$(".servtr").css("cursor", "pointer").bind("click", function(){
 	$("#loading").show();
 	var sid = this.id.substr(6);
 	$.post(

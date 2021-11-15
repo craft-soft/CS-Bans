@@ -22,22 +22,22 @@ Yii::app()->clientScript->registerScript('adminactions', '
 	var placeholder;
 
 	if(days.val() == 0) {
-		days.attr("disabled", "disabled");
-		forever.prop("checked", "checked");
+		days.prop("disabled", true);
+		forever.prop("checked", true);
 	}
 
 	forever.click(function() {
 		if($(this).prop("checked")) {
 			days.val("0");
-			days.attr("readonly", "readonly");
+			days.prop("readonly", true);
 		} else {
-			days.removeAttr("readonly");
+			days.prop("readonly", false);
 			days.val("30");
 		}
 	});
 
 	flags.change(function(){
-        $("#removePwd").removeAttr("disabled");
+        $("#removePwd").prop("disabled", false);
 		switch($(this).val()) {
 			case "d":
 				placeholder = "127.0.0.1";
@@ -47,7 +47,7 @@ Yii::app()->clientScript->registerScript('adminactions', '
 				break;
 			case "a":
 				placeholder = "";
-				$("#removePwd").attr("disabled", true);
+				$("#removePwd").prop("disabled", true);
 				break;
 		}
 		$("#Amxadmins_steamid").attr("placeholder", placeholder);
@@ -68,24 +68,24 @@ Yii::app()->clientScript->registerScript('adminactions', '
 		return false;
 	});
 	$("#checkAllFlags").click(function(){
-		if(!$(this).attr("checked"))
-			$(".adminflag").removeAttr("checked");
+		if(!$(this).prop("checked"))
+			$(".adminflag").prop("checked", false);
 		else
-			$(".adminflag:not(:last)").attr("checked", true);
+			$(".adminflag:not(:last)").prop("checked", true);
 	});
-	$(".adminflag").live("click", function(){
+	$(".adminflag").bind("click", function(){
 		var allCB	= $(".adminflag").size();
 		var chCB	= $(".adminflag:checked").size();
 		if(allCB == chCB)
-			$("#checkAllFlags").attr("checked", true);
+			$("#checkAllFlags").prop("checked", true);
 		else
-			$("#checkAllFlags").removeAttr("checked");
+			$("#checkAllFlags").prop("checked", false);
 	});
     $("#removePwd").click(function(){
-        if($(this).attr("checked")) {
-            $("#Amxadmins_password").attr("disabled", true);
+        if($(this).prop("checked")) {
+            $("#Amxadmins_password").prop("disabled", true);
         } else {
-            $("#Amxadmins_password").removeAttr("disabled");
+            $("#Amxadmins_password").prop("disabled", false);
         }
     });
 ');
