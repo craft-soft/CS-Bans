@@ -65,49 +65,37 @@ class BansController extends Controller
 		$comments->unsetAttributes();
 
 		// Подгружаем баны
-		$model=Bans::model()->with('admin')->findByPk($id);
+		$model = Bans::model()->with('admin')->findByPk($id);
 		if ($model === null) {
-            throw new CHttpException(404, 'The requested page does not exist.');
-        }
+			throw new CHttpException(404, 'The requested page does not exist.');
+		}
+
 		$geo = false;
 		// Проверка прав на просмотр IP
 		$ipaccess = Webadmins::checkAccess('ip_view');
 		if($ipaccess) {
-            $cacheKey = "PLAYER_IP_{$model->player_ip}_";
-            $geo = Yii::app()->cache->get($cacheKey);
-            if (!$geo) {
-                $geo = array(
-                    'city' => 'Н/А',
-                    'region' => 'Не определен',
-                    'country' => 'Не определен',
-                    'lat' => 0,
-                    'lng' => 0,
-                );
+			$cacheKey = "PLAYER_IP_{$model->player_ip}_";
+			$geo = Yii::app()->cache->get($cacheKey);
+			if (!$geo) {
+				$geo = array(
+					'city' => 'Н/А',
+					'region' => 'Не определен',
+					'country' => 'Не определен',
+					'lat' => 0,
+					'lng' => 0,
+				);
 
-                // Контекст с таймаутом на 3 секунды, чтобы страница не зависала наглухо
-                $context = stream_context_create(array(
-                    'http' =>
-                        array(
-                            'timeout' => 3,
-                        )
-                ));
+				$data = Yii::app()->GeoIP2->getInfoByIP($model->player_ip);
+				if(!empty($data)) {
+					$geo['city'] = $data->city;
+					$geo['region'] = $data->subdivisions;
+					$geo['country'] = $data->country;
+					$geo['lat'] = $data->location->latitude;
+					$geo['lng'] = $data->location->longitude;
+		                }
 
-                $get = @file_get_contents("http://ip-api.com/json/$model->player_ip?lang=ru&fields=status,message,country,regionName,city,district,lat,lon,query",
-                    false, $context);
-                if($get) {
-                    $json = json_decode($get, true);
-                    if (json_last_error() === JSON_ERROR_NONE) {
-                        $geo = array(
-                            'city' => $json['city'],
-                            'region' => $json['regionName'],
-                            'country' => $json['country'],
-                            'lat' => $json['lat'],
-                            'lng' => $json['lon'],
-                        );
-                    }
-                }
-                Yii::app()->cache->set($cacheKey, $geo, 86400);
-            }
+		                Yii::app()->cache->set($cacheKey, $geo, 86400);
+			}
 		}
 
 		// Добавление файла
