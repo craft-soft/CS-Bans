@@ -297,10 +297,10 @@ class Amxadmins extends CActiveRecord
 			'd' => 'IP'
 		);
 		if($get) {
-            $flag = $get{0};
+            $flag = $get[0];
 			if(isset($flags[$flag])) {
                 $return = $flags[$flag];
-                if(!isset($get{1})) {
+                if(!isset($get[1])) {
                     $return .= ' + пароль';
                 }
 				return $return;
