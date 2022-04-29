@@ -295,7 +295,7 @@ class Prefs extends CApplicationComponent {
 						: Yii::app()->db->serverVersion,
 				'display_errors'		=> ini_get('display_errors') ? '<span class="text-error"><b>Вкл</b></span>' : 'Выкл',
 				'register_globals'		=> ini_get('register_globals') ? '<span class="text-error"><b>Вкл</b></span>' : 'Выкл',
-				'magic_quotes_gpc'		=> get_magic_quotes_gpc() ? '<span class="text-error"><b>Вкл</b></span>' : 'Выкл',
+				'magic_quotes_gpc'		=> function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() ? '<span class="text-error"><b>Вкл</b></span>' : 'Выкл',
 				'safe_mode'				=> ini_get('safe_mode') ? '<span class="text-error"><b>Вкл</b></span>' : 'Выкл',
 				'post_max_size'			=> ini_get('post_max_size'),
 				'upload_max_filesize'	=> ini_get('upload_max_filesize'),

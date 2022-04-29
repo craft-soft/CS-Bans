@@ -91,7 +91,7 @@ Yii::app()->clientScript->registerScript('adminactions', '
 ');
 
 if(!$model->isNewRecord) {
-    $model->flags = $model->flags{0};
+    $model->flags = $model->flags[0];
 }
 
 $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
@@ -112,11 +112,11 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 			'maxlength'=>32,
 		)
 	);
-	
+
 	echo $form->textFieldRow($model,'nickname',array('class' => 'span6','maxlength'=>32));
 	echo $form->textFieldRow($model,'steamid',array('class' => 'span6','maxlength'=>32));
 	echo $form->textFieldRow($model,'username',array('class' => 'span6','maxlength'=>32));
-    
+
     if(!$model->isNewRecord && $model->flags != 'a' && $model->password) {
         $htmlOptions = array(
             'append' => '<label>'.CHtml::checkBox('removePwd') . ' Удалить пароль</label>',
@@ -129,13 +129,13 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
             'value' => isset($_POST['Amxadmins']['password']) ? CHtml::encode($_POST['Amxadmins']['password']) : '',
         );
     }
-    
+
 	echo $form->passwordFieldRow(
 		$model,
 		'password',
 		$htmlOptions
 	);
-	
+
 	echo $form->textFieldRow(
 		$model,
 		'access',
@@ -144,10 +144,10 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 			'append' => '<span id="flagsselector" style="cursor: pointer">Выбрать</span>'
 		)
 	);
-	
+
 	echo $form->textFieldRow($model,'icq',array('class' => 'span6',));
 	echo $form->dropDownListRow($model,'ashow', array('Нет', 'Да'),array('class' => 'span6',));
-	
+
 	if($model->isNewRecord):
 		echo $form->textFieldRow(
 			$model,
@@ -244,7 +244,7 @@ $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 	</div>
 	<?php
 	$this->endWidget();
-	
+
 	if($model->isNewRecord):?>
 		<hr class="row-divider">
 		<button class="btn btn-info" type="button" onclick="$('#webrights').slideToggle('slow');">Добавить WEB админа</button>

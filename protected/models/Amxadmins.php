@@ -232,12 +232,12 @@ class Amxadmins extends CActiveRecord
 
 			switch($this->addtake) {
 				case '1':
-					$this->expired = $this->expired - ($this->change *86400);
-					$this->days = $this->days - $this->change;
+					$this->expired = $this->expired - ((int)$this->change * 86400);
+					$this->days = $this->days - (int)$this->change;
 					break;
 				case '0':
-                    $this->expired = (int)$this->expired + ($this->change *86400);
-					$this->days = $this->days + $this->change;
+                    $this->expired = (int)$this->expired + ((int)$this->change * 86400);
+					$this->days = $this->days + (int)$this->change;
 					break;
 				default:
 					$this->expired = 0;
@@ -297,10 +297,10 @@ class Amxadmins extends CActiveRecord
 			'd' => 'IP'
 		);
 		if($get) {
-            $flag = $get{0};
+            $flag = $get[0];
 			if(isset($flags[$flag])) {
                 $return = $flags[$flag];
-                if(!isset($get{1})) {
+                if(!isset($get[1])) {
                     $return .= ' + пароль';
                 }
 				return $return;
