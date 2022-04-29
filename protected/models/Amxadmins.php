@@ -232,12 +232,12 @@ class Amxadmins extends CActiveRecord
 
 			switch($this->addtake) {
 				case '1':
-					$this->expired = $this->expired - ($this->change *86400);
-					$this->days = $this->days - $this->change;
+					$this->expired = $this->expired - ((int)$this->change * 86400);
+					$this->days = $this->days - (int)$this->change;
 					break;
 				case '0':
-                    $this->expired = (int)$this->expired + ($this->change *86400);
-					$this->days = $this->days + $this->change;
+                    $this->expired = (int)$this->expired + ((int)$this->change * 86400);
+					$this->days = $this->days + (int)$this->change;
 					break;
 				default:
 					$this->expired = 0;
