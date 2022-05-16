@@ -32,11 +32,13 @@ $config = new conf;
 
 // Подключаем конфиг старого AmxBans
 if (file_exists(ROOTPATH . '/include/db.config.inc.php')) {
-    require_once ROOTPATH . '/include/db.config.inc.php';
+	require_once ROOTPATH . '/include/db.config.inc.php';
 }
 
 // Подключаем bootstrap
 Yii::setPathOfAlias('bootstrap', dirname(__FILE__).'/../extensions/bootstrap');
+// GeoIP2 extension
+Yii::setPathOfAlias('geoip2', dirname(__FILE__).'/../extensions/GeoIP2');
 
 $dirs = scandir(dirname(__FILE__).'/../modules');
 
@@ -52,7 +54,7 @@ define('MODULES_MATCHES', implode('|', array_keys($modules)));
 // Главные параметры приложения
 return array(
 	'basePath'=>ROOTPATH . DIRECTORY_SEPARATOR . 'protected',
-	'name'=>'СS:Bans 1.3',
+	'name'=>'СS:Bans 1.3.3',
 	'sourceLanguage' => 'ru',
 	'language'=>'ru',
 
@@ -60,7 +62,7 @@ return array(
 	'preload'=>array(
 		'log',
 		'DConfig',
-		'Ip2Country',
+		'GeoIP2',
 		),
 	// Автозагружаемые модели и компоненты
 	'import'=>array(
@@ -91,8 +93,9 @@ return array(
 		'config'=>array(
 			'class' => 'DConfig'
 		),
-		'IpToCountry'=>array(
-			'class' => 'Ip2Country'
+		// GeoIP2
+		'GeoIP2' => array(
+			'class' => 'geoip2.GeoIP2',
 		),
 		// ЧПУ
 		'urlManager'=>array(

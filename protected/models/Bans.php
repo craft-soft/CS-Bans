@@ -141,19 +141,19 @@ class Bans extends CActiveRecord
         }
         return $return;
     }
-    
+
 	public function getUnbanned() {
 		return $this->ban_length == '-1' || ($this->ban_length && ($this->ban_created + ($this->ban_length * 60)) < time());
 	}
-	
+
 	protected function afterFind() {
-		$country = strtolower(Yii::app()->IpToCountry->lookup($this->player_ip));
+		$country = strtolower(Yii::app()->GeoIP2->getCountryByIP($this->player_ip));
 		$this->country = CHtml::image(
-            Yii::app()->urlManager->baseUrl 
-            . '/images/country/' 
-            . ($country != 'zz' ? $country : 'clear') . '.png'
-        );
-        return parent::afterFind();
+			Yii::app()->urlManager->baseUrl
+			. '/images/country/'
+			. ($country != '' ? $country : 'clear') . '.png'
+		);
+		return parent::afterFind();
 	}
 
 	protected function beforeSave() {
